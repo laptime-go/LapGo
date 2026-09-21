@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
-import MapView, { Polyline, Marker } from 'react-native-maps';
+import MapView, { Polyline, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 const AD_BANNER = "ca-app-pub-9890149028563226/7083933962";
-const PRO_ID = "pro_upgrade_38";
 
 const TRACKS = [
   { id:'zic', name:'珠海ZIC 4.32km 14彎', lat:22.3933, lng:113.9588, len:'4.32km' },
@@ -26,25 +25,22 @@ export default function App() {
   const [laps, setLaps] = useState([]);
   const [track, setTrack] = useState(TRACKS[0]);
   const [isPro, setIsPro] = useState(false);
+  const [mapReady, setMapReady] = useState(false); // 關鍵：延遲載地圖
   const timerRef = useRef(null);
   const startRef = useRef(0);
 
-  useEffect(()=>{ (async()=>{ await Location.requestForegroundPermissionsAsync(); })(); },[]);
+  useEffect(()=>{
+    (async()=>{
+      await Location.requestForegroundPermissionsAsync();
+      setTimeout(()=>setMapReady(true), 800); // 等UI出咗先載地圖，就唔會一開即彈
+    })();
+  },[]);
 
-  const start = () => {
-    setRunning(true);
-    startRef.current = Date.now() - time;
-    timerRef.current = setInterval(()=>setTime(Date.now()-startRef.current), 50);
-  };
+  const start = () => { setRunning(true); startRef.current = Date.now() - time; timerRef.current = setInterval(()=>setTime(Date.now()-startRef.current), 50); };
   const stop = () => { setRunning(false); clearInterval(timerRef.current); };
   const lap = () => { setLaps([...laps, time]); startRef.current = Date.now(); setTime(0); };
   const reset = () => { setLaps([]); setTime(0); setRunning(false); clearInterval(timerRef.current); };
-  const fmt = (ms) => {
-    const s = ms/1000;
-    const m = Math.floor(s/60);
-    const sec = (s%60).toFixed(2).padStart(5,'0');
-    return `${m}:${sec}`;
-  };
+  const fmt = (ms) => { const s = ms/1000; const m = Math.floor(s/60); const sec = (s%60).toFixed(2).padStart(5,'0'); return `${m}:${sec}`; };
   const best = laps.length? Math.min(...laps) : null;
 
   return (
@@ -60,13 +56,21 @@ export default function App() {
           <Text style={s.sub}>最佳 {best?fmt(best):'--'} | {track.name}</Text>
 
           <View style={s.mapBox}>
-            <MapView
-              style={s.map}
-              initialRegion={{latitude:track.lat, longitude:track.lng, latitudeDelta:0.01, longitudeDelta:0.01}}
-            >
-              <Polyline coordinates={ZIC_SHAPE} strokeColor="#FFFFFF" strokeWidth={4} />
-              <Marker coordinate={{latitude:track.lat, longitude:track.lng}} pinColor="blue" />
-            </MapView>
+            {mapReady? (
+              <MapView
+                key={track.id}
+                provider={PROVIDER_GOOGLE}
+                style={s.map}
+                initialRegion={{latitude:track.lat, longitude:track.lng, latitudeDelta:0.012, longitudeDelta:0.012}}
+                mapType="standard"
+                showsUserLocation={false}
+              >
+                <Polyline coordinates={ZIC_SHAPE} strokeColor="#007AFF" strokeWidth={4} />
+                <Marker coordinate={{latitude:track.lat, longitude:track.lng}} title={track.name} />
+              </MapView>
+            ) : (
+              <View style={[s.map,{justifyContent:'center',alignItems:'center'}]}><Text style={{color:'#999'}}>地圖載入中...</Text></View>
+            )}
           </View>
 
           <View style={s.btnRow}>
@@ -93,7 +97,7 @@ const s = StyleSheet.create({
   container:{flex:1, paddingTop:35, backgroundColor:'#fff'},
   header:{flexDirection:'row', justifyContent:'space-between', padding:12, alignItems:'center'},
   headerTitle:{fontWeight:'bold', fontSize:18}, proBtn:{borderWidth:1, borderColor:'#007AFF', padding:4, borderRadius:6}, proText:{fontSize:10, color:'#007AFF'},
-  bigTime:{fontSize:86, fontWeight:'900', textAlign:'center', marginTop:5}, sub:{textAlign:'center', color:'#666', marginBottom:6},
+  bigTime:{fontSize:72, fontWeight:'900', textAlign:'center', marginTop:5}, sub:{textAlign:'center', color:'#666', marginBottom:6},
   mapBox:{height:260, margin:10, borderRadius:12, overflow:'hidden', backgroundColor:'#eee'}, map:{flex:1},
   btnRow:{flexDirection:'row', justifyContent:'center', alignItems:'center', gap:15, marginTop:10},
   start:{backgroundColor:'#2ecc71', padding:18, borderRadius:30, width:120, alignItems:'center'}, lapBtn:{backgroundColor:'#007AFF', padding:18, borderRadius:30, width:120, alignItems:'center'}, stop:{backgroundColor:'#e74c3c', padding:14, borderRadius:26, width:90, alignItems:'center'}, btnTxt:{color:'#fff', fontWeight:'bold'}, reset:{color:'#999', marginLeft:10},
