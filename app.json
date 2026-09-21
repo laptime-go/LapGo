@@ -2,46 +2,33 @@
   "expo": {
     "name": "圈速Go",
     "slug": "lapgo",
-    "version": "1.0.21",
+    "version": "1.0.22",
     "orientation": "portrait",
     "owner": "fungfung1984",
     "icon": "./icon.png",
     "scheme": "lapgo",
     "splash": {
-      "image": "./icon.png",
+      "image": "./splash-icon.png",
       "backgroundColor": "#ffffff",
       "resizeMode": "contain"
     },
     "android": {
       "package": "com.lapgo.timer",
-      "versionCode": 21,
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
+      "versionCode": 23,
+      "permissions": ["ACCESS_FINE_LOCATION","ACCESS_COARSE_LOCATION"],
       "adaptiveIcon": {
         "foregroundImage": "./adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
     },
-    "platforms": ["android"],
     "plugins": [
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-9890149028563226~9678218420"
-        }
-      ],
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "kotlinVersion": "1.9.22"
-          }
-        }
-      ]
+      ["react-native-google-mobile-ads", {
+        "androidAppId": "ca-app-pub-9890149028563226~9678218420"
+      }],
+      ["expo-build-properties", {
+        "android": {"kotlinVersion": "1.9.22"}
+      }]
     ],
-    "extra": {
-      "eas": {
-        "projectId": "55a685d0-0488-4232-8159-54c692861118"
-      }
-    }
+    "extra": { "eas": { "projectId": "55a685d0-0488-4232-8159-54c692861118" } }
   }
 }
