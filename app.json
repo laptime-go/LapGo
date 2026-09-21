@@ -5,18 +5,19 @@
     "version": "1.0.20",
     "orientation": "portrait",
     "owner": "fungfung1984",
+    "icon": "./assets/icon.png",
     "android": {
       "package": "com.lapgo.timer",
       "versionCode": 20,
       "permissions": ["ACCESS_FINE_LOCATION"],
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-98"
+        "googleMobileAdsAppId": "ca-app-pub-9890149028563226~9678218420"
       }
     },
-    "platforms": ["android", "ios", "web"],
+    "platforms": ["android"],
     "extra": {
       "eas": {
-        "projectId": "去expo.dev/accounts/fungfung1984/projects/LapGo/settings度copy"
+        "projectId": "你嗰個真projectId"
       }
     }
   }
