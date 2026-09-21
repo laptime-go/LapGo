@@ -15,7 +15,7 @@
     "react-native-maps": "1.14.0",
     "@expo/vector-icons": "^14.0.2",
     "react-native-paper": "4.9.2",
-    "react-native-google-mobile-ads": "14.12.1"
+    "react-native-google-mobile-ads": "14.11.0"
   },
   "private": true
 }
