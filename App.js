@@ -1,91 +1,96 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
-import MapView, { Polyline, Marker, UrlTile } from 'react-native-maps';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
+import MapView, { Marker, Polyline, UrlTile } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { BannerAd, BannerAdSize, TestIds, MobileAds } from 'react-native-google-mobile-ads';
 
-const AD_BANNER = "ca-app-pub-9890149028563226/7083933962";
+const AD_BANNER = __DEV__? TestIds.BANNER : 'ca-app-pub-9890149028563226/7083933962';
 
 const TRACKS = [
-  { id:'zic', name:'珠海ZIC 4.32km 14彎', lat:22.3933, lng:113.9588 },
-  { id:'gic', name:'肇慶GIC 2.82km', lat:23.1005, lng:112.5200 },
-  { id:'conghua', name:'廣州從化', lat:23.5477, lng:113.5731 },
-  { id:'shajing', name:'深圳沙井', lat:22.7311, lng:113.8156 },
-  { id:'jingang', name:'北京金港', lat:40.1120, lng:116.5230 },
-  { id:'fugang', name:'惠州福岡', lat:23.0894, lng:114.3980 },
-];
-
-const ZIC_SHAPE = [
-  {latitude:22.3955, longitude:113.9580},{latitude:22.3958, longitude:113.9605},{latitude:22.3948, longitude:113.9620},{latitude:22.3930, longitude:113.9625},{latitude:22.3915, longitude:113.9615},{latitude:22.3910, longitude:113.9595},{latitude:22.3915, longitude:113.9575},{latitude:22.3928, longitude:113.9565},{latitude:22.3945, longitude:113.9568},{latitude:22.3955, longitude:113.9580},
+  { id: 'zic', name: '珠海 ZIC', lat: 22.335, lng: 113.55, radius: 15 },
+  { id: 'gic', name: '肇慶 GIC', lat: 23.12, lng: 112.35, radius: 15 },
+  { id: 'cong', name: '從化賽道', lat: 23.55, lng: 113.58, radius: 15 },
+  { id: 'saj', name: '沙井賽道', lat: 22.72, lng: 113.80, radius: 15 },
+  { id: 'jink', name: '北京金港', lat: 40.12, lng: 116.35, radius: 15 },
+  { id: 'fug', name: '福岡賽道', lat: 22.58, lng: 113.92, radius: 15 },
 ];
 
 export default function App() {
-  const [tab, setTab] = useState('賽道');
-  const [time, setTime] = useState(0);
-  const [running, setRunning] = useState(false);
-  const [laps, setLaps] = useState([]);
   const [track, setTrack] = useState(TRACKS[0]);
   const [isPro, setIsPro] = useState(false);
-  const [mapReady, setMapReady] = useState(false);
-  const timerRef = useRef(null);
-  const startRef = useRef(0);
+  const [laps, setLaps] = useState([]);
+  const [running, setRunning] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const locationSub = useRef(null);
 
-  useEffect(()=>{
-    (async()=>{
-      await Location.requestForegroundPermissionsAsync();
-      setTimeout(()=>setMapReady(true), 600);
+  useEffect(() => {
+    MobileAds().initialize();
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status!== 'granted') Alert.alert('需要定位權限先計到圈速');
     })();
-  },[]);
+  }, []);
 
-  const start = () => { setRunning(true); startRef.current = Date.now() - time; timerRef.current = setInterval(()=>setTime(Date.now()-startRef.current), 50); };
-  const stop = () => { setRunning(false); clearInterval(timerRef.current); };
-  const lap = () => { setLaps([...laps, time]); startRef.current = Date.now(); setTime(0); };
-  const reset = () => { setLaps([]); setTime(0); setRunning(false); clearInterval(timerRef.current); };
-  const fmt = (ms) => { const s = ms/1000; const m = Math.floor(s/60); const sec = (s%60).toFixed(2).padStart(5,'0'); return `${m}:${sec}`; };
-  const best = laps.length? Math.min(...laps) : null;
+  const toggleRun = () => {
+    if(!running){
+      const start = Date.now();
+      setRunning(true);
+      const id = setInterval(()=> setCurrentTime(Date.now() - start), 100);
+      locationSub.current = id;
+    } else {
+      clearInterval(locationSub.current);
+      setRunning(false);
+      if(laps.length < 5 || isPro){
+        setLaps(prev => [{ id: Date.now().toString(), time: currentTime },...prev]);
+      } else {
+        Alert.alert('升級 Pro 解鎖無限圈數 + 去廣告','Pro $48 一次性買斷');
+      }
+      setCurrentTime(0);
+    }
+  }
 
   return (
-    <View style={s.container}>
-      <View style={s.header}><Text style={s.headerTitle}>LapGo-Timer OSM版</Text><TouchableOpacity onPress={()=>setIsPro(!isPro)} style={s.proBtn}><Text style={s.proText}>{isPro?'Pro已去廣告':'升級Pro'}</Text></TouchableOpacity></View>
+    <View style={styles.container}>
+      <MapView style={styles.map}
+        initialRegion={{ latitude: track.lat, longitude: track.lng, latitudeDelta: 0.02, longitudeDelta: 0.02 }}>
+        <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} />
+        <Marker coordinate={{ latitude: track.lat, longitude: track.lng }} title={track.name} />
+      </MapView>
 
-      {tab==='賽道' && (
-        <View style={{flex:1}}>
-          <Text style={s.bigTime}>{fmt(time)}</Text>
-          <Text style={s.sub}>最佳 {best?fmt(best):'--'} | {track.name}</Text>
+      <View style={styles.panel}>
+        <Text style={styles.title}>圈速Go - {track.name}</Text>
+        <Text style={styles.timer}>{(currentTime/1000).toFixed(2)}s</Text>
+        <TouchableOpacity style={[styles.btn, running && styles.btnStop]} onPress={toggleRun}>
+          <Text style={styles.btnText}>{running? '完成此圈' : '開始計時'}</Text>
+        </TouchableOpacity>
 
-          <View style={s.mapBox}>
-            {mapReady? (
-              <MapView
-                key={track.id}
-                style={s.map}
-                initialRegion={{latitude:track.lat, longitude:track.lng, latitudeDelta:0.01, longitudeDelta:0.01}}
-              >
-                {/* 呢個就係唔洗Key，中港都用到嘅 OSM */}
-                <UrlTile urlTemplate="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} flipY={false} tileSize={256} />
-                <Polyline coordinates={ZIC_SHAPE} strokeColor="#FF0000" strokeWidth={4} />
-                <Marker coordinate={{latitude:track.lat, longitude:track.lng}} />
-              </MapView>
-            ) : <View style={[s.map,{justifyContent:'center',alignItems:'center'}]}><Text style={{color:'#999'}}>地圖載入中...</Text></View>}
-          </View>
+        <FlatList data={laps} keyExtractor={i=>i.id}
+          renderItem={({item,index})=> <Text style={styles.lap}>第 {laps.length-index} 圈 - {(item.time/1000).toFixed(2)}s</Text>} />
 
-          <View style={s.btnRow}>
-            {!running? <TouchableOpacity style={s.start} onPress={start}><Text style={s.btnTxt}>開始</Text></TouchableOpacity> :
-            <><TouchableOpacity style={s.lapBtn} onPress={lap}><Text style={s.btnTxt}>手動計圈</Text></TouchableOpacity><TouchableOpacity style={s.stop} onPress={stop}><Text style={s.btnTxt}>停止</Text></TouchableOpacity></>}
-            <TouchableOpacity onPress={reset}><Text style={s.reset}>重設</Text></TouchableOpacity>
-          </View>
-          {!isPro && <View style={s.ad}><Text style={s.adTxt}>OSM地圖 - 無需Google Key | {AD_BANNER}</Text></View>}
-        </View>
+        {!isPro && (
+          <TouchableOpacity style={styles.proBtn} onPress={()=> setIsPro(true)}>
+            <Text style={styles.proText}>升級 Pro $48 去廣告 + 無限圈數</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {!isPro && (
+        <BannerAd unitId={AD_BANNER} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} requestOptions={{}} />
       )}
-      {tab==='紀錄' && <ScrollView style={{flex:1, padding:15}}>{laps.map((l,i)=><View key={i} style={s.lapRow}><Text>Lap {i+1}: {fmt(l)}</Text></View>)}</ScrollView>}
-      {tab==='設定' && <ScrollView style={{flex:1, padding:15}}><Text>Pro: {isPro?'已買':'未買'}</Text></ScrollView>}
-      <View style={s.tabs}>{['賽道','紀錄','設定'].map(t=><TouchableOpacity key={t} onPress={()=>setTab(t)} style={[s.tab, tab===t&&s.tabOn]}><Text style={tab===t?{color:'#fff'}:{}}>{t}</Text></TouchableOpacity>)}</View>
     </View>
   );
 }
-const s = StyleSheet.create({
-  container:{flex:1, paddingTop:35, backgroundColor:'#fff'}, header:{flexDirection:'row', justifyContent:'space-between', padding:12}, headerTitle:{fontWeight:'bold', fontSize:18}, proBtn:{borderWidth:1, borderColor:'#007AFF', padding:4, borderRadius:6}, proText:{fontSize:10, color:'#007AFF'},
-  bigTime:{fontSize:72, fontWeight:'900', textAlign:'center'}, sub:{textAlign:'center', color:'#666', marginBottom:6},
-  mapBox:{height:280, margin:10, borderRadius:12, overflow:'hidden', backgroundColor:'#eee'}, map:{flex:1},
-  btnRow:{flexDirection:'row', justifyContent:'center', gap:15, marginTop:10}, start:{backgroundColor:'#2ecc71', padding:18, borderRadius:30, width:120, alignItems:'center'}, lapBtn:{backgroundColor:'#007AFF', padding:18, borderRadius:30, width:120, alignItems:'center'}, stop:{backgroundColor:'#e74c3c', padding:14, borderRadius:26, width:90, alignItems:'center'}, btnTxt:{color:'#fff', fontWeight:'bold'}, reset:{color:'#999', marginLeft:10},
-  ad:{backgroundColor:'#f2f2f2', padding:6, alignItems:'center', marginTop:8}, adTxt:{fontSize:8, color:'#aaa'},
-  lapRow:{padding:10, borderBottomWidth:1, borderColor:'#eee'}, tabs:{flexDirection:'row', height:56, borderTopWidth:1, borderColor:'#eee'}, tab:{flex:1, alignItems:'center', justifyContent:'center'}, tabOn:{backgroundColor:'#000'}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  map: { flex: 1 },
+  panel: { height: 320, backgroundColor: '#fff', padding: 12 },
+  title: { fontSize: 18, fontWeight: 'bold' },
+  timer: { fontSize: 42, fontWeight: 'bold', textAlign: 'center', marginVertical: 10 },
+  btn: { backgroundColor: '#000', padding: 14, borderRadius: 10, alignItems: 'center' },
+  btnStop: { backgroundColor: '#d00' },
+  btnText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  lap: { fontSize: 14, paddingVertical: 4 },
+  proBtn: { marginTop: 10, backgroundColor: '#ffcc00', padding: 10, borderRadius: 8, alignItems: 'center' },
+  proText: { fontWeight: 'bold' }
 });
