@@ -11,9 +11,6 @@
       "package": "com.lapgo.timer",
       "versionCode": 21,
       "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-9890149028563226~9678218420"
-      },
       "adaptiveIcon": {
         "foregroundImage": "./adaptive-icon.png",
         "backgroundColor": "#ffffff"
