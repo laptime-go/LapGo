@@ -2,7 +2,7 @@
   "expo": {
     "name": "圈速Go",
     "slug": "lapgo",
-    "version": "1.0.26",
+    "version": "1.0.27",
     "orientation": "portrait",
     "owner": "fungfung1984",
     "icon": "./icon.png",
@@ -14,7 +14,7 @@
     },
     "android": {
       "package": "com.lapgo.timer",
-      "versionCode": 26,
+      "versionCode": 27,
       "permissions": ["ACCESS_FINE_LOCATION","ACCESS_COARSE_LOCATION"],
       "adaptiveIcon": {
         "foregroundImage": "./adaptive-icon.png",
@@ -22,9 +22,19 @@
       }
     },
     "plugins": [
-      ["expo-build-properties", {
-        "android": {"kotlinVersion": "1.9.22"}
-      }]
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9890149028563226~9678218420",
+          "iosAppId": "ca-app-pub-9890149028563226~9678218420"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": { "kotlinVersion": "1.9.22" }
+        }
+      ]
     ],
     "extra": { "eas": { "projectId": "55a685d0-0488-4232-8159-54c692861118" } }
   }
