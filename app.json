@@ -5,7 +5,7 @@
     "version": "1.0.21",
     "orientation": "portrait",
     "owner": "fungfung1984",
-    "icon": "./assets/IMG-20260921-WA6453.jpg",
+    "icon": "./icon.png",
     "scheme": "lapgo",
     "android": {
       "package": "com.lapgo.timer",
@@ -13,6 +13,10 @@
       "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-9890149028563226~9678218420"
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./adaptive-icon.png",
+        "backgroundColor": "#ffffff"
       }
     },
     "platforms": ["android"],
