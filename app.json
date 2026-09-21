@@ -6,19 +6,23 @@
     "orientation": "portrait",
     "owner": "fungfung1984",
     "icon": "./assets/icon.png",
+    "scheme": "lapgo",
     "android": {
       "package": "com.lapgo.timer",
       "versionCode": 20,
-      "permissions": ["ACCESS_FINE_LOCATION"],
+      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-9890149028563226~9678218420"
       }
     },
     "platforms": ["android"],
-    "extra": {
-      "eas": {
-        "projectId": "你嗰個真projectId"
-      }
-    }
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9890149028563226~9678218420"
+        }
+      ]
+    ]
   }
 }
