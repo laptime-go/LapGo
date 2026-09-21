@@ -1,17 +1,23 @@
 {
   "expo": {
     "name": "圈速Go",
-    "slug": "lapgo-timer",
-    "version": "1.0.0",
+    "slug": "LapGo",
+    "version": "1.0.20",
     "orientation": "portrait",
+    "owner": "fungfung1984",
     "android": {
       "package": "com.lapgo.timer",
       "versionCode": 20,
-      "permissions": ["ACCESS_FINE_LOCATION","ACCESS_COARSE_LOCATION","ACCESS_BACKGROUND_LOCATION","FOREGROUND_SERVICE","VIBRATE"],
+      "permissions": ["ACCESS_FINE_LOCATION"],
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-9890149028563226~9678218420"
+        "googleMobileAdsAppId": "ca-app-pub-98"
       }
     },
-    "platforms": ["android","ios","web"]
+    "platforms": ["android", "ios", "web"],
+    "extra": {
+      "eas": {
+        "projectId": "去expo.dev/accounts/fungfung1984/projects/LapGo/settings度copy"
+      }
+    }
   }
 }
