@@ -7,6 +7,11 @@
     "owner": "fungfung1984",
     "icon": "./icon.png",
     "scheme": "lapgo",
+    "splash": {
+      "image": "./icon.png",
+      "backgroundColor": "#ffffff",
+      "resizeMode": "contain"
+    },
     "android": {
       "package": "com.lapgo.timer",
       "versionCode": 21,
