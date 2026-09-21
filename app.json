@@ -14,7 +14,7 @@
     },
     "android": {
       "package": "com.lapgo.timer",
-      "versionCode": 28,
+      "versionCode": 29,
       "permissions": ["ACCESS_FINE_LOCATION","ACCESS_COARSE_LOCATION","INTERNET"],
       "adaptiveIcon": {
         "foregroundImage": "./adaptive-icon.png",
@@ -32,8 +32,9 @@
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 35,
-            "targetSdkVersion": 34
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "kotlinVersion": "1.9.22"
           }
         }
       ]
