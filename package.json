@@ -16,7 +16,7 @@
     "@expo/vector-icons": "^14.0.2",
     "expo-font": "~12.0.5",
     "react-native-paper": "4.9.2",
-    "react-native-google-mobile-ads": "~13.0.1"
+    "react-native-google-mobile-ads": "12.12.0"
   },
   "private": true
 }
