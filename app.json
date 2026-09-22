@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./icon.png",
     "userInterfaceStyle": "dark",
-    "owner": "fungfung1984",
+    "owner": "fungfung84",
     "splash": {
       "image": "./splash-icon.png",
       "resizeMode": "contain",
@@ -51,7 +51,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "55a685d0-0488-4232-8159-54c692861118"
+        "projectId": "3485a81a-4f67-4c6c-b49a-ea6a3ea1ac80"
       }
     }
   }
