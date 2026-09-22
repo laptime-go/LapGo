@@ -1,23 +1,8 @@
 {
   "expo": {
     "name": "圈速Go",
-    "slug": "lapgo",
-    "version": "1.0.28",
-    "orientation": "portrait",
-    "owner": "fungfung1984",
-    "icon": "./icon.png",
-    "scheme": "lapgo",
-    "splash": { "image": "./splash-icon.png", "backgroundColor": "#ffffff", "resizeMode": "contain" },
-    "android": {
-      "package": "com.lapgo.timer",
-      "versionCode": 32,
-      "permissions": ["ACCESS_FINE_LOCATION","ACCESS_COARSE_LOCATION","INTERNET"],
-      "adaptiveIcon": { "foregroundImage": "./adaptive-icon.png", "backgroundColor": "#ffffff" }
-    },
-    "plugins": [
-      ["expo-location", { "locationAlwaysAndWhenInUsePermission": "需要定位先可以自動計圈" }],
-      ["expo-build-properties", { "android": { "compileSdkVersion": 34, "targetSdkVersion": 34, "kotlinVersion": "1.9.22" } }]
-    ],
-    "extra": { "eas": { "projectId": "55a685d0-0488-4232-8159-54c692861118" } }
+    "slug": "laptime-go",
+    "version": "1.0.29",
+    "android": { "package": "com.laptimego.app" }
   }
 }
