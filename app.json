@@ -29,7 +29,15 @@
       [
         "expo-build-properties",
         {
-          "android": { "minSdkVersion": 23 }
+          "android": { "minSdkVersion": 23, "compileSdkVersion": 34, "targetSdkVersion": 34 }
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow LapTime Go to use location to auto-detect track and lap timing.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true
         }
       ],
       [
