@@ -1,16 +1,30 @@
 name: Build APK
-on: [push]
+
+on:
+  push:
+    branches: [ main ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 18 }
-      - uses: actions/setup-java@v4
-        with: { distribution: 'temurin', java-version: '17' }
-      - run: npm install
-      - run: npx expo prebuild --platform android --clean
-      - run: cd android && chmod +x gradlew &&./gradlew assembleRelease
-      - uses: actions/upload-artifact@v4
-        with: { name: apk, path: android/app/build/outputs/apk/release/*.apk }
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }} # 你需要喺 GitHub Secrets 設定 EXPO_TOKEN
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build APK (Preview)
+        run: eas build --platform android --profile preview --non-interactive
+        
