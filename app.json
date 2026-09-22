@@ -4,11 +4,11 @@
     "slug": "lapgo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./icon.png",
     "userInterfaceStyle": "dark",
     "owner": "fungfung1984",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#121212"
     },
@@ -16,23 +16,25 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.laptimego.app"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./adaptive-icon.png",
         "backgroundColor": "#121212"
       },
       "package": "com.laptimego.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./favicon.png"
     },
     "plugins": [
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-9890149028563226~9678218420"
+          "androidAppId": "ca-app-pub-9890149028563226~9678218420",
+          "iosAppId": "ca-app-pub-9890149028563226~9678218420"
         }
       ]
     ],
