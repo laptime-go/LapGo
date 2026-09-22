@@ -1,11 +1,20 @@
 {
-  "expo": {
-    "name": "圈速Go",
-    "slug": "laptime-go",
-    "version": "1.0.30",
-    "orientation": "portrait",
-    "android": {
-      "package": "com.laptimego.app"
-    }
-  }
+  "name": "laptime-go",
+  "version": "1.0.30",
+  "main": "App.js",
+  "scripts": {
+    "start": "expo start"
+  },
+  "dependencies": {
+    "expo": "~50.0.13",
+    "expo-location": "~16.5",
+    "expo-status-bar": "~1.11.1",
+    "react": "18.2.0",
+    "react-native": "0.73.6",
+    "react-native-maps": "1.10.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0"
+  },
+  "private": true
 }
