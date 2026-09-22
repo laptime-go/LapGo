@@ -38,7 +38,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "你的EAS專案ID"
+        "projectId": "your-eas-project-id"
       }
     },
     "cli": {
