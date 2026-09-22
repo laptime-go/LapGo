@@ -16,15 +16,16 @@ jobs:
         with:
           node-version: 18.x
 
-      - name: Setup Expo
+      - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
-          packager: npm
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build APK (Preview)
-        run: eas build --platform android --profile preview --non-interactive
+      - name: Build on EAS Cloud
+        run: eas build --platform android --profile preview --non-interactive --no-wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
