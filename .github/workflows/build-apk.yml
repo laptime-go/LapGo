@@ -20,11 +20,11 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }} # 你需要喺 GitHub Secrets 設定 EXPO_TOKEN
+          token: ${{ secrets.EXPO_TOKEN }} # 使用你之前設定的 EXPO_TOKEN
+          packager: npm # 強制使用 npm，不使用 yarn，提高穩定性
 
       - name: Install dependencies
         run: npm install
 
       - name: Build APK (Preview)
         run: eas build --platform android --profile preview --non-interactive
-        
