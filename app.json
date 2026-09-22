@@ -2,7 +2,10 @@
   "expo": {
     "name": "圈速Go",
     "slug": "laptime-go",
-    "version": "1.0.29",
-    "android": { "package": "com.laptimego.app" }
+    "version": "1.0.30",
+    "orientation": "portrait",
+    "android": {
+      "package": "com.laptimego.app"
+    }
   }
 }
