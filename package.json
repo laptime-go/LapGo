@@ -6,11 +6,11 @@
   "dependencies": {
     "expo": "~51.0.28",
     "expo-status-bar": "~1.12.1",
-    "expo-location": "~17.5",
+    "expo-location": "~17.5.5",
     "react": "18.2.0",
     "react-native": "0.74.5",
     "react-native-svg": "15.2.0",
-    "react-native-google-mobile-ads": "^14.12.1",
+    "react-native-google-mobile-ads": "^13.0.0",
     "@react-native-async-storage/async-storage": "1.23.1"
   }
 }
