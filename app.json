@@ -1,20 +1,21 @@
 {
-  "name": "laptime-go",
-  "version": "1.0.30",
-  "main": "App.js",
-  "scripts": {
-    "start": "expo start"
-  },
-  "dependencies": {
-    "expo": "~50.0.13",
-    "expo-location": "~16.5",
-    "expo-status-bar": "~1.11.1",
-    "react": "18.2.0",
-    "react-native": "0.73.6",
-    "react-native-maps": "1.10.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.20.0"
-  },
-  "private": true
+  "expo": {
+    "name": "圈速Go",
+    "slug": "laptime-go",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./icon.png",
+    "splash": { "image": "./splash-icon.png", "resizeMode": "contain", "backgroundColor": "#000000" },
+    "android": {
+      "package": "com.laptimego.app",
+      "adaptiveIcon": { "foregroundImage": "./adaptive-icon.png", "backgroundColor": "#000000" },
+      "config": { "googleMobileAdsAppId": "ca-app-pub-9890149028563226~9678218420" },
+      "permissions": ["ACCESS_FINE_LOCATION","ACCESS_COARSE_LOCATION","ACCESS_BACKGROUND_LOCATION"]
+    },
+    "ios": { "bundleIdentifier": "com.laptimego.app", "config": { "googleMobileAdsAppId": "ca-app-pub-9890149028563226~9678218420" } },
+    "plugins": [
+      ["expo-location", { "locationAlwaysAndWhenInUsePermission": "允許圈速Go使用GPS記錄圈速", "isAndroidBackgroundLocationEnabled": true, "isAndroidForegroundServiceEnabled": true }],
+      ["react-native-google-mobile-ads", { "androidAppId": "ca-app-pub-9890149028563226~9678218420", "iosAppId": "ca-app-pub-9890149028563226~9678218420" }]
+    ]
+  }
 }
