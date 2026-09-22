@@ -1,20 +1,16 @@
 {
   "name": "laptime-go",
-  "version": "1.0.30",
-  "main": "App.js",
-  "scripts": {
-    "start": "expo start"
-  },
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": { "start": "expo start" },
   "dependencies": {
-    "expo": "~50.0.13",
-    "expo-location": "~16.5",
-    "expo-status-bar": "~1.11.1",
+    "expo": "~51.0.28",
+    "expo-status-bar": "~1.12.1",
+    "expo-location": "~17.5",
     "react": "18.2.0",
-    "react-native": "0.73.6",
-    "react-native-maps": "1.10.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.20.0"
-  },
-  "private": true
+    "react-native": "0.74.5",
+    "react-native-svg": "15.2.0",
+    "react-native-google-mobile-ads": "^14.12.1",
+    "@react-native-async-storage/async-storage": "1.23.1"
+  }
 }
