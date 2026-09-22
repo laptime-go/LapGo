@@ -12,9 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#121212"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lapgo.timer"
@@ -26,10 +24,14 @@
       },
       "package": "com.lapgo.timer"
     },
-    "web": {
-      "favicon": "./favicon.png"
-    },
+    "web": { "favicon": "./favicon.png" },
     "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": { "minSdkVersion": 23 }
+        }
+      ],
       [
         "react-native-google-mobile-ads",
         {
