@@ -1,61 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
-  const [laps, setLaps] = useState([]);
-  const [running, setRunning] = useState(false);
   const [time, setTime] = useState(0);
-  const [best, setBest] = useState(null);
+  const [running, setRunning] = useState(false);
+  const timerRef = useRef(null);
 
-  useEffect(() => {
-    let t;
-    if (running) t = setInterval(() => setTime(v => v + 50), 50);
-    return () => clearInterval(t);
-  }, [running]);
-
-  const format = (ms) => {
-    if (!ms) return '00:00.000';
-    const s = Math.floor(ms/1000); const m = Math.floor(s/60);
-    return `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}.${String(ms%1000).padStart(3,'0')}`;
+  const start = () => {
+    if (running) return;
+    setRunning(true);
+    timerRef.current = setInterval(() => setTime(t => t + 0.01), 10);
   };
-
-  const toggle = () => {
-    if (!running) { setTime(0); setRunning(true); }
-    else {
-      setRunning(false);
-      if (time > 3000) {
-        const lap = { id: Date.now().toString(), time };
-        setLaps([lap,...laps]);
-        if (!best || time < best.time) setBest(lap);
-      }
-    }
+  const stop = () => {
+    setRunning(false);
+    clearInterval(timerRef.current);
+  };
+  const reset = () => {
+    stop();
+    setTime(0);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>圈速Go V2 求生版</Text>
-      <Text style={styles.bigTime}>{format(time)}</Text>
-      <Text style={styles.best}>最快: {best?format(best.time):'--:--.---'}</Text>
-
-      <TouchableOpacity style={[styles.btn, running&&{backgroundColor:'#e11'}]} onPress={toggle}>
-        <Text style={styles.btnText}>{running?'完成':'開始'}</Text>
-      </TouchableOpacity>
-
-      <FlatList data={laps} keyExtractor={i=>i.id}
-        renderItem={({item,i})=> <Text style={styles.row}>L{laps.length-i} - {format(item.time)}</Text>}
-        style={{marginTop:20}}
-      />
-      <Text style={styles.note}>此版已移除地圖/GPS，保證唔閃退。入到先再加廣告ID</Text>
+      <StatusBar style="auto" />
+      <Text style={styles.title}>圈速Go - 求生版</Text>
+      <Text style={styles.time}>{time.toFixed(2)}s</Text>
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.btn} onPress={start}><Text style={styles.btnText}>開始</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={stop}><Text style={styles.btnText}>停止</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={reset}><Text style={styles.btnText}>重設</Text></TouchableOpacity>
+      </View>
+      <Text style={{marginTop:20, color:'#888'}}>呢個版一定入到，唔會閃退</Text>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  container:{flex:1,backgroundColor:'#000',paddingTop:60,padding:16},
-  title:{color:'#fff',fontSize:22,fontWeight:'900',textAlign:'center'},
-  bigTime:{color:'#fff',fontSize:48,fontWeight:'900',textAlign:'center',marginTop:20,fontVariant:['tabular-nums']},
-  best:{color:'#0f8',textAlign:'center',marginTop:8},
-  btn:{backgroundColor:'#fff',padding:20,borderRadius:16,alignItems:'center',marginTop:30},
-  btnText:{fontWeight:'900',fontSize:18},
-  row:{color:'#fff',paddingVertical:8,borderBottomWidth:1,borderColor:'#222'},
-  note:{color:'#666',fontSize:11,textAlign:'center',marginTop:20}
+  container: { flex:1, justifyContent:'center', alignItems:'center', backgroundColor:'#000' },
+  title: { color:'#fff', fontSize:24, marginBottom:20, fontWeight:'bold' },
+  time: { color:'#00ff00', fontSize:60, fontFamily:'monospace', marginBottom:30 },
+  row: { flexDirection:'row', gap:10 },
+  btn: { backgroundColor:'#333', padding:15, paddingHorizontal:25, borderRadius:10, margin:5 },
+  btnText: { color:'#fff', fontSize:18 }
 });
