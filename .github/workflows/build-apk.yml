@@ -20,11 +20,14 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }} # 使用你之前設定的 EXPO_TOKEN
-          packager: npm # 強制使用 npm，不使用 yarn，提高穩定性
+          token: ${{ secrets.EXPO_TOKEN }}
+          packager: npm
 
       - name: Install dependencies
         run: npm install
+
+      - name: Init EAS Project
+        run: npx eas-cli init --id $(npx eas-cli project:init --non-interactive || true) --non-interactive || true
 
       - name: Build APK (Preview)
         run: eas build --platform android --profile preview --non-interactive
