@@ -2,7 +2,7 @@
   "expo": {
     "name": "LapTime Go",
     "slug": "laptime-go",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./icon.jpg",
     "userInterfaceStyle": "dark",
@@ -22,14 +22,7 @@
         "foregroundImage": "./adaptive-icon.jpg",
         "backgroundColor": "#121212"
       },
-      "package": "com.lapgo.timer",
-      "versionCode": 2,
-      "permissions": [
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.FOREGROUND_SERVICE",
-        "com.android.vending.BILLING"
-      ]
+      "package": "com.lapgo.timer"
     },
     "web": { "favicon": "./favicon.jpg" },
     "plugins": [
@@ -51,7 +44,8 @@
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-9890149028563226~9678218420",
-          "iosAppId": "ca-app-pub-9890149028563226~9678218420"
+          "iosAppId": "ca-app-pub-9890149028563226~9678218420",
+          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
         }
       ]
     ],
