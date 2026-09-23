@@ -2,7 +2,7 @@
   "expo": {
     "name": "LapTime Go",
     "slug": "laptime-go",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./icon.jpg",
     "userInterfaceStyle": "dark",
@@ -23,6 +23,7 @@
         "backgroundColor": "#121212"
       },
       "package": "com.lapgo.timer",
+      "versionCode": 2,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
