@@ -1,12 +1,12 @@
 {
   "expo": {
     "name": "LapTime Go",
-    "slug": "laptime-go",
+    "slug": "laptime-go-v2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./icon.jpg",
     "userInterfaceStyle": "dark",
-    "owner": "fungfung84",
+    "owner": "fungfung842",
     "splash": {
       "image": "./splash-icon.jpg",
       "resizeMode": "contain",
@@ -51,7 +51,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "0c8d52dd-8886-408d-bfae-f803101d8a09"
+        "projectId": "075ddfb4-4fc5-47dd-acd4-d398b1319a94"
       }
     }
   }
