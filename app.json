@@ -22,7 +22,13 @@
         "foregroundImage": "./adaptive-icon.jpg",
         "backgroundColor": "#121212"
       },
-      "package": "com.lapgo.timer"
+      "package": "com.lapgo.timer",
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "com.android.vending.BILLING"
+      ]
     },
     "web": { "favicon": "./favicon.jpg" },
     "plugins": [
@@ -44,8 +50,7 @@
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-9890149028563226~9678218420",
-          "iosAppId": "ca-app-pub-9890149028563226~9678218420",
-          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+          "iosAppId": "ca-app-pub-9890149028563226~9678218420"
         }
       ]
     ],
