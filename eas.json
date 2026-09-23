@@ -18,7 +18,7 @@
       "distribution": "store",
       "android": {
         "buildType": "app-bundle",
-        "package": "com.fungfung84.laptimego"
+        "package": "com.lapgo.timer"
       }
     }
   },
