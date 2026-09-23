@@ -4,11 +4,11 @@
     "slug": "laptime-go",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./icon.png",
+    "icon": "./icon.jpg",
     "userInterfaceStyle": "dark",
     "owner": "fungfung84",
     "splash": {
-      "image": "./splash-icon.png",
+      "image": "./splash-icon.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#121212"
     },
@@ -19,12 +19,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./adaptive-icon.png",
+        "foregroundImage": "./adaptive-icon.jpg",
         "backgroundColor": "#121212"
       },
       "package": "com.lapgo.timer"
     },
-    "web": { "favicon": "./favicon.png" },
+    "web": { "favicon": "./favicon.jpg" },
     "plugins": [
       [
         "expo-build-properties",
