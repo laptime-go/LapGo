@@ -57,9 +57,15 @@ const start=()=>{
   setRunning(true);
   setCur(0);
   setGForce({x:0,max:0});
-  timerRef.current=setInterval(()=>{setCur((Date.now()-startRef.current)/1000);},100);
+  timerRef.current=setInterval(()=>setCur((Date.now()-startRef.current)/1000),100);
 };
 const stop=()=>{
+  if(!runningRef.current){
+    // 已經停咗，再按一次就歸零
+    setCur(0);
+    setSector([0,0,0]);
+    return;
+  }
   if(timerRef.current){clearInterval(timerRef.current); timerRef.current=null;}
   runningRef.current=false;
   setRunning(false);
@@ -72,35 +78,28 @@ const save=async(k,v)=>{await AsyncStorage.setItem(k,String(v));};const theme=da
 const toggleLang=async()=>{const nl=lang==='zh'?'en':'zh';setLang(nl);await save('lang',nl);};
 const toggleUnit=async()=>{const nu=unit==='kmh'?'mph':'kmh';setUnit(nu);await save('unit',nu);};
 const showComingSoon=()=>{Alert.alert(T.needPro,T.needProDesc,[{text:'知道了',style:'cancel'}],{cancelable:true});};const handleProToggle=()=>{showComingSoon();};
-const handleUpgrade=async()=>{const exp=Date.now()+30*24*60*60*1000;setIsPro(true);setProExp(exp);await AsyncStorage.multiSet([['isPro','1'],['pro_exp',String(exp)]]);Alert.alert(lang==='zh'?'已訂閱Pro':'Subscribed','',[{text:'OK',style:'cancel'}],{cancelable:true});};const DashContent=()=>{
+const handleUpgrade=async()=>{const exp=Date.now()+30*24*60*60*1000;setIsPro(true);setProExp(exp);await AsyncStorage.multiSet([['isPro','1'],['pro_exp',String(exp)]]);Alert.alert(lang==='zh'?'已訂閱Pro':'Subscribed','',[{text:'OK',style:'cancel'}],{cancelable:true});};const DashView=()=>{
 return(
-<View>
+<View style={{flex:1}}>
 <Text style={[s.big,theme.t]}>{fmt(cur)}</Text>
 <View style={s.row3}><View style={[s.b,theme.b]}><Text style={[s.l,theme.sub]}>{T.prev}</Text><Text style={[s.v,theme.t]}>{prev?fmt(prev):'--'}</Text></View><View style={[s.b,theme.b]}><Text style={[s.l,theme.sub]}>{T.best}</Text><Text style={[s.v,{color:'#00cc66'}]}>{best?fmt(best):'--'}</Text></View><View style={[s.b,theme.b]}><Text style={[s.l,theme.sub]}>{T.delta}</Text><Text style={[s.v,{color:'#00cc66'}]}>{prev&&best?`${(prev-best).toFixed(2)}`:'--'}</Text></View></View>
 <View style={{flexDirection:'row',marginHorizontal:6,marginTop:4}}><View style={[s.dataBox,theme.b,{flex:1}]}><Text style={s.dataLabel}>{T.speed} ({unit})</Text><Text style={[s.dataVal,{color:'#00e5ff'}]}>{getSpeed()}</Text></View><View style={[s.dataBox,theme.b,{flex:0.8}]}><Text style={s.dataLabel}>{T.temp}</Text><Text style={[s.dataVal,{color:'#ffaa00',fontSize:14}]}>{getTemp()}</Text></View><View style={[s.dataBox,theme.b,{flex:1}]}><Text style={s.dataLabel}>G</Text><View style={{flexDirection:'row',justifyContent:'space-around'}}><Text style={{color:'#ffaa00',fontWeight:'bold',fontSize:10}}>{gForce.x}G</Text><Text style={{color:'#fff',fontWeight:'bold',fontSize:10}}>{gForce.max}G</Text></View><Text style={[s.dataLabel,{marginTop:2}]}>Max {unit}</Text><Text style={{color:'#00e5ff',fontWeight:'bold',fontSize:12}}>{getMaxDisplay(maxSpeedLapRef.current)}</Text></View></View>
 <View style={[s.mapFixed,{backgroundColor:'#000',borderColor:'#00cc66',borderWidth:1.5}]}><Image source={track.img} style={s.mapImgFixed} resizeMode="contain"/>{showLabels&&<Text style={s.start}>{T.sf} • {track.short}</Text>}</View>
 <View style={s.row3}><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[0].toFixed(2)}</Text><Text style={s.sL}>{T.s1}</Text></View><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[1].toFixed(2)}</Text><Text style={s.sL}>{T.s2}</Text></View><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[2].toFixed(2)}</Text><Text style={s.sL}>{T.s3}</Text></View></View>
-</View>);};
-const DashView=()=>{
-return(
-<ScrollView style={{flex:1}} contentContainerStyle={{paddingBottom:20}} showsVerticalScrollIndicator={false}>
-<DashContent/>
+<View style={s.btnR}>
+<Pressable onPress={stop} style={[s.btn,{backgroundColor: running? '#ff3333' : '#551111'}]}><Text style={s.btnT}>■ STOP</Text></Pressable>
+<Pressable onPress={start} style={[s.btn,{backgroundColor: running? '#114422' : '#00cc66'}]}><Text style={s.btnT}>▶ START</Text></Pressable>
+</View>
 <Text style={[s.hT,theme.t]}>{T.hist} ({history.length})</Text>
-<View style={{minHeight:120,maxHeight:200,marginHorizontal:6,marginTop:4,borderWidth:1,borderColor:'#222',borderRadius:8,overflow:'hidden'}}>
+<View style={{flex:1,minHeight:120,maxHeight:220,marginHorizontal:6,marginTop:4,borderWidth:1,borderColor:'#222',borderRadius:8,overflow:'hidden'}}>
 <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:6,backgroundColor:'#111'}}><Text style={{flex:0.5,fontSize:8,color:'#888'}}>LAP</Text><Text style={{flex:1.1,fontSize:8,color:'#888'}}>TIME</Text><Text style={{flex:0.7,fontSize:8,color:'#888'}}>TRACK</Text><Text style={{flex:0.5,fontSize:8,color:'#888'}}>G</Text><Text style={{flex:0.6,fontSize:8,color:'#00e5ff'}}>MAX</Text></View>
-<ScrollView nestedScrollEnabled showsVerticalScrollIndicator={true}>{history.map((h,i)=>{const isBest=h.time===best;return(<View key={h.id} style={[s.hR,{flexDirection:'row',alignItems:'center',backgroundColor:isBest?'#003322':'#1a1a1a',borderColor:'#222'}]}><Text style={{flex:0.5,fontSize:10,color:'#fff'}}>{history.length-i}</Text><Text style={{flex:1.1,fontSize:10,fontWeight:'bold',color:isBest?'#00ff88':'#fff'}}>{fmt(h.time)}</Text><Text style={{flex:0.7,fontSize:9,color:'#aaa'}}>{h.track.toUpperCase()}</Text><Text style={{flex:0.5,fontSize:9,color:'#aaa'}}>{h.gMax||0}G</Text><Text style={{flex:0.6,fontSize:10,fontWeight:'bold',color:'#00e5ff'}}>{getMaxDisplay(h.maxKph)}</Text></View>);})}{history.length===0&&<Text style={[theme.sub,{textAlign:'center',marginTop:10}]}>未有紀錄</Text>}</ScrollView></View>
-<View style={{height:80}}/>
-</ScrollView>);};return(
+<ScrollView nestedScrollEnabled showsVerticalScrollIndicator={true} style={{flex:1}}>{history.map((h,i)=>{const isBest=h.time===best;return(<View key={h.id} style={[s.hR,{flexDirection:'row',alignItems:'center',backgroundColor:isBest?'#003322':'#1a1a1a',borderColor:'#222'}]}><Text style={{flex:0.5,fontSize:10,color:'#fff'}}>{history.length-i}</Text><Text style={{flex:1.1,fontSize:10,fontWeight:'bold',color:isBest?'#00ff88':'#fff'}}>{fmt(h.time)}</Text><Text style={{flex:0.7,fontSize:9,color:'#aaa'}}>{h.track.toUpperCase()}</Text><Text style={{flex:0.5,fontSize:9,color:'#aaa'}}>{h.gMax||0}G</Text><Text style={{flex:0.6,fontSize:10,fontWeight:'bold',color:'#00e5ff'}}>{getMaxDisplay(h.maxKph)}</Text></View>);})}{history.length===0&&<Text style={[theme.sub,{textAlign:'center',marginTop:20}]}>未有紀錄</Text>}</ScrollView></View>
+</View>);};return(
 <View style={[s.c,theme.c]}>
 <View style={[s.head,theme.head]}><View style={{flex:1}}><Text style={[s.t,theme.t]}>{T.app}</Text><Text style={[s.sub,theme.sub]} numberOfLines={1}>{lang==='zh'?track.name:track.en} • {track.short}</Text></View><TouchableOpacity onPress={()=>setShowSet(true)} style={s.gear}><Text style={{fontSize:16}}>⚙️</Text></TouchableOpacity></View>
 <View style={[s.gps,theme.gps]}><Text style={{color:locked?'#00cc66':'#ff4444',fontWeight:'bold',fontSize:10}}>{locked?T.gpsOk:T.gpsNo}</Text><Text style={[s.gpsI,theme.sub]}>{T.acc} {acc.toFixed(1)}m • {getTemp()}</Text></View>
-<View style={{flex:1, marginBottom: isPro?0:100}}>
-{tab==='dash'&&<DashView/>}
-{tab==='sessions'&&<ScrollView style={{flex:1,padding:6}}>{history.map((h,i)=><View key={h.id} style={[s.hR,theme.b]}><Text style={[theme.t,{fontSize:10}]}>{history.length-i}. {h.track.toUpperCase()} • {fmt(h.time)} • {getMaxDisplay(h.maxKph)}{unit}</Text></View>)}</ScrollView>}
-{tab==='tracks'&&<ScrollView style={{flex:1}} contentContainerStyle={{flexDirection:'row',flexWrap:'wrap',padding:6}}>{TRACKS.map(t=><TouchableOpacity key={t.id} onPress={()=>{setTrack(t);lastManualTrack.current=Date.now();trackRef.current=t; setTab('dash');}} style={[s.trackCard,theme.b,track.id===t.id&&{borderColor:'#00cc66',borderWidth:2}]}><Image source={t.img} style={{width:'100%',height:72,borderRadius:6}} resizeMode="contain"/><Text style={[theme.t,{fontSize:9,marginTop:3}]}>{lang==='zh'?t.name:t.en}</Text></TouchableOpacity>)}</ScrollView>}
-</View>
-{tab==='dash'&&<View style={[s.btnR,{position:'absolute',bottom:isPro?48:98,left:8,right:8,backgroundColor:darkMode?'#000':'#f5f5f5',paddingTop:4}]}><TouchableOpacity onPress={stop} style={[s.btn,{backgroundColor:running?'#ff3333':'#551111'}]}><Text style={s.btnT}>■ STOP</Text></TouchableOpacity><TouchableOpacity onPress={start} style={[s.btn,{backgroundColor:running?'#114422':'#00cc66'}]}><Text style={s.btnT}>▶ START</Text></TouchableOpacity></View>}
-{!isPro&&BannerAd&&<View style={{position:'absolute',bottom:48,left:0,right:0,height:50,backgroundColor:'#000',justifyContent:'center',alignItems:'center',borderTopWidth:1,borderColor:'#222'}}><BannerAd unitId={BANNER_ID} size={BannerAdSize.BANNER} /></View>}
+<View style={{flex:1, marginBottom: isPro?0:50}}>{tab==='dash'&&<DashView/>}{tab==='sessions'&&<ScrollView style={{flex:1,padding:6}}>{history.map((h,i)=><View key={h.id} style={[s.hR,theme.b]}><Text style={[theme.t,{fontSize:10}]}>{history.length-i}. {h.track.toUpperCase()} • {fmt(h.time)} • {getMaxDisplay(h.maxKph)}{unit}</Text></View>)}</ScrollView>}{tab==='tracks'&&<ScrollView style={{flex:1}} contentContainerStyle={{flexDirection:'row',flexWrap:'wrap',padding:6}}>{TRACKS.map(t=><TouchableOpacity key={t.id} onPress={()=>{setTrack(t);lastManualTrack.current=Date.now();trackRef.current=t; setTab('dash');}} style={[s.trackCard,theme.b,track.id===t.id&&{borderColor:'#00cc66',borderWidth:2}]}><Image source={t.img} style={{width:'100%',height:72,borderRadius:6}} resizeMode="contain"/><Text style={[theme.t,{fontSize:9,marginTop:3}]}>{lang==='zh'?t.name:t.en}</Text></TouchableOpacity>)}</ScrollView>}</View>
+{!isPro&&BannerAd&&<View style={{position:'absolute',bottom:48,left:0,right:0,height:50,backgroundColor:'#000',justifyContent:'center',alignItems:'center',borderTopWidth:1,borderColor:'#222',zIndex:99}}><BannerAd unitId={BANNER_ID} size={BannerAdSize.BANNER} /></View>}
 <Modal visible={showSet} animationType="slide"><View style={[s.setPage,theme.c]}><ScrollView style={{padding:14,paddingTop:8}}><View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8,marginTop:4}}><Text style={[{fontSize:15,fontWeight:'bold'},theme.t]}>{T.set}</Text><TouchableOpacity onPress={()=>setShowSet(false)}><Text style={[{fontSize:18},theme.t]}>✕</Text></TouchableOpacity></View>
 <View style={[s.proCard,isPro&&{backgroundColor:'#111'}]}><Text style={{fontWeight:'bold',color:isPro?'#ffaa00':'#111',fontSize:12}}>👑 {isPro?T.proOn:T.proFree}</Text><Text style={{fontSize:9,color:isPro?'#fff':'#666',marginTop:2}}>{T.proDesc}</Text>{!isPro&&<TouchableOpacity style={s.upBtn} onPress={handleUpgrade}><Text style={{color:'#fff',fontWeight:'bold',textAlign:'center',fontSize:11}}>{T.upgrade}</Text></TouchableOpacity>}</View>
 <Text style={[s.setTitle,theme.t]}>{T.timer}</Text><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const nv=calibDist>=50?10:calibDist+5;setCalibDist(nv);save('calib',nv);}}><Text style={theme.t}>{T.calib} {calibDist}m</Text><Text style={theme.sub}>{calibDist}m ＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const nv=minTrigger>=30?5:minTrigger+5;setMinTrigger(nv);save('minTrig',nv);}}><Text style={theme.t}>{T.minTrig} {minTrigger}s</Text><Text style={theme.sub}>{minTrigger}s ＞</Text></TouchableOpacity><View style={[s.setRow,theme.b]}><Text style={theme.t}>{T.autoLap}</Text><Switch value={autoLap} onValueChange={v=>{setAutoLap(v);save('autoLap',v?'1':'0');}}/></View><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const opts=[1,5,10];const idx=opts.indexOf(gpsHz);const nv=opts[(idx+1)%opts.length];setGpsHz(nv);save('gpsHz',nv);}}><Text style={theme.t}>{T.gpsHz}</Text><Text style={[theme.t,{color:'#00cc66',fontWeight:'bold'}]}>{gpsHz}Hz ＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const nv=accFilt>=10?3:accFilt+2;setAccFilt(nv);save('accFilt',nv);}}><Text style={theme.t}>{T.accFilt}</Text><Text style={theme.sub}>＜{accFilt}m ＞</Text></TouchableOpacity>
