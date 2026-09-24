@@ -46,8 +46,24 @@ if(runningRef.current&&autoLap&&finishLapRef.current){if(dist(loc.coords.latitud
 const getSpeed=()=>{const kmh=speedMs*3.6;return unit==='kmh'?kmh.toFixed(0):(kmh*0.621371).toFixed(0);};
 const getTemp=()=>{if(tempC===null)return '--';return tempU==='C'?`${tempC.toFixed(1)}°C`:`${(tempC*9/5+32).toFixed(1)}°F`;};
 const getMaxDisplay=(kph)=>{if(kph===null||kph===undefined||kph===0) return '--'; const v=parseFloat(kph); if(isNaN(v)) return '--'; if(unit==='mph') return (v*0.621371).toFixed(1); return v.toFixed(1);};
-const start=()=>{if(timerRef.current)clearInterval(timerRef.current);startRef.current=Date.now();maxSpeedLapRef.current=0;setRunning(true);runningRef.current=true;setCur(0);setGForce({x:0,max:0});timerRef.current=setInterval(()=>setCur((Date.now()-startRef.current)/1000),100);};
-const stop=()=>{runningRef.current=false;setRunning(false);if(timerRef.current){clearInterval(timerRef.current);timerRef.current=null;}};
+// FIXED: STOP/START邏輯修正
+const start=()=>{
+  if(runningRef.current) return;
+  if(timerRef.current)clearInterval(timerRef.current);
+  startRef.current=Date.now();
+  maxSpeedLapRef.current=0;
+  setRunning(true);
+  runningRef.current=true;
+  setCur(0);
+  setGForce({x:0,max:0});
+  timerRef.current=setInterval(()=>setCur((Date.now()-startRef.current)/1000),100);
+};
+const stop=()=>{
+  if(!runningRef.current) return;
+  runningRef.current=false;
+  setRunning(false);
+  if(timerRef.current){clearInterval(timerRef.current);timerRef.current=null;}
+};
 const finishLap=async()=>{const t=(Date.now()-startRef.current)/1000;const s1=t*0.35,s2=t*0.34,s3=t*0.31;const isTM=trackRef.current.id==='tmn'||trackRef.current.id==='tms';const maxKphRaw=maxSpeedLapRef.current; maxSpeedLapRef.current=0;
 if(safeMode&&isTM){Alert.alert('安全模式',lang==='zh'?'此圈僅作訓練參考':'Training only');setPrev(t);setSector([s1,s2,s3]);startRef.current=Date.now();return;}
 const lap={id:Date.now(),time:t,s1,s2,s3,track:trackRef.current.id,date:new Date().toISOString(),maxKph:maxKphRaw,gMax:gForce.max};let nh=[lap,...history];if(!isPro&&nh.length>30)nh=nh.slice(0,30);if(isPro&&nh.length>100)nh=nh.slice(0,100);setHistory(nh);await AsyncStorage.setItem('lap_history',JSON.stringify(nh));setPrev(t);if(!best||t<best)setBest(t);setSector([s1,s2,s3]);startRef.current=Date.now();};
@@ -63,7 +79,10 @@ const handleUpgrade=async()=>{const exp=Date.now()+30*24*60*60*1000;setIsPro(tru
 <View style={{flexDirection:'row',marginHorizontal:6,marginTop:4}}><View style={[s.dataBox,theme.b,{flex:1}]}><Text style={s.dataLabel}>{T.speed} ({unit})</Text><Text style={[s.dataVal,{color:'#00e5ff'}]}>{getSpeed()}</Text></View><View style={[s.dataBox,theme.b,{flex:0.8}]}><Text style={s.dataLabel}>{T.temp}</Text><Text style={[s.dataVal,{color:'#ffaa00',fontSize:14}]}>{getTemp()}</Text></View><View style={[s.dataBox,theme.b,{flex:1}]}><Text style={s.dataLabel}>G</Text><View style={{flexDirection:'row',justifyContent:'space-around'}}><Text style={{color:'#ffaa00',fontWeight:'bold',fontSize:10}}>{gForce.x}G</Text><Text style={{color:'#fff',fontWeight:'bold',fontSize:10}}>{gForce.max}G</Text></View><Text style={[s.dataLabel,{marginTop:2}]}>Max {unit}</Text><Text style={{color:'#00e5ff',fontWeight:'bold',fontSize:12}}>{getMaxDisplay(maxSpeedLapRef.current)}</Text></View></View>
 <View style={[s.mapFixed,{backgroundColor:'#000',borderColor:'#00cc66',borderWidth:1.5}]}><Image source={track.img} style={s.mapImgFixed} resizeMode="contain"/>{showLabels&&<Text style={s.start}>{T.sf} • {track.short}</Text>}</View>
 <View style={s.row3}><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[0].toFixed(2)}</Text><Text style={s.sL}>{T.s1}</Text></View><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[1].toFixed(2)}</Text><Text style={s.sL}>{T.s2}</Text></View><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[2].toFixed(2)}</Text><Text style={s.sL}>{T.s3}</Text></View></View>
-<View style={s.btnR}><TouchableOpacity style={[s.btn,{backgroundColor:'#ff3333'}]} onPress={stop}><Text style={s.btnT}>■ STOP</Text></TouchableOpacity><TouchableOpacity style={[s.btn,{backgroundColor:'#00cc66'}]} onPress={start}><Text style={s.btnT}>▶ START</Text></TouchableOpacity></View>
+<View style={s.btnR}>
+<TouchableOpacity style={[s.btn,{backgroundColor: running? '#ff3333' : '#551111', opacity: running? 1 : 0.5}]} onPress={stop} disabled={!running}><Text style={s.btnT}>■ STOP</Text></TouchableOpacity>
+<TouchableOpacity style={[s.btn,{backgroundColor: running? '#114422' : '#00cc66', opacity: running? 0.5 : 1}]} onPress={start} disabled={running}><Text style={s.btnT}>▶ START</Text></TouchableOpacity>
+</View>
 <Text style={[s.hT,theme.t]}>{T.hist} ({history.length})</Text>
 <View style={{flex:1,minHeight:120,maxHeight:200,marginHorizontal:6,marginTop:4,borderWidth:1,borderColor:'#222',borderRadius:8,overflow:'hidden'}}>
 <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:6,backgroundColor:'#111'}}><Text style={{flex:0.5,fontSize:8,color:'#888'}}>LAP</Text><Text style={{flex:1.1,fontSize:8,color:'#888'}}>TIME</Text><Text style={{flex:0.7,fontSize:8,color:'#888'}}>TRACK</Text><Text style={{flex:0.5,fontSize:8,color:'#888'}}>G</Text><Text style={{flex:0.6,fontSize:8,color:'#00e5ff'}}>MAX</Text></View>
