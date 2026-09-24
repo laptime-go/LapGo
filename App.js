@@ -49,21 +49,8 @@ const getSpeed=()=>{const kmh=speedMs*3.6;return unit==='kmh'?kmh.toFixed(0):(km
 const getTemp=()=>{if(tempC===null)return '--';return tempU==='C'?`${tempC.toFixed(1)}°C`:`${(tempC*9/5+32).toFixed(1)}°F`;};
 const getMaxDisplay=(kph)=>{if(kph===null||kph===undefined||kph===0) return '--'; const v=parseFloat(kph); if(isNaN(v)) return '--'; if(unit==='mph') return (v*0.621371).toFixed(1); return v.toFixed(1);};
 useEffect(()=>{fetch(`https://api.open-meteo.com/v1/forecast?latitude=${track.lat}&longitude=${track.lng}&current=temperature_2m`).then(r=>r.json()).then(d=>{if(d.current) setTempC(d.current.temperature_2m);}).catch(e=>{});},[track.id]);
-const start=()=>{
-  if(timerRef.current) clearInterval(timerRef.current);
-  startRef.current=Date.now();
-  maxSpeedLapRef.current=0;
-  runningRef.current=true;
-  setRunning(true);
-  setCur(0);
-  setGForce({x:0,max:0});
-  timerRef.current=setInterval(()=>{setCur((Date.now()-startRef.current)/1000);},100);
-};
-const stop=()=>{
-  if(timerRef.current){clearInterval(timerRef.current); timerRef.current=null;}
-  runningRef.current=false;
-  setRunning(false);
-};
+const start=()=>{ if(timerRef.current) clearInterval(timerRef.current); startRef.current=Date.now(); maxSpeedLapRef.current=0; runningRef.current=true; setRunning(true); setCur(0); setGForce({x:0,max:0}); timerRef.current=setInterval(()=>{setCur((Date.now()-startRef.current)/1000);},100); };
+const stop=()=>{ if(timerRef.current){clearInterval(timerRef.current); timerRef.current=null;} runningRef.current=false; setRunning(false); };
 const finishLap=async()=>{const t=(Date.now()-startRef.current)/1000;const s1=t*0.35,s2=t*0.34,s3=t*0.31;const isTM=trackRef.current.id==='tmn'||trackRef.current.id==='tms';const maxKphRaw=maxSpeedLapRef.current; maxSpeedLapRef.current=0;
 if(safeMode&&isTM){Alert.alert('安全模式',lang==='zh'?'此圈僅作訓練參考':'Training only',[{text:'知道了',style:'cancel'}],{cancelable:true});setPrev(t);setSector([s1,s2,s3]);startRef.current=Date.now();return;}
 const lap={id:Date.now(),time:t,s1,s2,s3,track:trackRef.current.id,date:new Date().toISOString(),maxKph:maxKphRaw,gMax:gForce.max};let nh=[lap,...history];if(!isPro&&nh.length>30)nh=nh.slice(0,30);if(isPro&&nh.length>100)nh=nh.slice(0,100);setHistory(nh);await AsyncStorage.setItem('lap_history',JSON.stringify(nh));setPrev(t);if(!best||t<best)setBest(t);setSector([s1,s2,s3]);startRef.current=Date.now();};
@@ -81,16 +68,15 @@ return(
 <View style={[s.mapFixed,{backgroundColor:'#000',borderColor:'#00cc66',borderWidth:1.5}]}><Image source={track.img} style={s.mapImgFixed} resizeMode="contain"/>{showLabels&&<Text style={s.start}>{T.sf} • {track.short}</Text>}</View>
 <View style={s.row3}><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[0].toFixed(2)}</Text><Text style={s.sL}>{T.s1}</Text></View><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[1].toFixed(2)}</Text><Text style={s.sL}>{T.s2}</Text></View><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[2].toFixed(2)}</Text><Text style={s.sL}>{T.s3}</Text></View></View>
 </View>);};
-// B版面：主版唔滾，淨係圈速紀錄滾，S1/S2/S3 → STOP/START → 紀錄
 const DashView=()=>{
 return(
 <View style={{flex:1}}>
 <DashContent/>
 <View style={s.btnR}><TouchableOpacity onPress={stop} style={[s.btn,{backgroundColor:running?'#ff3333':'#551111'}]}><Text style={s.btnT}>■ STOP</Text></TouchableOpacity><TouchableOpacity onPress={start} style={[s.btn,{backgroundColor:running?'#114422':'#00cc66'}]}><Text style={s.btnT}>▶ START</Text></TouchableOpacity></View>
 <Text style={[s.hT,theme.t]}>{T.hist} ({history.length})</Text>
-<View style={{flex:1,minHeight:120,marginHorizontal:6,marginTop:4,borderWidth:1,borderColor:'#222',borderRadius:8,overflow:'hidden'}}>
+<View style={{height:200,marginHorizontal:6,marginTop:4,borderWidth:1,borderColor:'#222',borderRadius:8,overflow:'hidden'}}>
 <View style={{flexDirection:'row',paddingVertical:5,paddingHorizontal:6,backgroundColor:'#111'}}><Text style={{flex:0.5,fontSize:8,color:'#888'}}>LAP</Text><Text style={{flex:1.1,fontSize:8,color:'#888'}}>TIME</Text><Text style={{flex:0.7,fontSize:8,color:'#888'}}>TRACK</Text><Text style={{flex:0.5,fontSize:8,color:'#888'}}>G</Text><Text style={{flex:0.6,fontSize:8,color:'#00e5ff'}}>MAX</Text></View>
-<ScrollView nestedScrollEnabled style={{flex:1}}>{history.map((h,i)=>{const isBest=h.time===best;return(<View key={h.id} style={[s.hR,{flexDirection:'row',alignItems:'center',backgroundColor:isBest?'#003322':'#1a1a1a',borderColor:'#222'}]}><Text style={{flex:0.5,fontSize:10,color:'#fff'}}>{history.length-i}</Text><Text style={{flex:1.1,fontSize:10,fontWeight:'bold',color:isBest?'#00ff88':'#fff'}}>{fmt(h.time)}</Text><Text style={{flex:0.7,fontSize:9,color:'#aaa'}}>{h.track.toUpperCase()}</Text><Text style={{flex:0.5,fontSize:9,color:'#aaa'}}>{h.gMax||0}G</Text><Text style={{flex:0.6,fontSize:10,fontWeight:'bold',color:'#00e5ff'}}>{getMaxDisplay(h.maxKph)}</Text></View>);})}{history.length===0&&<Text style={[theme.sub,{textAlign:'center',marginTop:10}]}>未有紀錄</Text>}</ScrollView></View>
+<ScrollView style={{flex:1}}>{history.map((h,i)=>{const isBest=h.time===best;return(<View key={h.id} style={[s.hR,{flexDirection:'row',alignItems:'center',backgroundColor:isBest?'#003322':'#1a1a1a',borderColor:'#222'}]}><Text style={{flex:0.5,fontSize:10,color:'#fff'}}>{history.length-i}</Text><Text style={{flex:1.1,fontSize:10,fontWeight:'bold',color:isBest?'#00ff88':'#fff'}}>{fmt(h.time)}</Text><Text style={{flex:0.7,fontSize:9,color:'#aaa'}}>{h.track.toUpperCase()}</Text><Text style={{flex:0.5,fontSize:9,color:'#aaa'}}>{h.gMax||0}G</Text><Text style={{flex:0.6,fontSize:10,fontWeight:'bold',color:'#00e5ff'}}>{getMaxDisplay(h.maxKph)}</Text></View>);})}{history.length===0&&<Text style={[theme.sub,{textAlign:'center',marginTop:10}]}>未有紀錄</Text>}</ScrollView></View>
 </View>);};return(
 <View style={[s.c,theme.c]}>
 <View style={[s.head,theme.head]}><View style={{flex:1}}><Text style={[s.t,theme.t]}>{T.app}</Text><Text style={[s.sub,theme.sub]} numberOfLines={1}>{lang==='zh'?track.name:track.en} • {track.short}</Text></View><TouchableOpacity onPress={()=>setShowSet(true)} style={s.gear}><Text style={{fontSize:16}}>⚙️</Text></TouchableOpacity></View>
