@@ -15,8 +15,7 @@ const [sector,setSector]=useState([0,0,0]);const [history,setHistory]=useState([
 const [tab,setTab]=useState('dash');const [showSet,setShowSet]=useState(false);const [darkMode,setDarkMode]=useState(true);const [lang,setLang]=useState('zh');
 const [calibDist,setCalibDist]=useState(25);const [minTrigger,setMinTrigger]=useState(15);const [autoLap,setAutoLap]=useState(true);const [unit,setUnit]=useState('kmh');const [tempU,setTempU]=useState('C');const [tempC,setTempC]=useState(null);const [timeFmt,setTimeFmt]=useState('mm:ss');const [liveDot,setLiveDot]=useState(false);const [ghostOp,setGhostOp]=useState(0.5);const [gForce,setGForce]=useState({x:0,max:0});const [gpsHz,setGpsHz]=useState(1);const [accFilt,setAccFilt]=useState(5);const [showLabels,setShowLabels]=useState(true);const [safeMode,setSafeMode]=useState(true);
 const startRef=useRef(0);const timerRef=useRef(null);const subRef=useRef(null);const trackRef=useRef(TRACKS[0]);const runningRef=useRef(false);const maxSpeedLapRef=useRef(0);const finishLapRef=useRef(null);const lastSpeed=useRef(0);const lastManualTrack=useRef(0);const lastPos=useRef(null);const T=LANG[lang];
-useEffect(()=>{trackRef.current=track;},[track]);useEffect(()=>{runningRef.current=running;},[running]);
-useEffect(()=>{fetch(`https://api.open-meteo.com/v1/forecast?latitude=${track.lat}&longitude=${track.lng}&current=temperature_2m`).then(r=>r.json()).then(d=>{if(d.current) setTempC(d.current.temperature_2m);}).catch(e=>{});},[track.id]);
+useEffect(()=>{trackRef.current=track;},[track]);
 useEffect(()=>{(async()=>{
 try{if(MobileAds)await MobileAds().initialize();}catch(e){}
 const {status}=await Location.requestForegroundPermissionsAsync();if(status!=='granted')return;await Location.requestBackgroundPermissionsAsync();
@@ -25,44 +24,48 @@ if(m.lap_history)try{setHistory(JSON.parse(m.lap_history));}catch(e){};if(m.isPr
 let timeInt=gpsHz>=10?100:gpsHz>=5?200:1000;if(subRef.current) subRef.current.remove();
 subRef.current=await Location.watchPositionAsync({accuracy:Location.Accuracy.BestForNavigation,distanceInterval:1,timeInterval:timeInt},loc=>{
 try{
-if((loc.coords.accuracy||99)>accFilt*2)return;setAcc(loc.coords.accuracy||0);setLocked(true);setSpeedMs(loc.coords.speed||0);
+const lat=loc.coords.latitude, lng=loc.coords.longitude, accu=loc.coords.accuracy||99;
+// FIX 1: 換圖放最前，唔睇精度，跑緊都換，慢鎖定都會轉圖
+if(Date.now()-lastManualTrack.current>30000){
+ let near=trackRef.current, minD=Infinity; TRACKS.forEach(t=>{const dd=dist(lat,lng,t.lat,t.lng); if(dd<minD){minD=dd; near=t;}});
+ if(minD<50000 && near){
+  if((near.id==='tmn'||near.id==='tms') && lastPos.current && (loc.coords.speed||0)>1){
+   const head=loc.coords.heading!=null?loc.coords.heading:bearing(lastPos.current.lat,lastPos.current.lng,lat,lng);
+   if(!isNaN(head)){ near = head>=0&&head<180? TRACKS.find(t=>t.id==='tmn') : TRACKS.find(t=>t.id==='tms'); }
+  }
+  if(near && near.id!==trackRef.current.id){ trackRef.current=near; setTrack(near); }
+ }
+ lastPos.current={lat,lng};
+}
+// FIX 2: 先至過濾精度
+if(accu>accFilt*2) return;
+setAcc(accu); setLocked(true); setSpeedMs(loc.coords.speed||0);
 const kmhNow=(loc.coords.speed||0)*3.6; if(runningRef.current && kmhNow>maxSpeedLapRef.current) maxSpeedLapRef.current=kmhNow;
-const g=Math.abs((loc.coords.speed||0)-lastSpeed.current)*0.8;lastSpeed.current=loc.coords.speed||0;setGForce(p=>({x:g.toFixed(2),max:Math.max(g,p.max).toFixed(2)}));
-if(Date.now()-lastManualTrack.current>30000 &&!runningRef.current){
-let near=trackRef.current, min=Infinity;TRACKS.forEach(t=>{const dd=dist(loc.coords.latitude,loc.coords.longitude,t.lat,t.lng);if(dd<min){min=dd;near=t;}});
-if(min<50000){
-if((near.id==='tmn'||near.id==='tms') && lastPos.current && (loc.coords.speed||0)>2){
-const head=loc.coords.heading!=null? loc.coords.heading : bearing(lastPos.current.lat,lastPos.current.lng,loc.coords.latitude,loc.coords.longitude);
-if(!isNaN(head)){if(head>=0 && head<180){ const tm=TRACKS.find(t=>t.id==='tmn'); if(tm) near=tm; }else{ const tm=TRACKS.find(t=>t.id==='tms'); if(tm) near=tm; }}
-}
-if(near.id!==trackRef.current.id) setTrack(near);
-}
-}
-lastPos.current={lat:loc.coords.latitude,lng:loc.coords.longitude};
-if(runningRef.current&&autoLap&&finishLapRef.current){if(dist(loc.coords.latitude,loc.coords.longitude,trackRef.current.lat,trackRef.current.lng)<calibDist&&Date.now()-startRef.current>minTrigger*1000)finishLapRef.current();}
+const g=Math.abs((loc.coords.speed||0)-lastSpeed.current)*0.8; lastSpeed.current=loc.coords.speed||0; setGForce(p=>({x:g.toFixed(2),max:Math.max(g,p.max).toFixed(2)}));
+if(runningRef.current&&autoLap&&finishLapRef.current){if(dist(lat,lng,trackRef.current.lat,trackRef.current.lng)<calibDist&&Date.now()-startRef.current>minTrigger*1000)finishLapRef.current();}
 }catch(e){}
 });
 })();return()=>{if(subRef.current)subRef.current.remove();if(timerRef.current)clearInterval(timerRef.current);};},[]);const fmt=s=>{if(!s)return '--:--.--';if(timeFmt==='ss')return `${s.toFixed(2)}s`;const mm=Math.floor(s/60);const r=(s%60).toFixed(2);return `${mm}:${r.padStart(5,'0')}`;};
 const getSpeed=()=>{const kmh=speedMs*3.6;return unit==='kmh'?kmh.toFixed(0):(kmh*0.621371).toFixed(0);};
 const getTemp=()=>{if(tempC===null)return '--';return tempU==='C'?`${tempC.toFixed(1)}°C`:`${(tempC*9/5+32).toFixed(1)}°F`;};
 const getMaxDisplay=(kph)=>{if(kph===null||kph===undefined||kph===0) return '--'; const v=parseFloat(kph); if(isNaN(v)) return '--'; if(unit==='mph') return (v*0.621371).toFixed(1); return v.toFixed(1);};
-// FIXED: STOP/START邏輯修正
+useEffect(()=>{fetch(`https://api.open-meteo.com/v1/forecast?latitude=${track.lat}&longitude=${track.lng}&current=temperature_2m`).then(r=>r.json()).then(d=>{if(d.current) setTempC(d.current.temperature_2m);}).catch(e=>{});},[track.id]);
+// FIXED: STOP/START 一定停到，唔再check ref return
 const start=()=>{
   if(runningRef.current) return;
-  if(timerRef.current)clearInterval(timerRef.current);
+  if(timerRef.current) clearInterval(timerRef.current);
   startRef.current=Date.now();
   maxSpeedLapRef.current=0;
-  setRunning(true);
   runningRef.current=true;
+  setRunning(true);
   setCur(0);
   setGForce({x:0,max:0});
   timerRef.current=setInterval(()=>setCur((Date.now()-startRef.current)/1000),100);
 };
 const stop=()=>{
-  if(!runningRef.current) return;
   runningRef.current=false;
   setRunning(false);
-  if(timerRef.current){clearInterval(timerRef.current);timerRef.current=null;}
+  if(timerRef.current){clearInterval(timerRef.current); timerRef.current=null;}
 };
 const finishLap=async()=>{const t=(Date.now()-startRef.current)/1000;const s1=t*0.35,s2=t*0.34,s3=t*0.31;const isTM=trackRef.current.id==='tmn'||trackRef.current.id==='tms';const maxKphRaw=maxSpeedLapRef.current; maxSpeedLapRef.current=0;
 if(safeMode&&isTM){Alert.alert('安全模式',lang==='zh'?'此圈僅作訓練參考':'Training only');setPrev(t);setSector([s1,s2,s3]);startRef.current=Date.now();return;}
@@ -80,8 +83,8 @@ const handleUpgrade=async()=>{const exp=Date.now()+30*24*60*60*1000;setIsPro(tru
 <View style={[s.mapFixed,{backgroundColor:'#000',borderColor:'#00cc66',borderWidth:1.5}]}><Image source={track.img} style={s.mapImgFixed} resizeMode="contain"/>{showLabels&&<Text style={s.start}>{T.sf} • {track.short}</Text>}</View>
 <View style={s.row3}><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[0].toFixed(2)}</Text><Text style={s.sL}>{T.s1}</Text></View><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[1].toFixed(2)}</Text><Text style={s.sL}>{T.s2}</Text></View><View style={[s.sb,theme.b]}><Text style={[s.sbT,theme.t]}>{sector[2].toFixed(2)}</Text><Text style={s.sL}>{T.s3}</Text></View></View>
 <View style={s.btnR}>
-<TouchableOpacity style={[s.btn,{backgroundColor: running? '#ff3333' : '#551111', opacity: running? 1 : 0.5}]} onPress={stop} disabled={!running}><Text style={s.btnT}>■ STOP</Text></TouchableOpacity>
-<TouchableOpacity style={[s.btn,{backgroundColor: running? '#114422' : '#00cc66', opacity: running? 0.5 : 1}]} onPress={start} disabled={running}><Text style={s.btnT}>▶ START</Text></TouchableOpacity>
+<TouchableOpacity style={[s.btn,{backgroundColor: running? '#ff3333' : '#551111', opacity: running? 1 : 0.5}]} onPress={stop}><Text style={s.btnT}>■ STOP</Text></TouchableOpacity>
+<TouchableOpacity style={[s.btn,{backgroundColor: running? '#114422' : '#00cc66', opacity: running? 0.5 : 1}]} onPress={start}><Text style={s.btnT}>▶ START</Text></TouchableOpacity>
 </View>
 <Text style={[s.hT,theme.t]}>{T.hist} ({history.length})</Text>
 <View style={{flex:1,minHeight:120,maxHeight:200,marginHorizontal:6,marginTop:4,borderWidth:1,borderColor:'#222',borderRadius:8,overflow:'hidden'}}>
@@ -91,8 +94,8 @@ const handleUpgrade=async()=>{const exp=Date.now()+30*24*60*60*1000;setIsPro(tru
 <View style={[s.c,theme.c]}>
 <View style={[s.head,theme.head]}><View style={{flex:1}}><Text style={[s.t,theme.t]}>{T.app}</Text><Text style={[s.sub,theme.sub]} numberOfLines={1}>{lang==='zh'?track.name:track.en} • {track.short}</Text></View><TouchableOpacity onPress={()=>setShowSet(true)} style={s.gear}><Text style={{fontSize:16}}>⚙️</Text></TouchableOpacity></View>
 <View style={[s.gps,theme.gps]}><Text style={{color:locked?'#00cc66':'#ff4444',fontWeight:'bold',fontSize:10}}>{locked?T.gpsOk:T.gpsNo}</Text><Text style={[s.gpsI,theme.sub]}>{T.acc} {acc.toFixed(1)}m • {getTemp()}</Text></View>
-<View style={{flex:1, marginBottom: isPro?0:50}}>{tab==='dash'&&<DashView/>}{tab==='sessions'&&<ScrollView style={{flex:1,padding:6}}>{history.map((h,i)=><View key={h.id} style={[s.hR,theme.b]}><Text style={[theme.t,{fontSize:10}]}>{history.length-i}. {h.track.toUpperCase()} • {fmt(h.time)} • {getMaxDisplay(h.maxKph)}{unit}</Text></View>)}</ScrollView>}{tab==='tracks'&&<ScrollView style={{flex:1}} contentContainerStyle={{flexDirection:'row',flexWrap:'wrap',padding:6}}>{TRACKS.map(t=><TouchableOpacity key={t.id} onPress={()=>{setTrack(t);lastManualTrack.current=Date.now();setTab('dash');}} style={[s.trackCard,theme.b,track.id===t.id&&{borderColor:'#00cc66',borderWidth:2}]}><Image source={t.img} style={{width:'100%',height:72,borderRadius:6}} resizeMode="contain"/><Text style={[theme.t,{fontSize:9,marginTop:3}]}>{lang==='zh'?t.name:t.en}</Text></TouchableOpacity>)}</ScrollView>}</View>
-{!isPro&&BannerAd&&<View style={{position:'absolute',bottom:48,left:0,right:0,height:50,backgroundColor:'#000',justifyContent:'center',alignItems:'center',borderTopWidth:1,borderColor:'#222',zIndex:99}}><BannerAd unitId={BANNER_ID} size={BannerAdSize.BANNER} /></View>}
+<View style={{flex:1, marginBottom: isPro?0:52}}>{tab==='dash'&&<DashView/>}{tab==='sessions'&&<ScrollView style={{flex:1,padding:6}}>{history.map((h,i)=><View key={h.id} style={[s.hR,theme.b]}><Text style={[theme.t,{fontSize:10}]}>{history.length-i}. {h.track.toUpperCase()} • {fmt(h.time)} • {getMaxDisplay(h.maxKph)}{unit}</Text></View>)}</ScrollView>}{tab==='tracks'&&<ScrollView style={{flex:1}} contentContainerStyle={{flexDirection:'row',flexWrap:'wrap',padding:6}}>{TRACKS.map(t=><TouchableOpacity key={t.id} onPress={()=>{setTrack(t);lastManualTrack.current=Date.now();setTab('dash');}} style={[s.trackCard,theme.b,track.id===t.id&&{borderColor:'#00cc66',borderWidth:2}]}><Image source={t.img} style={{width:'100%',height:72,borderRadius:6}} resizeMode="contain"/><Text style={[theme.t,{fontSize:9,marginTop:3}]}>{lang==='zh'?t.name:t.en}</Text></TouchableOpacity>)}</ScrollView>}</View>
+{!isPro&&BannerAd&&<View style={{position:'absolute',bottom:48,left:0,right:0,height:52,backgroundColor:'#000',justifyContent:'center',alignItems:'center',borderTopWidth:1,borderColor:'#222',zIndex:99}}><BannerAd unitId={BANNER_ID} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} onAdFailedToLoad={(e)=>console.log('ad fail',e)} /></View>}
 <Modal visible={showSet} animationType="slide"><View style={[s.setPage,theme.c]}><ScrollView style={{padding:14,paddingTop:8}}><View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8,marginTop:4}}><Text style={[{fontSize:15,fontWeight:'bold'},theme.t]}>{T.set}</Text><TouchableOpacity onPress={()=>setShowSet(false)}><Text style={[{fontSize:18},theme.t]}>✕</Text></TouchableOpacity></View>
 <View style={[s.proCard,isPro&&{backgroundColor:'#111'}]}><Text style={{fontWeight:'bold',color:isPro?'#ffaa00':'#111',fontSize:12}}>👑 {isPro?T.proOn:T.proFree}</Text><Text style={{fontSize:9,color:isPro?'#fff':'#666',marginTop:2}}>{T.proDesc}</Text>{!isPro&&<TouchableOpacity style={s.upBtn} onPress={handleUpgrade}><Text style={{color:'#fff',fontWeight:'bold',textAlign:'center',fontSize:11}}>{T.upgrade}</Text></TouchableOpacity>}</View>
 <Text style={[s.setTitle,theme.t]}>{T.timer}</Text><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const nv=calibDist>=50?10:calibDist+5;setCalibDist(nv);save('calib',nv);}}><Text style={theme.t}>{T.calib} {calibDist}m</Text><Text style={theme.sub}>{calibDist}m ＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const nv=minTrigger>=30?5:minTrigger+5;setMinTrigger(nv);save('minTrig',nv);}}><Text style={theme.t}>{T.minTrig} {minTrigger}s</Text><Text style={theme.sub}>{minTrigger}s ＞</Text></TouchableOpacity><View style={[s.setRow,theme.b]}><Text style={theme.t}>{T.autoLap}</Text><Switch value={autoLap} onValueChange={v=>{setAutoLap(v);save('autoLap',v?'1':'0');}}/></View><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const opts=[1,5,10];const idx=opts.indexOf(gpsHz);const nv=opts[(idx+1)%opts.length];setGpsHz(nv);save('gpsHz',nv);}}><Text style={theme.t}>{T.gpsHz}</Text><Text style={[theme.t,{color:'#00cc66',fontWeight:'bold'}]}>{gpsHz}Hz ＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const nv=accFilt>=10?3:accFilt+2;setAccFilt(nv);save('accFilt',nv);}}><Text style={theme.t}>{T.accFilt}</Text><Text style={theme.sub}>＜{accFilt}m ＞</Text></TouchableOpacity>
