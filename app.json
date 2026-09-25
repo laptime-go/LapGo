@@ -7,25 +7,52 @@
     "icon": "./icon.jpg",
     "userInterfaceStyle": "dark",
     "owner": "fungfung842",
-    "splash": { "image": "./splash-icon.jpg", "resizeMode": "contain", "backgroundColor": "#121212" },
+    "splash": {
+      "image": "./splash-icon.jpg",
+      "resizeMode": "contain",
+      "backgroundColor": "#121212"
+    },
     "assetBundlePatterns": ["**/*"],
-    "ios": { "supportsTablet": true, "bundleIdentifier": "com.lapgo.timer" },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lapgo.timer"
+    },
     "android": {
-      "adaptiveIcon": { "foregroundImage": "./adaptive-icon.jpg", "backgroundColor": "#121212" },
-      "package": "com.lapgo.timer",
-      "permissions": ["ACCESS_COARSE_LOCATION","ACCESS_FINE_LOCATION","ACCESS_BACKGROUND_LOCATION","FOREGROUND_SERVICE","FOREGROUND_SERVICE_LOCATION"]
+      "adaptiveIcon": {
+        "foregroundImage": "./adaptive-icon.jpg",
+        "backgroundColor": "#121212"
+      },
+      "package": "com.lapgo.timer"
     },
     "web": { "favicon": "./favicon.jpg" },
     "plugins": [
-      ["expo-build-properties", { "android": { "minSdkVersion": 23, "compileSdkVersion": 34, "targetSdkVersion": 34 } }],
-      ["expo-location", {
-        "locationAlwaysAndWhenInUsePermission": "賽道計時需在背景持續記錄GPS，即使切換App或關屏，否則會斷圈。通知欄會顯示「圈速go正在計時」。",
-        "isIosBackgroundLocationEnabled": true,
-        "isAndroidBackgroundLocationEnabled": true,
-        "isAndroidForegroundServiceEnabled": true
-      }],
-      ["react-native-google-mobile-ads", { "androidAppId": "ca-app-pub-9890149028563226~9678218420", "iosAppId": "ca-app-pub-9890149028563226~9678218420" }]
+      [
+        "expo-build-properties",
+        {
+          "android": { "minSdkVersion": 23, "compileSdkVersion": 34, "targetSdkVersion": 34 }
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow LapTime Go to use location to auto-detect track and lap timing.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9890149028563226~9678218420",
+          "iosAppId": "ca-app-pub-9890149028563226~9678218420",
+          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+        }
+      ]
     ],
-    "extra": { "eas": { "projectId": "075ddfb4-4fc5-47dd-acd4-d398b1319a94" } }
+    "extra": {
+      "eas": {
+        "projectId": "075ddfb4-4fc5-47dd-acd4-d398b1319a94"
+      }
+    }
   }
 }
