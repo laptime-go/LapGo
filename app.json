@@ -19,7 +19,7 @@
     "plugins": [
       ["expo-build-properties", { "android": { "minSdkVersion": 23, "compileSdkVersion": 34, "targetSdkVersion": 34 } }],
       ["expo-location", {
-        "locationAlwaysAndWhenInUsePermission": "賽道計時需在背景持續記錄GPS，即使切換App或關屏，否則會斷圈。通知欄會顯示定位中。",
+        "locationAlwaysAndWhenInUsePermission": "賽道計時需在背景持續記錄GPS，即使切換App或關屏，否則會斷圈。通知欄會顯示「圈速go正在計時」。",
         "isIosBackgroundLocationEnabled": true,
         "isAndroidBackgroundLocationEnabled": true,
         "isAndroidForegroundServiceEnabled": true
