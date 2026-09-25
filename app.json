@@ -22,7 +22,19 @@
         "foregroundImage": "./adaptive-icon.jpg",
         "backgroundColor": "#121212"
       },
-      "package": "com.lapgo.timer"
+      "package": "com.lapgo.timer",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
+      ]
     },
     "web": { "favicon": "./favicon.jpg" },
     "plugins": [
@@ -35,9 +47,17 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow LapTime Go to use location to auto-detect track and lap timing.",
+          "locationAlwaysAndWhenInUsePermission": "賽道計時需在背景持續記錄GPS，即使切換App或關屏，否則會斷圈。通知欄會顯示正在計時。",
+          "locationAlwaysPermission": "Allow LapTime Go to use location in background for lap timing.",
+          "locationWhenInUsePermission": "Allow LapTime Go to use location to auto-detect track and lap timing.",
           "isIosBackgroundLocationEnabled": true,
-          "isAndroidBackgroundLocationEnabled": true
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true,
+          "foregroundService": {
+            "notificationTitle": "圈速go 正在計時",
+            "notificationBody": "背景GPS持續記錄中，點擊返回App",
+            "notificationColor": "#00cc66"
+          }
         }
       ],
       [
