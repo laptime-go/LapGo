@@ -11,26 +11,12 @@ function dist(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLng=(
 function bearing(a,b,c,d){const y=Math.sin((d-b)*Math.PI/180)*Math.cos(c*Math.PI/180);const x=Math.cos(a*Math.PI/180)*Math.sin(c*Math.PI/180)-Math.sin(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.cos((d-b)*Math.PI/180);return (Math.atan2(y,x)*180/Math.PI+360)%360;}
 function TimerText({startRef, runningRef, timeFmt, style, lastRef}){
   const [cur,setCur]=useState(0);
-  useEffect(()=>{
-    const id=setInterval(()=>{
-      if(runningRef.current){
-        const v=(Date.now()-startRef.current)/1000;
-        setCur(v); lastRef.current=v;
-      }
-    },100);
-    return()=>clearInterval(id);
-  },[]);
+  useEffect(()=>{ const id=setInterval(()=>{ if(runningRef.current){ const v=(Date.now()-startRef.current)/1000; setCur(v); lastRef.current=v; } },100); return()=>clearInterval(id); },[]);
   const fmt=s=>{if(!s&&s!==0)return '0:00.00';if(timeFmt==='ss')return `${s.toFixed(2)}s`;const mm=Math.floor(s/60);const r=(s%60).toFixed(2);return `${mm}:${r.padStart(5,'0')}`;};
   const show = runningRef.current? cur : (lastRef.current||0);
   return <Text style={style}>{fmt(show)}</Text>;
 }
-const AdBar = React.memo(()=>{
-  return (
-    <View style={{height:50,width:'100%',backgroundColor:'#000',borderTopWidth:1,borderColor:'#333',alignItems:'center',justifyContent:'center'}}>
-      {BannerAd? <BannerAd unitId={BANNER_ID} size={BannerAdSize.BANNER} /> : <Text style={{color:'#555',fontSize:10}}>AD 320x50</Text>}
-    </View>
-  );
-});export default function App(){
+const AdBar = React.memo(()=>{ return (<View style={{height:52,width:'100%',backgroundColor:'#000',borderTopWidth:1,borderColor:'#222',alignItems:'center',justifyContent:'center'}}>{BannerAd? <BannerAd unitId={BANNER_ID} size={BannerAdSize.BANNER} /> : <Text style={{color:'#666',fontSize:10}}>AD 320x50</Text>}</View>); });export default function App(){
 const [track,setTrack]=useState(TRACKS[0]);const [locked,setLocked]=useState(false);const [acc,setAcc]=useState(0);const [speedMs,setSpeedMs]=useState(0);
 const [running,setRunning]=useState(false);const [best,setBest]=useState(null);const [prev,setPrev]=useState(null);
 const [sector,setSector]=useState([0,0,0]);const [history,setHistory]=useState([]);const [isPro,setIsPro]=useState(false);
@@ -92,7 +78,7 @@ return(
 {tab==='sessions'&&<ScrollView style={{flex:1,padding:6}}>{history.map((h,i)=><View key={h.id} style={[s.hR,theme.b]}><Text style={[theme.t,{fontSize:10}]}>{history.length-i}. {h.track.toUpperCase()} • {fmt(h.time)} • {getMaxDisplay(h.maxKph)}{unit}</Text></View>)}</ScrollView>}
 {tab==='tracks'&&<ScrollView style={{flex:1}} contentContainerStyle={{flexDirection:'row',flexWrap:'wrap',padding:6}}>{TRACKS.map(t=><TouchableOpacity key={t.id} onPress={()=>{setTrack(t);lastManualTrack.current=Date.now();trackRef.current=t; setTab('dash');}} style={[s.trackCard,theme.b,track.id===t.id&&{borderColor:'#00cc66',borderWidth:2}]}><Image source={t.img} style={{width:'100%',height:72,borderRadius:6}} resizeMode="contain"/><Text style={[theme.t,{fontSize:9,marginTop:3}]}>{lang==='zh'?t.name:t.en}</Text></TouchableOpacity>)}</ScrollView>}
 </View>
-{!isPro&&<AdBar/>}<Modal visible={showSet} animationType="slide"><View style={[s.setPage,theme.c]}><ScrollView style={{padding:14,paddingTop:8}}><View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8,marginTop:4}}><Text style={[{fontSize:15,fontWeight:'bold'},theme.t]}>{T.set}</Text><TouchableOpacity onPress={()=>setShowSet(false)}><Text style={[{fontSize:18},theme.t]}>✕</Text></TouchableOpacity></View>
+{!isPro && <AdBar/>}<Modal visible={showSet} animationType="slide"><View style={[s.setPage,theme.c]}><ScrollView style={{padding:14,paddingTop:8}}><View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8,marginTop:4}}><Text style={[{fontSize:15,fontWeight:'bold'},theme.t]}>{T.set}</Text><TouchableOpacity onPress={()=>setShowSet(false)}><Text style={[{fontSize:18},theme.t]}>✕</Text></TouchableOpacity></View>
 <View style={[s.proCard,isPro&&{backgroundColor:'#111'}]}><Text style={{fontWeight:'bold',color:isPro?'#ffaa00':'#111',fontSize:12}}>👑 {isPro?T.proOn:T.proFree}</Text><Text style={{fontSize:9,color:isPro?'#fff':'#666',marginTop:2}}>{T.proDesc}</Text>{!isPro&&<TouchableOpacity style={s.upBtn} onPress={handleUpgrade}><Text style={{color:'#fff',fontWeight:'bold',textAlign:'center',fontSize:11}}>{T.upgrade}</Text></TouchableOpacity>}</View>
 <Text style={[s.setTitle,theme.t]}>{T.timer}</Text><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const nv=calibDist>=50?10:calibDist+5;setCalibDist(nv);save('calib',nv);}}><Text style={theme.t}>{T.calib} {calibDist}m</Text><Text style={theme.sub}>{calibDist}m ＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const nv=minTrigger>=30?5:minTrigger+5;setMinTrigger(nv);save('minTrig',nv);}}><Text style={theme.t}>{T.minTrig} {minTrigger}s</Text><Text style={theme.sub}>{minTrigger}s ＞</Text></TouchableOpacity><View style={[s.setRow,theme.b]}><Text style={theme.t}>{T.autoLap}</Text><Switch value={autoLap} onValueChange={v=>{setAutoLap(v);save('autoLap',v?'1':'0');}}/></View><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const opts=[1,5,10];const idx=opts.indexOf(gpsHz);const nv=opts[(idx+1)%opts.length];setGpsHz(nv);save('gpsHz',nv);}}><Text style={theme.t}>{T.gpsHz}</Text><Text style={[theme.t,{color:'#00cc66',fontWeight:'bold'}]}>{gpsHz}Hz ＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{const nv=accFilt>=10?3:accFilt+2;setAccFilt(nv);save('accFilt',nv);}}><Text style={theme.t}>{T.accFilt}</Text><Text style={theme.sub}>＜{accFilt}m ＞</Text></TouchableOpacity>
 <Text style={[s.setTitle,theme.t]}>{T.disp}</Text><View style={[s.setRow,theme.b]}><Text style={theme.t}>{T.night}</Text><Switch value={darkMode} onValueChange={v=>{setDarkMode(v);save('darkMode',v?'1':'0');}}/></View><TouchableOpacity style={[s.setRow,theme.b]} onPress={toggleLang}><Text style={theme.t}>{T.langTitle}</Text><Text style={[theme.t,{fontWeight:'bold',color:'#00cc66'}]}>{lang==='zh'?'中文':'EN'} ↔</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={toggleUnit}><Text style={theme.t}>{T.unit}</Text><Text style={[theme.t,{fontWeight:'bold',color:'#00cc66'}]}>{unit.toUpperCase()} ↔</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={async()=>{const nv=tempU==='C'?'F':'C';setTempU(nv);await save('tempU',nv);}}><Text style={theme.t}>{T.tempUnit} {getTemp()}</Text><Text style={[theme.t,{fontWeight:'bold',color:'#00cc66'}]}>°{tempU} ↔</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={async()=>{const nv=timeFmt==='mm:ss'?'ss':'mm:ss';setTimeFmt(nv);await save('timeFmt',nv);}}><Text style={theme.t}>{T.timeFmt}</Text><Text style={[theme.t,{fontWeight:'bold',color:'#00cc66'}]}>{timeFmt} ↔</Text></TouchableOpacity><View style={[s.setRow,theme.b]}><Text style={theme.t}>{T.labels}</Text><Switch value={showLabels} onValueChange={v=>{setShowLabels(v);save('showLabels',v?'1':'0');}}/></View><View style={[s.setRow,theme.b]}><Text style={theme.t}>安全模式</Text><Switch value={safeMode} onValueChange={v=>{setSafeMode(v);save('safeMode',v?'1':'0');}}/></View>
