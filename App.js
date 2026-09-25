@@ -1,12 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Pressable, Alert, Image, Modal, Switch, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, Alert, Image, Modal, Switch, ScrollView, Platform } from 'react-native';
 import * as Location from 'expo-location';
+import * as TaskManager from 'expo-task-manager';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 let BannerAd, BannerAdSize, MobileAds;
 try{ const A=require('react-native-google-mobile-ads'); BannerAd=A.BannerAd; BannerAdSize=A.BannerAdSize; MobileAds=A.MobileAds; }catch(e){}
 const BANNER_ID = __DEV__? "ca-app-pub-3940256099942544/6300978111" : "ca-app-pub-9890149028563226/7083933962";
+const LOCATION_TASK = 'lapgo-bg-task';
 const TRACKS=[{id:'zic',name:'珠海國際賽車場',en:'Zhuhai Circuit',short:'ZIC • ZHUHAI • 14T',lat:22.3598,lng:113.5678,img:require('./assets/tracks/zic.jpg')},{id:'gic',name:'廣東國際賽車場',en:'Guangdong Circuit',short:'GIC • 13T',lat:23.1216,lng:112.559,img:require('./assets/tracks/gic.jpg')},{id:'fuji',name:'富士賽道',en:'Fuji Speedway',short:'FUJI • 16T',lat:35.3717,lng:138.927,img:require('./assets/tracks/fuji.jpg')},{id:'suzuka',name:'鈴鹿賽道',en:'Suzuka Circuit',short:'SUZUKA • 18T',lat:34.8431,lng:136.5409,img:require('./assets/tracks/suzuka.jpg')},{id:'tsukuba',name:'筑波賽道',en:'Tsukuba Circuit',short:'TSUKUBA • 9T',lat:36.083,lng:140.075,img:require('./assets/tracks/tsukuba.jpg')},{id:'okayama',name:'岡山國際賽道',en:'Okayama Circuit',short:'OKAYAMA • 11T',lat:34.915,lng:134.212,img:require('./assets/tracks/okayama.jpg')},{id:'buriram',name:'武里南賽道',en:'Buriram Circuit',short:'BURIRAM • 12T',lat:14.966,lng:103.095,img:require('./assets/tracks/buriram.jpg')},{id:'sepang',name:'雪邦賽道',en:'Sepang Circuit',short:'SEPANG • 15T',lat:2.7606,lng:101.738,img:require('./assets/tracks/sepang.jpg')},{id:'zhuzhou',name:'株洲國際賽道',en:'Zhuzhou Circuit',short:'ZHUZHOU • 14T',lat:27.85,lng:113.15,img:require('./assets/tracks/zhuzhou.jpg')},{id:'ningbo',name:'寧波國際賽道',en:'Ningbo Circuit',short:'NINGBO • 22T',lat:30.33,lng:121.45,img:require('./assets/tracks/ningbo.jpg')},{id:'guia',name:'東望洋賽道',en:'Guia Circuit',short:'GUIA • MACAU • 22T',lat:22.197,lng:113.555,img:require('./assets/tracks/guia.jpg')},{id:'tmn',name:'屯門公路 (荃灣→屯門)',en:'Tuen Mun Rd (TW→TM)',short:'TMR • 荃→屯 • 限速70',lat:22.3905,lng:113.9768,img:require('./assets/tracks/tuenmun-north.jpg')},{id:'tms',name:'屯門公路 (屯門→荃灣)',en:'Tuen Mun Rd (TM→TW)',short:'TMR • 屯→荃 • 限速70',lat:22.3741,lng:113.9585,img:require('./assets/tracks/tuenmun-south.jpg')}];
-const LANG={zh:{app:'圈速go',gpsOk:'● GPS已鎖定',gpsNo:'○ 搜尋中...',acc:'精度',speed:'速度',temp:'氣溫',prev:'上一圈',best:'最佳',delta:'Delta',sf:'起/終點',s1:'S1',s2:'S2',s3:'S3',hist:'圈速紀錄',dash:'儀表',sess:'紀錄',tracks:'賽道',set:'設定',timer:'--- 計時 ---',disp:'--- 顯示 ---',sys:'--- 系統 ---',proF:'--- Pro功能',night:'夜間模式',unit:'速度單位',tempUnit:'溫度單位',timeFmt:'時間制式',dot:'即時紅點',langTitle:'語言',ghost:'幽靈線透明度',clear:'清除紀錄',ver:'v1.0',proFree:'免費版',proOn:'Pro大佬已啟用 (30日)',proDesc:'免費版30圈睇廣告 • Pro解鎖100圈',upgrade:'升級 Pro',calib:'起/終點校準',minTrig:'最低觸發',autoLap:'自動計圈',needPro:'不日推出',needProDesc:'敬請期待🤣',gpsHz:'GPS頻率',accFilt:'精度過濾',labels:'賽道標籤',safeMode:'安全模式',about:'--- 關於 ---',disclaimer:'免責聲明',privacy:'私隱政策',contact:'聯絡我',disTxt:'本App僅供賽道日及訓練參考，公共道路請遵守限速。',priTxt:'本App不會收集個人位置數據。',conTxt:'問題反饋: fungfung842@gmail.com'},en:{app:'LapGo',gpsOk:'● GPS Locked',gpsNo:'○ Searching...',acc:'Acc',speed:'Speed',temp:'Temp',prev:'Prev',best:'Best',delta:'Delta',sf:'S/F',s1:'S1',s2:'S2',s3:'S3',hist:'Lap History',dash:'Dash',sess:'Logs',tracks:'Tracks',set:'Settings',timer:'--- Timer ---',disp:'--- Display ---',sys:'--- System ---',proF:'--- Pro ---',night:'Night Mode',unit:'Speed Unit',tempUnit:'Temp Unit',timeFmt:'Time Format',dot:'Live Dot',langTitle:'Language',ghost:'Ghost Opacity',clear:'Clear All',ver:'v1.0',proFree:'Free Mode',proOn:'Pro Active (30d)',proDesc:'Free 30 laps with Ads • Pro 100 laps',upgrade:'Upgrade Pro',calib:'S/F Calib',minTrig:'Min Trigger',autoLap:'Auto Lap',needPro:'Coming Soon',needProDesc:'Stay tuned 🤣',gpsHz:'GPS Rate',accFilt:'Accuracy Filter',labels:'Track Labels',safeMode:'Safe Mode',about:'--- About ---',disclaimer:'Disclaimer',privacy:'Privacy',contact:'Contact',disTxt:'For track day only.',priTxt:'No data collected.',conTxt:'Feedback: fungfung842@gmail.com'}};function dist(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLng=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+const LANG={zh:{app:'圈速go',gpsOk:'● GPS已鎖定',gpsNo:'○ 搜尋中...',acc:'精度',speed:'速度',temp:'氣溫',prev:'上一圈',best:'最佳',delta:'Delta',sf:'起/終點',s1:'S1',s2:'S2',s3:'S3',hist:'圈速紀錄',dash:'儀表',sess:'紀錄',tracks:'賽道',set:'設定',timer:'--- 計時 ---',disp:'--- 顯示 ---',sys:'--- 系統 ---',proF:'--- Pro功能',night:'夜間模式',unit:'速度單位',tempUnit:'溫度單位',timeFmt:'時間制式',dot:'即時紅點',langTitle:'語言',ghost:'幽靈線透明度',clear:'清除紀錄',ver:'v1.0',proFree:'免費版',proOn:'Pro大佬已啟用 (30日)',proDesc:'免費版30圈睇廣告 • Pro解鎖100圈',upgrade:'升級 Pro',calib:'起/終點校準',minTrig:'最低觸發',autoLap:'自動計圈',needPro:'不日推出',needProDesc:'敬請期待🤣',gpsHz:'GPS頻率',accFilt:'精度過濾',labels:'賽道標籤',safeMode:'安全模式',about:'--- 關於 ---',disclaimer:'免責聲明',privacy:'私隱政策',contact:'聯絡我',disTxt:'本App僅供賽道日及訓練參考，公共道路請遵守限速。',priTxt:'本App不會收集個人位置數據。',conTxt:'問題反饋: fungfung842@gmail.com'},en:{app:'LapGo',gpsOk:'● GPS Locked',gpsNo:'○ Searching...',acc:'Acc',speed:'Speed',temp:'Temp',prev:'Prev',best:'Best',delta:'Delta',sf:'S/F',s1:'S1',s2:'S2',s3:'S3',hist:'Lap History',dash:'Dash',sess:'Logs',tracks:'Tracks',set:'Settings',timer:'--- Timer ---',disp:'--- Display ---',sys:'--- System ---',proF:'--- Pro ---',night:'Night Mode',unit:'Speed Unit',tempUnit:'Temp Unit',timeFmt:'Time Format',dot:'Live Dot',langTitle:'Language',ghost:'Ghost Opacity',clear:'Clear All',ver:'v1.0',proFree:'Free Mode',proOn:'Pro Active (30d)',proDesc:'Free 30 laps with Ads • Pro 100 laps',upgrade:'Upgrade Pro',calib:'S/F Calib',minTrig:'Min Trigger',autoLap:'Auto Lap',needPro:'Coming Soon',needProDesc:'Stay tuned 🤣',gpsHz:'GPS Rate',accFilt:'Accuracy Filter',labels:'Track Labels',safeMode:'Safe Mode',about:'--- About ---',disclaimer:'Disclaimer',privacy:'Privacy',contact:'Contact',disTxt:'For track day only.',priTxt:'No data collected.',conTxt:'Feedback: fungfung842@gmail.com'}};
+if(!TaskManager.isTaskDefined(LOCATION_TASK)){
+  TaskManager.defineTask(LOCATION_TASK, ({ data, error }) => {
+    if(error) return;
+    if(data){
+      // 背景任務，系統會自動顯示通知欄，唔使做嘢
+    }
+  });
+}function dist(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLng=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 function bearing(a,b,c,d){const y=Math.sin((d-b)*Math.PI/180)*Math.cos(c*Math.PI/180);const x=Math.cos(a*Math.PI/180)*Math.sin(c*Math.PI/180)-Math.sin(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.cos((d-b)*Math.PI/180);return (Math.atan2(y,x)*180/Math.PI+360)%360;}
 function TimerText({startRef, runningRef, timeFmt, style, lastRef}){
   const [cur,setCur]=useState(0);
@@ -25,9 +35,25 @@ const startRef=useRef(0);const lastTimeRef=useRef(0);const subRef=useRef(null);c
 useEffect(()=>{trackRef.current=track;},[track]);
 useEffect(()=>{(async()=>{
 try{ if(MobileAds){ await MobileAds().initialize(); } }catch(e){}
-try{const fg=await AsyncStorage.getItem('bg_disclosed');if(!fg){Alert.alert("需要背景定位","賽道計時需在背景持續記錄GPS，即使切換App或關屏，否則會斷圈。",[{text:"明白",onPress:async()=>{await AsyncStorage.setItem('bg_disclosed','1');}}]);}}catch(e){}
-const {status}=await Location.requestForegroundPermissionsAsync();if(status!=='granted')return;
-try{ await Location.requestBackgroundPermissionsAsync(); }catch(e){}
+try{const fg=await AsyncStorage.getItem('bg_disclosed');if(!fg){Alert.alert("需要背景定位","賽道計時需在背景持續記錄GPS，即使切換App或關屏，否則會斷圈。通知欄會顯示「圈速go正在計時」。",[{text:"明白",onPress:async()=>{await AsyncStorage.setItem('bg_disclosed','1');}}]);}}catch(e){}
+let {status}=await Location.requestForegroundPermissionsAsync();if(status!=='granted')return;
+let bgStatus = await Location.requestBackgroundPermissionsAsync();
+if(bgStatus.status!=='granted'){ console.log("bg denied"); }
+try{
+  const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK);
+  if(!hasStarted){
+    await Location.startLocationUpdatesAsync(LOCATION_TASK, {
+      accuracy: Location.Accuracy.BestForNavigation,
+      distanceInterval: 1,
+      timeInterval: 1000,
+      foregroundService: {
+        notificationTitle: "圈速go 正在計時",
+        notificationBody: "背景GPS持續記錄中，點擊返回",
+        notificationColor: "#00cc66"
+      }
+    });
+  }
+}catch(e){ console.log("fg service err",e); }
 const vals=await AsyncStorage.multiGet(['lap_history','isPro','pro_exp','darkMode','lang','calib','minTrig','autoLap','unit','tempU','timeFmt','gpsHz','accFilt','showLabels','safeMode']);const m=Object.fromEntries(vals);
 if(m.lap_history)try{setHistory(JSON.parse(m.lap_history));}catch(e){};if(m.isPro && m.pro_exp){const exp=parseInt(m.pro_exp);if(Date.now()<exp){setIsPro(true);}else{await AsyncStorage.multiRemove(['isPro','pro_exp']);}}if(m.darkMode!==null)setDarkMode(m.darkMode==='1');if(m.lang)setLang(m.lang);if(m.calib)setCalibDist(parseInt(m.calib));if(m.minTrig)setMinTrigger(parseInt(m.minTrig));if(m.autoLap!==null)setAutoLap(m.autoLap==='1');if(m.unit)setUnit(m.unit);if(m.tempU)setTempU(m.tempU);if(m.timeFmt)setTimeFmt(m.timeFmt);if(m.gpsHz)setGpsHz(parseInt(m.gpsHz));if(m.accFilt)setAccFilt(parseInt(m.accFilt));if(m.showLabels!==null)setShowLabels(m.showLabels==='1');if(m.safeMode!==null)setSafeMode(m.safeMode==='1');
 if(subRef.current) subRef.current.remove();
