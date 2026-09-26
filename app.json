@@ -23,6 +23,7 @@
         "backgroundColor": "#121212"
       },
       "package": "com.lapgo.timer",
+      "versionCode": 1,
       "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
     },
     "web": { "favicon": "./favicon.jpg" },
@@ -34,8 +35,7 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow LapTime Go to use location for lap timing.",
-          "locationWhenInUsePermission": "Allow LapTime Go to use location for lap timing.",
+          "locationWhenInUsePermission": "Allow LapTime Go to use location for lap timing. Foreground only, pauses when screen off.",
           "isIosBackgroundLocationEnabled": false,
           "isAndroidBackgroundLocationEnabled": false
         }
