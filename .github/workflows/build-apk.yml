@@ -1,5 +1,4 @@
 name: Build AAB for Play Store
-
 on:
   push:
     branches: [ main ]
@@ -9,11 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -24,6 +21,19 @@ jobs:
 
       - name: Expo prebuild clean
         run: npx expo prebuild --clean --no-install
+
+      - name: Generate Release Keystore
+        run: |
+          cd android
+          keytool -genkey -v -keystore release.keystore -alias lapgo -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=LapGo, OU=Dev, O=LapGo, L=HK, S=HK, C=HK"
+          echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> gradle.properties
+          echo "MYAPP_RELEASE_KEY_ALIAS=lapgo" >> gradle.properties
+          echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> gradle.properties
+          echo "MYAPP_RELEASE_KEY_PASSWORD=123456" >> gradle.properties
+          echo "MYAPP_UPLOAD_STORE_FILE=release.keystore" >> gradle.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=lapgo" >> gradle.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=123456" >> gradle.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=123456" >> gradle.properties
 
       - name: Build AAB for Play Store
         run: |
@@ -36,3 +46,9 @@ jobs:
         with:
           name: lapgo-release-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Upload Keystore artifact (IMPORTANT - download and keep it!)
+        uses: actions/upload-artifact@v4
+        with:
+          name: lapgo-keystore
+          path: android/release.keystore
