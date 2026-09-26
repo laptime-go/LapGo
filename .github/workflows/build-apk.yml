@@ -1,4 +1,4 @@
-name: Build APK Local
+name: Build AAB for Play Store
 
 on:
   push:
@@ -25,14 +25,14 @@ jobs:
       - name: Expo prebuild clean
         run: npx expo prebuild --clean --no-install
 
-      - name: Build APK locally
+      - name: Build AAB for Play Store
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease
+          ./gradlew bundleRelease
 
-      - name: Upload APK artifact
+      - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lapgo-release-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
+          name: lapgo-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
