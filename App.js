@@ -34,7 +34,6 @@ if(status!=='granted'){
 }
 const vals=await AsyncStorage.multiGet(['lap_history','isPro','pro_exp','darkMode','lang','calib','minTrig','autoLap','unit','tempU','timeFmt','gpsHz','accFilt','showLabels','safeMode']);const m=Object.fromEntries(vals);
 if(m.lap_history)try{setHistory(JSON.parse(m.lap_history));}catch(e){};if(m.isPro && m.pro_exp){const exp=parseInt(m.pro_exp);if(Date.now()<exp){setIsPro(true);}else{await AsyncStorage.multiRemove(['isPro','pro_exp']);}}if(m.darkMode!==null)setDarkMode(m.darkMode==='1');if(m.lang)setLang(m.lang);if(m.calib)setCalibDist(parseInt(m.calib));if(m.minTrig)setMinTrigger(parseInt(m.minTrig));if(m.autoLap!==null)setAutoLap(m.autoLap==='1');if(m.unit)setUnit(m.unit);if(m.tempU)setTempU(m.tempU);if(m.timeFmt)setTimeFmt(m.timeFmt);if(m.gpsHz){setGpsHz(parseInt(m.gpsHz));gpsHzRef.current=parseInt(m.gpsHz);}if(m.accFilt){setAccFilt(parseInt(m.accFilt));accFiltRef.current=parseInt(m.accFilt);}if(m.showLabels!==null)setShowLabels(m.showLabels==='1');if(m.safeMode!==null)setSafeMode(m.safeMode==='1');
-
 const startWatch = async()=>{
   if(subRef.current) subRef.current.remove();
   const hz = gpsHzRef.current;
@@ -44,9 +43,8 @@ const startWatch = async()=>{
     try{
       const lat=loc.coords.latitude, lng=loc.coords.longitude, accu=loc.coords.accuracy||99, spd=loc.coords.speed||0;
       setAcc(accu);
-      if(accu > accFiltRef.current){ return; } // 真生效：精度過濾
+      if(accu > accFiltRef.current){ return; }
       if(accu<100) setLocked(true);
-
       if(Date.now()-lastManualTrack.current>15000){
        let near=trackRef.current, minD=Infinity; TRACKS.forEach(t=>{const d=dist(lat,lng,t.lat,t.lng); if(d<minD){minD=d; near=t;}});
        if(minD<50000 && near){
@@ -69,8 +67,6 @@ const startWatch = async()=>{
 };
 await startWatch();
 })();return()=>{if(subRef.current)subRef.current.remove();};},[]);
-
-// 當用戶改頻率，自動重啟watch - 真生效
 useEffect(()=>{(async()=>{
   if(!subRef.current) return;
   const ti = gpsHz===1?1000 : gpsHz===5?200 : 100;
@@ -137,7 +133,7 @@ const DashView=()=>{
 <Text style={[s.setTitle,theme.t]}>{T.proF}</Text><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>handleProToggle('dot')}><Text style={theme.t}>{T.dot}</Text><Text style={theme.sub}>🔒 ＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>handleProToggle('ghost')}><Text style={theme.t}>{T.ghost} {Math.round(ghostOp*100)}%</Text><Text style={theme.sub}>🔒 ＞</Text></TouchableOpacity>
 <Text style={[s.setTitle,theme.t]}>{T.sys}</Text><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{Alert.alert('清除紀錄','確定清晒所有圈速？',[{text:'取消',style:'cancel'},{text:'確定清除',style:'destructive',onPress:async()=>{await AsyncStorage.multiRemove(['lap_history']);setHistory([]);}}],{cancelable:true});}}><Text style={theme.t}>{T.clear}</Text><Text style={theme.sub}>＞</Text></TouchableOpacity>
 <Text style={[s.setTitle,theme.t]}>{T.about}</Text><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>Alert.alert(T.disclaimer,T.disTxt,[{text:'知道了',style:'cancel'}],{cancelable:true})}><Text style={theme.t}>{T.disclaimer}</Text><Text style={theme.sub}>＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>Alert.alert(T.privacy,T.priTxt,[{text:'知道了',style:'cancel'}],{cancelable:true})}><Text style={theme.t}>{T.privacy}</Text><Text style={theme.sub}>＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>Alert.alert(T.contact,T.conTxt,[{text:'知道了',style:'cancel'}],{cancelable:true})}><Text style={theme.t}>{T.contact}</Text><Text style={theme.sub}>＞</Text></TouchableOpacity>
-<View style={{alignItems:'center',marginTop:14,marginBottom:10}}><Text style={{fontSize:11,color:'#888'}}>v1.0 Foreground Only • {gpsHz}Hz • ＜{accFilt}m</Text></View>
+<View style={{alignItems:'center',marginTop:14,marginBottom:10}}><Text style={{fontSize:11,color:'#888'}}>v1.0 Foreground Only</Text></View>
 </ScrollView></View></Modal>
 <View style={[s.tabBar,theme.gps]}><TouchableOpacity style={s.tabBtn} onPress={()=>setTab('dash')}><Text style={[s.tab,tab==='dash'&&s.tabOn]}>{T.dash}</Text></TouchableOpacity><TouchableOpacity style={s.tabBtn} onPress={()=>setTab('sessions')}><Text style={[s.tab,tab==='sessions'&&s.tabOn]}>{T.sess}</Text></TouchableOpacity><TouchableOpacity style={s.tabBtn} onPress={()=>setTab('tracks')}><Text style={[s.tab,tab==='tracks'&&s.tabOn]}>{T.tracks}</Text></TouchableOpacity></View>
 </View>);}
