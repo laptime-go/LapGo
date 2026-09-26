@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -36,4 +36,23 @@ jobs:
           echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> gradle.properties
           echo "MYAPP_RELEASE_KEY_PASSWORD=123456" >> gradle.properties
           sed -i 's/signingConfig signingConfigs.debug/signingConfig signingConfigs.release/g' app/build.gradle
-          cat gradle.properties
+
+      - name: Build AAB for Play Store
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew bundleRelease --stacktrace
+          find . -name "*.aab" -type f -print
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lapgo-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: warn
+
+      - name: Upload Keystore artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lapgo-keystore
+          path: android/app/release.keystore
