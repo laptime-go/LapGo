@@ -22,22 +22,22 @@
         "foregroundImage": "./adaptive-icon.jpg",
         "backgroundColor": "#121212"
       },
-      "package": "com.lapgo.timer"
+      "package": "com.lapgo.timer",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
     },
     "web": { "favicon": "./favicon.jpg" },
     "plugins": [
       [
         "expo-build-properties",
-        {
-          "android": { "minSdkVersion": 23, "compileSdkVersion": 34, "targetSdkVersion": 34 }
-        }
+        { "android": { "minSdkVersion": 23, "compileSdkVersion": 34, "targetSdkVersion": 34 } }
       ],
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow LapTime Go to use location to auto-detect track and lap timing.",
-          "isIosBackgroundLocationEnabled": true,
-          "isAndroidBackgroundLocationEnabled": true
+          "locationAlwaysAndWhenInUsePermission": "Allow LapTime Go to use location for lap timing.",
+          "locationWhenInUsePermission": "Allow LapTime Go to use location for lap timing.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false
         }
       ],
       [
@@ -49,10 +49,6 @@
         }
       ]
     ],
-    "extra": {
-      "eas": {
-        "projectId": "075ddfb4-4fc5-47dd-acd4-d398b1319a94"
-      }
-    }
+    "extra": { "eas": { "projectId": "075ddfb4-4fc5-47dd-acd4-d398b1319a94" } }
   }
 }
