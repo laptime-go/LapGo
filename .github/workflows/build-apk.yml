@@ -22,36 +22,45 @@ jobs:
       - name: Expo prebuild clean
         run: npx expo prebuild --clean
 
-      - name: Generate and Force Release Keystore
+      - name: Generate Release Keystore
         run: |
           cd android
-          keytool -genkey -v -keystore release.keystore -alias lapgo -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=LapGo, OU=Dev, O=LapGo, L=HK, S=HK, C=HK"
-          cp release.keystore app/release.keystore
-          echo "MYAPP_UPLOAD_STORE_FILE=release.keystore" >> gradle.properties
-          echo "MYAPP_UPLOAD_KEY_ALIAS=lapgo" >> gradle.properties
-          echo "MYAPP_UPLOAD_STORE_PASSWORD=123456" >> gradle.properties
-          echo "MYAPP_UPLOAD_KEY_PASSWORD=123456" >> gradle.properties
-          echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> gradle.properties
-          echo "MYAPP_RELEASE_KEY_ALIAS=lapgo" >> gradle.properties
-          echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> gradle.properties
-          echo "MYAPP_RELEASE_KEY_PASSWORD=123456" >> gradle.properties
-          if grep -q "signingConfigs.debug" app/build.gradle; then
-            sed -i 's/signingConfig signingConfigs.debug/signingConfig signingConfigs.release/g' app/build.gradle
-          fi
+          keytool -genkey -v -keystore app/release.keystore -alias lapgo -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=LapGo, OU=Dev, O=LapGo, L=HK, S=HK, C=HK"
+          cp app/release.keystore release.keystore
+          ls -lh app/release.keystore release.keystore
+
+      - name: Force inject release signing into build.gradle
+        run: |
+          python3 << 'PY'
+          import pathlib
+          p = pathlib.Path('android/app/build.gradle')
+          txt = p.read_text()
+          # 1. 確保 signingConfigs 入面有 release
+          if "release {" not in txt or "release.keystore" not in txt:
+              txt = txt.replace(
+                  "signingConfigs {",
+                  "signingConfigs {\n        release {\n            storeFile file('release.keystore')\n            storePassword '123456'\n            keyAlias 'lapgo'\n            keyPassword '123456'\n        }"
+              )
+          # 2. 強制 release build 用 release 簽名
+          txt = txt.replace("signingConfig signingConfigs.debug", "signingConfig signingConfigs.release")
+          # 有啲新版係 if else寫法，兜埋底
+          if "signingConfig signingConfigs.release" not in txt:
+              txt = txt.replace("release {", "release {\n            signingConfig signingConfigs.release\n            ")
+          p.write_text(txt)
+          print(txt[txt.find("signingConfigs"):txt.find("signingConfigs")+800])
+          PY
 
       - name: Build AAB for Play Store
         run: |
           cd android
           chmod +x gradlew
           ./gradlew bundleRelease --stacktrace
-          find . -name "*.aab" -type f -print
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: lapgo-release-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
-          if-no-files-found: error
 
       - name: Upload Keystore artifact
         uses: actions/upload-artifact@v4
