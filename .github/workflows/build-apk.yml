@@ -22,7 +22,7 @@ jobs:
       - name: Expo prebuild clean
         run: npx expo prebuild --clean --no-install
 
-      - name: Generate and Setup Release Keystore
+      - name: Generate and Force Release Keystore
         run: |
           cd android
           keytool -genkey -v -keystore release.keystore -alias lapgo -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=LapGo, OU=Dev, O=LapGo, L=HK, S=HK, C=HK"
@@ -35,22 +35,5 @@ jobs:
           echo "MYAPP_RELEASE_KEY_ALIAS=lapgo" >> gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> gradle.properties
           echo "MYAPP_RELEASE_KEY_PASSWORD=123456" >> gradle.properties
+          sed -i 's/signingConfig signingConfigs.debug/signingConfig signingConfigs.release/g' app/build.gradle
           cat gradle.properties
-
-      - name: Build AAB for Play Store
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew bundleRelease --info
-
-      - name: Upload AAB artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: lapgo-release-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
-
-      - name: Upload Keystore artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: lapgo-keystore
-          path: android/app/release.keystore
