@@ -6,8 +6,7 @@ let BannerAd, BannerAdSize, MobileAds;
 try{ const A=require('react-native-google-mobile-ads'); BannerAd=A.BannerAd; BannerAdSize=A.BannerAdSize; MobileAds=A.MobileAds; }catch(e){}
 const BANNER_ID = __DEV__? "ca-app-pub-3940256099942544/6300978111" : "ca-app-pub-9890149028563226/7083933962";
 const TRACKS=[{id:'zic',name:'珠海國際賽車場',en:'Zhuhai Circuit',short:'ZIC • ZHUHAI • 14T',lat:22.3598,lng:113.5678,img:require('./assets/tracks/zic.jpg')},{id:'gic',name:'廣東國際賽車場',en:'Guangdong Circuit',short:'GIC • 13T',lat:23.1216,lng:112.559,img:require('./assets/tracks/gic.jpg')},{id:'fuji',name:'富士賽道',en:'Fuji Speedway',short:'FUJI • 16T',lat:35.3717,lng:138.927,img:require('./assets/tracks/fuji.jpg')},{id:'suzuka',name:'鈴鹿賽道',en:'Suzuka Circuit',short:'SUZUKA • 18T',lat:34.8431,lng:136.5409,img:require('./assets/tracks/suzuka.jpg')},{id:'tsukuba',name:'筑波賽道',en:'Tsukuba Circuit',short:'TSUKUBA • 9T',lat:36.083,lng:140.075,img:require('./assets/tracks/tsukuba.jpg')},{id:'okayama',name:'岡山國際賽道',en:'Okayama Circuit',short:'OKAYAMA • 11T',lat:34.915,lng:134.212,img:require('./assets/tracks/okayama.jpg')},{id:'buriram',name:'武里南賽道',en:'Buriram Circuit',short:'BURIRAM • 12T',lat:14.966,lng:103.095,img:require('./assets/tracks/buriram.jpg')},{id:'sepang',name:'雪邦賽道',en:'Sepang Circuit',short:'SEPANG • 15T',lat:2.7606,lng:101.738,img:require('./assets/tracks/sepang.jpg')},{id:'zhuzhou',name:'株洲國際賽道',en:'Zhuzhou Circuit',short:'ZHUZHOU • 14T',lat:27.85,lng:113.15,img:require('./assets/tracks/zhuzhou.jpg')},{id:'ningbo',name:'寧波國際賽道',en:'Ningbo Circuit',short:'NINGBO • 22T',lat:30.33,lng:121.45,img:require('./assets/tracks/ningbo.jpg')},{id:'guia',name:'東望洋賽道',en:'Guia Circuit',short:'GUIA • MACAU • 22T',lat:22.197,lng:113.555,img:require('./assets/tracks/guia.jpg')},{id:'tmn',name:'屯門公路 (荃灣→屯門)',en:'Tuen Mun Rd (TW→TM)',short:'TMR • 荃→屯 • 限速70',lat:22.3905,lng:113.9768,img:require('./assets/tracks/tuenmun-north.jpg')},{id:'tms',name:'屯門公路 (屯門→荃灣)',en:'Tuen Mun Rd (TM→TW)',short:'TMR • 屯→荃 • 限速70',lat:22.3741,lng:113.9585,img:require('./assets/tracks/tuenmun-south.jpg')}];
-const LANG={zh:{app:'圈速go',gpsOk:'● GPS已鎖定',gpsNo:'○ 搜尋中...',acc:'精度',speed:'速度',temp:'氣溫',prev:'上一圈',best:'最佳',delta:'Delta',sf:'起/終點',s1:'S1',s2:'S2',s3:'S3',hist:'圈速紀錄',dash:'儀表',sess:'紀錄',tracks:'賽道',set:'設定',timer:'--- 計時 ---',disp:'--- 顯示 ---',sys:'--- 系統 ---',proF:'--- Pro功能',night:'夜間模式',unit:'速度單位',tempUnit:'溫度單位',timeFmt:'時間制式',dot:'即時紅點',langTitle:'語言',ghost:'幽靈線透明度',clear:'清除紀錄',ver:'v1.0',proFree:'免費版',proOn:'Pro大佬已啟用 (30日)',proDesc:'免費版30圈睇廣告 • Pro解鎖100圈',upgrade:'升級 Pro',calib:'起/終點校準',minTrig:'最低觸發',autoLap:'自動計圈',needPro:'不日推出',needProDesc:'敬請期待🤣',gpsHz:'GPS頻率',accFilt:'精度過濾',labels:'賽道標籤',safeMode:'安全模式',about:'--- 關於 ---',disclaimer:'免責聲明',privacy:'私隱政策',contact:'聯絡我',disTxt:'本App僅供賽道日及訓練參考，公共道路請遵守限速。熄屏會暫停計時，屬前台定位設計。',priTxt:'本App不會收集個人位置數據，僅前景使用GPS。',conTxt:'問題反饋: fungfung1984@gmail.com'},en:{app:'LapGo',gpsOk:'● GPS Locked',gpsNo:'○ Searching...',acc:'Acc',speed:'Speed',temp:'Temp',prev:'Prev',best:'Best',delta:'Delta',sf:'S/F',s1:'S1',s2:'S2',s3:'S3',hist:'Lap History',dash:'Dash',sess:'Logs',tracks:'Tracks',set:'Settings',timer:'--- Timer ---',disp:'--- Display ---',sys:'--- System ---',proF:'--- Pro ---',night:'Night Mode',unit:'Speed Unit',tempUnit:'Temp Unit',timeFmt:'Time Format',dot:'Live Dot',langTitle:'Language',ghost:'Ghost Opacity',clear:'Clear All',ver:'v1.0',proFree:'Free Mode',proOn:'Pro Active (30d)',proDesc:'Free 30 laps with Ads • Pro 100 laps',upgrade:'Upgrade Pro',calib:'S/F Calib',minTrig:'Min Trigger',autoLap:'Auto Lap',needPro:'Coming Soon',needProDesc:'Stay tuned 🤣',gpsHz:'GPS Rate',accFilt:'Accuracy Filter',labels:'Track Labels',safeMode:'Safe Mode',about:'--- About ---',disclaimer:'Disclaimer',privacy:'Privacy',contact:'Contact',disTxt:'For track day only. Foreground GPS only, pause when screen off.',priTxt:'No data collected. Foreground GPS only.',conTxt:'Feedback: fungfung1984@gmail.com'}};
-function dist(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLng=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+const LANG={zh:{app:'圈速go',gpsOk:'● GPS已鎖定',gpsNo:'○ 搜尋中...',acc:'精度',speed:'速度',temp:'氣溫',prev:'上一圈',best:'最佳',delta:'Delta',sf:'起/終點',s1:'S1',s2:'S2',s3:'S3',hist:'圈速紀錄',dash:'儀表',sess:'紀錄',tracks:'賽道',set:'設定',timer:'--- 計時 ---',disp:'--- 顯示 ---',sys:'--- 系統 ---',proF:'--- Pro功能',night:'夜間模式',unit:'速度單位',tempUnit:'溫度單位',timeFmt:'時間制式',dot:'即時紅點',langTitle:'語言',ghost:'幽靈線透明度',clear:'清除紀錄',ver:'v1.0',proFree:'免費版',proOn:'Pro大佬已啟用 (30日)',proDesc:'免費版30圈睇廣告 • Pro解鎖100圈',upgrade:'升級 Pro',calib:'起/終點校準',minTrig:'最低觸發',autoLap:'自動計圈',needPro:'不日推出',needProDesc:'敬請期待🤣',gpsHz:'GPS頻率',accFilt:'精度過濾',labels:'賽道標籤',safeMode:'安全模式',about:'--- 關於 ---',disclaimer:'免責聲明',privacy:'私隱政策',contact:'聯絡我',disTxt:'本App僅供賽道日及訓練參考，公共道路請遵守限速。熄屏會暫停計時，屬前台定位設計。',priTxt:'本App不會收集個人位置數據，僅前景使用GPS。',conTxt:'問題反饋: fungfung1984@gmail.com'},en:{app:'LapGo',gpsOk:'● GPS Locked',gpsNo:'○ Searching...',acc:'Acc',speed:'Speed',temp:'Temp',prev:'Prev',best:'Best',delta:'Delta',sf:'S/F',s1:'S1',s2:'S2',s3:'S3',hist:'Lap History',dash:'Dash',sess:'Logs',tracks:'Tracks',set:'Settings',timer:'--- Timer ---',disp:'--- Display ---',sys:'--- System ---',proF:'--- Pro ---',night:'Night Mode',unit:'Speed Unit',tempUnit:'Temp Unit',timeFmt:'Time Format',dot:'Live Dot',langTitle:'Language',ghost:'Ghost Opacity',clear:'Clear All',ver:'v1.0',proFree:'Free Mode',proOn:'Pro Active (30d)',proDesc:'Free 30 laps with Ads • Pro 100 laps',upgrade:'Upgrade Pro',calib:'S/F Calib',minTrig:'Min Trigger',autoLap:'Auto Lap',needPro:'Coming Soon',needProDesc:'Stay tuned 🤣',gpsHz:'GPS Rate',accFilt:'Accuracy Filter',labels:'Track Labels',safeMode:'Safe Mode',about:'--- About ---',disclaimer:'Disclaimer',privacy:'Privacy',contact:'Contact',disTxt:'For track day only. Foreground GPS only, pause when screen off.',priTxt:'No data collected. Foreground GPS only.',conTxt:'Feedback: fungfung1984@gmail.com'}};function dist(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLng=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 function bearing(a,b,c,d){const y=Math.sin((d-b)*Math.PI/180)*Math.cos(c*Math.PI/180);const x=Math.cos(a*Math.PI/180)*Math.sin(c*Math.PI/180)-Math.sin(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.cos((d-b)*Math.PI/180);return (Math.atan2(y,x)*180/Math.PI+360)%360;}
 function TimerText({startRef, runningRef, timeFmt, style, lastRef}){
   const [cur,setCur]=useState(0);
@@ -16,47 +15,79 @@ function TimerText({startRef, runningRef, timeFmt, style, lastRef}){
   const show = runningRef.current? cur : (lastRef.current||0);
   return <Text style={style}>{fmt(show)}</Text>;
 }
-const AdBar = React.memo(()=>{ return (<View style={{height:52,width:'100%',backgroundColor:'#000',borderTopWidth:1,borderColor:'#222',alignItems:'center',justifyContent:'center'}}>{BannerAd? <BannerAd unitId={BANNER_ID} size={BannerAdSize.BANNER} /> : <Text style={{color:'#666',fontSize:10}}>AD</Text>}</View>); });export default function App(){
+const AdBar = React.memo(()=>{ return (<View style={{height:52,width:'100%',backgroundColor:'#000',borderTopWidth:1,borderColor:'#222',alignItems:'center',justifyContent:'center'}}>{BannerAd? <BannerAd unitId={BANNER_ID} size={BannerAdSize.BANNER} /> : <Text style={{color:'#666',fontSize:10}}>AD</Text>}</View>); });
+export default function App(){
 const [track,setTrack]=useState(TRACKS[0]);const [locked,setLocked]=useState(false);const [acc,setAcc]=useState(0);const [speedMs,setSpeedMs]=useState(0);
 const [running,setRunning]=useState(false);const [best,setBest]=useState(null);const [prev,setPrev]=useState(null);
 const [sector,setSector]=useState([0,0,0]);const [history,setHistory]=useState([]);const [isPro,setIsPro]=useState(false);
 const [tab,setTab]=useState('dash');const [showSet,setShowSet]=useState(false);const [darkMode,setDarkMode]=useState(false);const [lang,setLang]=useState('zh');
 const [calibDist,setCalibDist]=useState(25);const [minTrigger,setMinTrigger]=useState(15);const [autoLap,setAutoLap]=useState(true);const [unit,setUnit]=useState('kmh');const [tempU,setTempU]=useState('C');const [tempC,setTempC]=useState(null);const [timeFmt,setTimeFmt]=useState('mm:ss');const [ghostOp,setGhostOp]=useState(0.5);const [gForce,setGForce]=useState({x:0,max:0});const [gpsHz,setGpsHz]=useState(1);const [accFilt,setAccFilt]=useState(10);const [showLabels,setShowLabels]=useState(true);const [safeMode,setSafeMode]=useState(true);
-const startRef=useRef(0);const lastTimeRef=useRef(0);const subRef=useRef(null);const trackRef=useRef(TRACKS[0]);const runningRef=useRef(false);const maxSpeedLapRef=useRef(0);const finishLapRef=useRef(null);const lastSpeed=useRef(0);const lastManualTrack=useRef(0);const lastPos=useRef(null);const T=LANG[lang];
-useEffect(()=>{trackRef.current=track;},[track]);useEffect(()=>{(async()=>{
+const startRef=useRef(0);const lastTimeRef=useRef(0);const subRef=useRef(null);const trackRef=useRef(TRACKS[0]);const runningRef=useRef(false);const maxSpeedLapRef=useRef(0);const finishLapRef=useRef(null);const lastSpeed=useRef(0);const lastManualTrack=useRef(0);const lastPos=useRef(null);const gpsHzRef=useRef(1);const accFiltRef=useRef(10);const T=LANG[lang];
+useEffect(()=>{trackRef.current=track;},[track]);
+useEffect(()=>{gpsHzRef.current=gpsHz;},[gpsHz]);
+useEffect(()=>{accFiltRef.current=accFilt;},[accFilt]);useEffect(()=>{(async()=>{
 try{ if(MobileAds){ await MobileAds().initialize(); } }catch(e){}
-// A方案：純前台，不再彈背景定位提示，不再requestBackground
 const {status}=await Location.requestForegroundPermissionsAsync();
 if(status!=='granted'){
   Alert.alert(lang==='zh'?"需要定位權限":"Location needed", lang==='zh'?"請去設定開啟定位":"Please enable location in settings");
   return;
 }
 const vals=await AsyncStorage.multiGet(['lap_history','isPro','pro_exp','darkMode','lang','calib','minTrig','autoLap','unit','tempU','timeFmt','gpsHz','accFilt','showLabels','safeMode']);const m=Object.fromEntries(vals);
-if(m.lap_history)try{setHistory(JSON.parse(m.lap_history));}catch(e){};if(m.isPro && m.pro_exp){const exp=parseInt(m.pro_exp);if(Date.now()<exp){setIsPro(true);}else{await AsyncStorage.multiRemove(['isPro','pro_exp']);}}if(m.darkMode!==null)setDarkMode(m.darkMode==='1');if(m.lang)setLang(m.lang);if(m.calib)setCalibDist(parseInt(m.calib));if(m.minTrig)setMinTrigger(parseInt(m.minTrig));if(m.autoLap!==null)setAutoLap(m.autoLap==='1');if(m.unit)setUnit(m.unit);if(m.tempU)setTempU(m.tempU);if(m.timeFmt)setTimeFmt(m.timeFmt);if(m.gpsHz)setGpsHz(parseInt(m.gpsHz));if(m.accFilt)setAccFilt(parseInt(m.accFilt));if(m.showLabels!==null)setShowLabels(m.showLabels==='1');if(m.safeMode!==null)setSafeMode(m.safeMode==='1');
-if(subRef.current) subRef.current.remove();
-subRef.current=await Location.watchPositionAsync({accuracy:Location.Accuracy.BestForNavigation,distanceInterval:1,timeInterval:1000},loc=>{
-try{
-const lat=loc.coords.latitude, lng=loc.coords.longitude, accu=loc.coords.accuracy||99, spd=loc.coords.speed||0;
-if(Date.now()-lastManualTrack.current>15000){
- let near=trackRef.current, minD=Infinity; TRACKS.forEach(t=>{const d=dist(lat,lng,t.lat,t.lng); if(d<minD){minD=d; near=t;}});
- if(minD<50000 && near){
-  if(near.id==='tmn'||near.id==='tms'){
-   if(lastPos.current && spd>1){
-    const h=loc.coords.heading!=null?loc.coords.heading:bearing(lastPos.current.lat,lastPos.current.lng,lat,lng);
-    if(!isNaN(h)){ near = h>=0&&h<180? TRACKS.find(t=>t.id==='tmn') : TRACKS.find(t=>t.id==='tms'); }
-   }
-  }
-  if(near && near.id!==trackRef.current.id){ trackRef.current=near; setTrack(near); }
- }
- lastPos.current={lat,lng};
-}
-setAcc(accu); if(accu<100) setLocked(true); setSpeedMs(spd);
-const kmhNow=spd*3.6; if(runningRef.current && kmhNow>maxSpeedLapRef.current) maxSpeedLapRef.current=kmhNow;
-const g=Math.abs(spd-lastSpeed.current)*0.8; lastSpeed.current=spd; setGForce(p=>({x:g.toFixed(2),max:Math.max(g,p.max).toFixed(2)}));
-if(runningRef.current&&autoLap&&finishLapRef.current){if(dist(lat,lng,trackRef.current.lat,trackRef.current.lng)<calibDist&&Date.now()-startRef.current>minTrigger*1000)finishLapRef.current();}
-}catch(e){}
-});
-})();return()=>{if(subRef.current)subRef.current.remove();};},[]);const fmt=s=>{if(!s)return '--:--.--';if(timeFmt==='ss')return `${s.toFixed(2)}s`;const mm=Math.floor(s/60);const r=(s%60).toFixed(2);return `${mm}:${r.padStart(5,'0')}`;};
+if(m.lap_history)try{setHistory(JSON.parse(m.lap_history));}catch(e){};if(m.isPro && m.pro_exp){const exp=parseInt(m.pro_exp);if(Date.now()<exp){setIsPro(true);}else{await AsyncStorage.multiRemove(['isPro','pro_exp']);}}if(m.darkMode!==null)setDarkMode(m.darkMode==='1');if(m.lang)setLang(m.lang);if(m.calib)setCalibDist(parseInt(m.calib));if(m.minTrig)setMinTrigger(parseInt(m.minTrig));if(m.autoLap!==null)setAutoLap(m.autoLap==='1');if(m.unit)setUnit(m.unit);if(m.tempU)setTempU(m.tempU);if(m.timeFmt)setTimeFmt(m.timeFmt);if(m.gpsHz){setGpsHz(parseInt(m.gpsHz));gpsHzRef.current=parseInt(m.gpsHz);}if(m.accFilt){setAccFilt(parseInt(m.accFilt));accFiltRef.current=parseInt(m.accFilt);}if(m.showLabels!==null)setShowLabels(m.showLabels==='1');if(m.safeMode!==null)setSafeMode(m.safeMode==='1');
+
+const startWatch = async()=>{
+  if(subRef.current) subRef.current.remove();
+  const hz = gpsHzRef.current;
+  const ti = hz===1?1000 : hz===5?200 : 100;
+  const di = hz===10?0 : 1;
+  subRef.current=await Location.watchPositionAsync({accuracy:Location.Accuracy.BestForNavigation,distanceInterval:di,timeInterval:ti},loc=>{
+    try{
+      const lat=loc.coords.latitude, lng=loc.coords.longitude, accu=loc.coords.accuracy||99, spd=loc.coords.speed||0;
+      setAcc(accu);
+      if(accu > accFiltRef.current){ return; } // 真生效：精度過濾
+      if(accu<100) setLocked(true);
+
+      if(Date.now()-lastManualTrack.current>15000){
+       let near=trackRef.current, minD=Infinity; TRACKS.forEach(t=>{const d=dist(lat,lng,t.lat,t.lng); if(d<minD){minD=d; near=t;}});
+       if(minD<50000 && near){
+        if(near.id==='tmn'||near.id==='tms'){
+         if(lastPos.current && spd>1){
+          const h=loc.coords.heading!=null?loc.coords.heading:bearing(lastPos.current.lat,lastPos.current.lng,lat,lng);
+          if(!isNaN(h)){ near = h>=0&&h<180? TRACKS.find(t=>t.id==='tmn') : TRACKS.find(t=>t.id==='tms'); }
+         }
+        }
+        if(near && near.id!==trackRef.current.id){ trackRef.current=near; setTrack(near); }
+       }
+       lastPos.current={lat,lng};
+      }
+      setSpeedMs(spd);
+      const kmhNow=spd*3.6; if(runningRef.current && kmhNow>maxSpeedLapRef.current) maxSpeedLapRef.current=kmhNow;
+      const g=Math.abs(spd-lastSpeed.current)*0.8; lastSpeed.current=spd; setGForce(p=>({x:g.toFixed(2),max:Math.max(g,p.max).toFixed(2)}));
+      if(runningRef.current&&autoLap&&finishLapRef.current){if(dist(lat,lng,trackRef.current.lat,trackRef.current.lng)<calibDist&&Date.now()-startRef.current>minTrigger*1000)finishLapRef.current();}
+    }catch(e){}
+  });
+};
+await startWatch();
+})();return()=>{if(subRef.current)subRef.current.remove();};},[]);
+
+// 當用戶改頻率，自動重啟watch - 真生效
+useEffect(()=>{(async()=>{
+  if(!subRef.current) return;
+  const ti = gpsHz===1?1000 : gpsHz===5?200 : 100;
+  const di = gpsHz===10?0 : 1;
+  if(subRef.current) subRef.current.remove();
+  subRef.current=await Location.watchPositionAsync({accuracy:Location.Accuracy.BestForNavigation,distanceInterval:di,timeInterval:ti},loc=>{
+    try{
+      const lat=loc.coords.latitude, lng=loc.coords.longitude, accu=loc.coords.accuracy||99, spd=loc.coords.speed||0;
+      setAcc(accu);
+      if(accu > accFilt) return;
+      if(accu<100) setLocked(true);
+      setSpeedMs(spd);
+      const kmhNow=spd*3.6; if(runningRef.current && kmhNow>maxSpeedLapRef.current) maxSpeedLapRef.current=kmhNow;
+      if(runningRef.current&&autoLap&&finishLapRef.current){if(dist(lat,lng,trackRef.current.lat,trackRef.current.lng)<calibDist&&Date.now()-startRef.current>minTrigger*1000)finishLapRef.current();}
+    }catch(e){}
+  });
+})();},[gpsHz, accFilt]);const fmt=s=>{if(!s)return '--:--.--';if(timeFmt==='ss')return `${s.toFixed(2)}s`;const mm=Math.floor(s/60);const r=(s%60).toFixed(2);return `${mm}:${r.padStart(5,'0')}`;};
 const getSpeed=()=>{const kmh=speedMs*3.6;return unit==='kmh'?kmh.toFixed(0):(kmh*0.621371).toFixed(0);};
 const getTemp=()=>{if(tempC===null)return '--';return tempU==='C'?`${tempC.toFixed(1)}°C`:`${(tempC*9/5+32).toFixed(1)}°F`;};
 const getMaxDisplay=(kph)=>{if(kph===null||kph===undefined||kph===0) return '--'; const v=parseFloat(kph); if(isNaN(v)) return '--'; if(unit==='mph') return (v*0.621371).toFixed(1); return v.toFixed(1);};
@@ -106,7 +137,7 @@ const DashView=()=>{
 <Text style={[s.setTitle,theme.t]}>{T.proF}</Text><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>handleProToggle('dot')}><Text style={theme.t}>{T.dot}</Text><Text style={theme.sub}>🔒 ＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>handleProToggle('ghost')}><Text style={theme.t}>{T.ghost} {Math.round(ghostOp*100)}%</Text><Text style={theme.sub}>🔒 ＞</Text></TouchableOpacity>
 <Text style={[s.setTitle,theme.t]}>{T.sys}</Text><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>{Alert.alert('清除紀錄','確定清晒所有圈速？',[{text:'取消',style:'cancel'},{text:'確定清除',style:'destructive',onPress:async()=>{await AsyncStorage.multiRemove(['lap_history']);setHistory([]);}}],{cancelable:true});}}><Text style={theme.t}>{T.clear}</Text><Text style={theme.sub}>＞</Text></TouchableOpacity>
 <Text style={[s.setTitle,theme.t]}>{T.about}</Text><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>Alert.alert(T.disclaimer,T.disTxt,[{text:'知道了',style:'cancel'}],{cancelable:true})}><Text style={theme.t}>{T.disclaimer}</Text><Text style={theme.sub}>＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>Alert.alert(T.privacy,T.priTxt,[{text:'知道了',style:'cancel'}],{cancelable:true})}><Text style={theme.t}>{T.privacy}</Text><Text style={theme.sub}>＞</Text></TouchableOpacity><TouchableOpacity style={[s.setRow,theme.b]} onPress={()=>Alert.alert(T.contact,T.conTxt,[{text:'知道了',style:'cancel'}],{cancelable:true})}><Text style={theme.t}>{T.contact}</Text><Text style={theme.sub}>＞</Text></TouchableOpacity>
-<View style={{alignItems:'center',marginTop:14,marginBottom:10}}><Text style={{fontSize:11,color:'#888'}}>v1.0 Foreground Only</Text></View>
+<View style={{alignItems:'center',marginTop:14,marginBottom:10}}><Text style={{fontSize:11,color:'#888'}}>v1.0 Foreground Only • {gpsHz}Hz • ＜{accFilt}m</Text></View>
 </ScrollView></View></Modal>
 <View style={[s.tabBar,theme.gps]}><TouchableOpacity style={s.tabBtn} onPress={()=>setTab('dash')}><Text style={[s.tab,tab==='dash'&&s.tabOn]}>{T.dash}</Text></TouchableOpacity><TouchableOpacity style={s.tabBtn} onPress={()=>setTab('sessions')}><Text style={[s.tab,tab==='sessions'&&s.tabOn]}>{T.sess}</Text></TouchableOpacity><TouchableOpacity style={s.tabBtn} onPress={()=>setTab('tracks')}><Text style={[s.tab,tab==='tracks'&&s.tabOn]}>{T.tracks}</Text></TouchableOpacity></View>
 </View>);}
