@@ -22,10 +22,11 @@ const [running,setRunning]=useState(false);const [best,setBest]=useState(null);c
 const [sector,setSector]=useState([0,0,0]);const [history,setHistory]=useState([]);const [isPro,setIsPro]=useState(false);
 const [tab,setTab]=useState('dash');const [showSet,setShowSet]=useState(false);const [darkMode,setDarkMode]=useState(false);const [lang,setLang]=useState('zh');
 const [calibDist,setCalibDist]=useState(25);const [minTrigger,setMinTrigger]=useState(15);const [autoLap,setAutoLap]=useState(true);const [unit,setUnit]=useState('kmh');const [tempU,setTempU]=useState('C');const [tempC,setTempC]=useState(null);const [timeFmt,setTimeFmt]=useState('mm:ss');const [ghostOp,setGhostOp]=useState(0.5);const [gForce,setGForce]=useState({x:0,max:0});const [gpsHz,setGpsHz]=useState(1);const [accFilt,setAccFilt]=useState(10);const [showLabels,setShowLabels]=useState(true);const [safeMode,setSafeMode]=useState(true);
-const startRef=useRef(0);const lastTimeRef=useRef(0);const subRef=useRef(null);const trackRef=useRef(TRACKS[0]);const runningRef=useRef(false);const maxSpeedLapRef=useRef(0);const finishLapRef=useRef(null);const lastSpeed=useRef(0);const lastManualTrack=useRef(0);const lastPos=useRef(null);const gpsHzRef=useRef(1);const accFiltRef=useRef(10);const T=LANG[lang];
+const startRef=useRef(0);const lastTimeRef=useRef(0);const subRef=useRef(null);const trackRef=useRef(TRACKS[0]);const runningRef=useRef(false);const maxSpeedLapRef=useRef(0);const finishLapRef=useRef(null);const lastSpeed=useRef(0);const lastManualTrack=useRef(0);const lastPos=useRef(null);const gpsHzRef=useRef(1);const accFiltRef=useRef(10);const lockedRef=useRef(false);const T=LANG[lang];
 useEffect(()=>{trackRef.current=track;},[track]);
 useEffect(()=>{gpsHzRef.current=gpsHz;},[gpsHz]);
-useEffect(()=>{accFiltRef.current=accFilt;},[accFilt]);useEffect(()=>{(async()=>{
+useEffect(()=>{accFiltRef.current=accFilt;},[accFilt]);
+useEffect(()=>{lockedRef.current=locked;},[locked]);useEffect(()=>{(async()=>{
 try{ if(MobileAds){ await MobileAds().initialize(); } }catch(e){}
 const {status}=await Location.requestForegroundPermissionsAsync();
 if(status!=='granted'){
@@ -43,8 +44,12 @@ const startWatch = async()=>{
     try{
       const lat=loc.coords.latitude, lng=loc.coords.longitude, accu=loc.coords.accuracy||99, spd=loc.coords.speed||0;
       setAcc(accu);
-      if(accu > accFiltRef.current){ return; }
-      if(accu<100) setLocked(true);
+      // 快鎖：未鎖之前唔過濾，3秒即顯示已鎖定
+      if(!lockedRef.current){
+        if(accu<100){ setLocked(true); lockedRef.current=true; }
+      }else{
+        if(accu > accFiltRef.current) return; // 鎖咗之後先真過濾
+      }
       if(Date.now()-lastManualTrack.current>15000){
        let near=trackRef.current, minD=Infinity; TRACKS.forEach(t=>{const d=dist(lat,lng,t.lat,t.lng); if(d<minD){minD=d; near=t;}});
        if(minD<50000 && near){
@@ -76,8 +81,11 @@ useEffect(()=>{(async()=>{
     try{
       const lat=loc.coords.latitude, lng=loc.coords.longitude, accu=loc.coords.accuracy||99, spd=loc.coords.speed||0;
       setAcc(accu);
-      if(accu > accFilt) return;
-      if(accu<100) setLocked(true);
+      if(!lockedRef.current){
+        if(accu<100){ setLocked(true); lockedRef.current=true; }
+      }else{
+        if(accu > accFilt) return;
+      }
       setSpeedMs(spd);
       const kmhNow=spd*3.6; if(runningRef.current && kmhNow>maxSpeedLapRef.current) maxSpeedLapRef.current=kmhNow;
       if(runningRef.current&&autoLap&&finishLapRef.current){if(dist(lat,lng,trackRef.current.lat,trackRef.current.lng)<calibDist&&Date.now()-startRef.current>minTrigger*1000)finishLapRef.current();}
