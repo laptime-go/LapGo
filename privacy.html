@@ -8,22 +8,22 @@
 </head>
 <body>
 <h1>Privacy Policy for LapTime Go / 圈速go</h1>
-<p>Last updated: 2026-08-09</p>
+<p>Last updated: 2026-09-26</p>
 
 <h2>1. Overview</h2>
 <p>LapTime Go does not collect, store, or transmit any personal data to our servers. All GPS timing data is processed locally on your device.</p>
 
-<h2>2. Location Data</h2>
-<p>The app uses GPS location (foreground and background) solely for lap timing functionality. Location data is used to detect start/finish lines and calculate lap times. This data never leaves your device and is not shared with any third party, except as required for map display and weather API (Open-Meteo) which only uses approximate lat/lng to fetch temperature.</p>
+<h2>2. Location Data - Foreground Only</h2>
+<p>The app uses GPS location ONLY when the app is in foreground (open on screen) solely for lap timing. Location is used to detect start/finish lines and calculate lap times. If you switch apps or turn screen off, timing will pause. This is intentional to comply with Google Play foreground-only policy. Location data never leaves your device and is not shared with any third party, except Open-Meteo weather API which only uses approximate lat/lng to fetch temperature.</p>
 
 <h2>3. Background Location</h2>
-<p>Background location is required to continue lap timing when the screen is off or the app is in background during track sessions. A persistent notification "圈速go 正在計時" is shown when background tracking is active.</p>
+<p>We do NOT use background location. We do NOT request ACCESS_BACKGROUND_LOCATION permission. No background tracking, no persistent notification.</p>
 
 <h2>4. Data Storage</h2>
 <p>Lap history is stored locally using AsyncStorage on your device. You can delete it anytime in Settings > Clear All.</p>
 
 <h2>5. Advertising</h2>
-<p>We use Google AdMob (react-native-google-mobile-ads). AdMob may collect device advertising ID as per Google's policy. No personal location is sent to AdMob by us.</p>
+<p>We use Google AdMob (react-native-google-mobile-ads). AdMob may collect device advertising ID as per Google's policy. No location is sent to AdMob by us.</p>
 
 <h2>6. No Personal Data Collection</h2>
 <p>We do not collect names, emails, phone numbers, or precise location history on any server.</p>
@@ -32,8 +32,8 @@
 <p>This app is not directed to children under 13.</p>
 
 <h2>8. Contact</h2>
-<p>If you have any questions about this privacy policy, contact us at: <b>fungfung1984@gmail.com</b></p>
+<p>Contact: <b>fungfung1984@gmail.com</b></p>
 
-<p>Effective for: LapTime Go (com.lapgo.timer)</p>
+<p>Effective for: LapTime Go (com.lapgo.timer) - Foreground Location Only Version</p>
 </body>
 </html>
