@@ -11,10 +11,10 @@
 <p>Last updated: 2026-09-26</p>
 
 <h2>1. Overview</h2>
-<p>LapTime Go does not collect, store, or transmit any personal data to our servers. All GPS timing data is processed locally on your device.</p>
+<p>LapTime Go does not collect, store, or transmit personal data to our own servers. All GPS timing data is processed locally on your device. However, third-party SDKs (Google AdMob, Open-Meteo) may collect data as described below.</p>
 
 <h2>2. Location Data - Foreground Only</h2>
-<p>The app uses GPS location ONLY when the app is in foreground (open on screen) solely for lap timing. Location is used to detect start/finish lines and calculate lap times. If you switch apps or turn screen off, timing will pause. This is intentional to comply with Google Play foreground-only policy. Location data never leaves your device and is not shared with any third party, except Open-Meteo weather API which only uses approximate lat/lng to fetch temperature.</p>
+<p>The app uses GPS location ONLY when the app is in foreground (open on screen) solely for lap timing. Location is used to detect start/finish lines and calculate lap times. If you switch apps or turn screen off, timing will pause. This is intentional to comply with Google Play foreground-only policy. Precise location is processed locally and not stored on our server. Only approximate lat/lng is sent to Open-Meteo weather API to fetch temperature.</p>
 
 <h2>3. Background Location</h2>
 <p>We do NOT use background location. We do NOT request ACCESS_BACKGROUND_LOCATION permission. No background tracking, no persistent notification.</p>
@@ -22,16 +22,31 @@
 <h2>4. Data Storage</h2>
 <p>Lap history is stored locally using AsyncStorage on your device. You can delete it anytime in Settings > Clear All.</p>
 
-<h2>5. Advertising</h2>
-<p>We use Google AdMob (react-native-google-mobile-ads). AdMob may collect device advertising ID as per Google's policy. No location is sent to AdMob by us.</p>
+<h2>5. Advertising & Data Sharing</h2>
+<p>We use Google AdMob (react-native-google-mobile-ads). AdMob may collect Device Advertising ID and App Interaction data for advertising purposes as per Google's policy. No precise location is sent to AdMob by us.<br>
+We use Open-Meteo Weather API. It receives approximate location only.</p>
 
-<h2>6. No Personal Data Collection</h2>
-<p>We do not collect names, emails, phone numbers, or precise location history on any server.</p>
+<h2>6. Data Collection Summary (for Google Play Data Safety)</h2>
+<p>
+- Precise Location: Collected for App Functionality, shared with Open-Meteo, encrypted in transit, required for app functionality.<br>
+- Device or other IDs (Advertising ID): Collected for Advertising, shared with AdMob, encrypted in transit.<br>
+- App Activity (App Interactions): Collected for Advertising, shared with AdMob, encrypted in transit.
+</p>
 
-<h2>7. Children's Privacy</h2>
+<h2>7. No Personal Data Collection On Our Server</h2>
+<p>We do not collect names, emails, phone numbers, or precise location history on any server owned by us.</p>
+
+<h2>8. Data Deletion & Your Rights</h2>
+<p><b>How to delete your data:</b><br>
+1. Local data: Open LapTime Go > Settings > Clear All, or go to Android Settings > Apps > LapGo > Storage > Clear Data, or uninstall the app.<br>
+2. Third-party data: To request deletion of data collected by AdMob or Open-Meteo, please contact us at fungfung1984@gmail.com. We will respond and process your request within 7 days.<br>
+3. Deletion request webpage: https://laptime-go.github.io/LapGo/privacy.html<br>
+After deletion, no data is retained.</p>
+
+<h2>9. Children's Privacy</h2>
 <p>This app is not directed to children under 13.</p>
 
-<h2>8. Contact</h2>
+<h2>10. Contact</h2>
 <p>Contact: <b>fungfung1984@gmail.com</b></p>
 
 <p>Effective for: LapTime Go (com.lapgo.timer) - Foreground Location Only Version</p>
