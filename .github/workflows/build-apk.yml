@@ -1,7 +1,7 @@
-name: Build AAB for Play Store
+name: Build APK Self Use
+
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch: # 手動按先build，唔會每次push都build
 
 jobs:
   build:
@@ -24,25 +24,17 @@ jobs:
 
       - name: Fix minSdk 23 -> 24
         run: |
-          echo "Before:"
-          grep -r "minSdk" android --include="*.gradle" -n || true
-          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle
-          sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle
-          sed -i 's/minSdkVersion = 23/minSdkVersion = 24/g' android/app/build.gradle
-          sed -i 's/minSdk = 23/minSdk = 24/g' android/app/build.gradle
-          # 保險：全個android folder 暴力replace
-          find android -name "*.gradle" -exec sed -i 's/23/24/g' {} \; -exec grep -l "minSdk" {} \; || true
-          echo "After:"
-          grep -r "minSdk" android --include="*.gradle" -n || true
+          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
+          sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle || true
+          sed -i 's/minSdkVersion = 23/minSdkVersion = 24/g' android/app/build.gradle || true
+          sed -i 's/minSdk = 23/minSdk = 24/g' android/app/build.gradle || true
 
       - name: Use Permanent Keystore 90:BA
         run: |
-          echo "Using committed release.keystore from repo root"
           ls -lh release.keystore
           mkdir -p android/app
           cp release.keystore android/release.keystore
           cp release.keystore android/app/release.keystore
-          keytool -list -v -keystore release.keystore -storepass 123456 | grep -E "Alias|SHA1"
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
           echo "MYAPP_RELEASE_KEY_ALIAS=lapgo" >> android/gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> android/gradle.properties
@@ -52,14 +44,14 @@ jobs:
           echo "MYAPP_UPLOAD_STORE_PASSWORD=123456" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=123456" >> android/gradle.properties
 
-      - name: Build AAB for Play Store
+      - name: Build APK for Self Use
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew bundleRelease
+          ./gradlew assembleRelease
 
-      - name: Upload AAB artifact
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lapgo-release-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          name: lapgo-self-apk-tuenmun
+          path: android/app/build/outputs/apk/release/app-release.apk
