@@ -10,7 +10,6 @@ if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, {recursive:true});
 
 TRACKS.forEach(id=>{
   const p = path.join(outDir, `${id}.jpg`);
-  // 如果已有真圖>5k就skip，0圖就會全畫
   if(fs.existsSync(p) && fs.statSync(p).size>5000){
     console.log(`SKIP ${id} 已有真圖`);
     return;
@@ -25,6 +24,6 @@ TRACKS.forEach(id=>{
   ctx.shadowBlur=0; ctx.fillStyle='#666'; ctx.font='18px Arial';
   ctx.fillText('LAPGO • GREEN NEON • '+id,400,310);
   fs.writeFileSync(p, canvas.toBuffer('image/jpeg',{quality:0.9}));
-  console.log(`NEON ${id}.jpg`);
+  console.log(`✅ ${id}.jpg`);
 });
-console.log(`Done Total: ${fs.readdirSync(outDir).length} / ${TRACKS.length}`);
+console.log(`Done ${TRACKS.length} / ${fs.readdirSync(outDir).length}`);
