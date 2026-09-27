@@ -21,22 +21,65 @@ jobs:
       - name: Expo prebuild clean
         run: npx expo prebuild --clean --no-install
 
-      - name: Filter to 11 Tracks For Google - Remove Tuen Mun
+      - name: Filter to 11 Tracks SAFELY (No Crash)
         run: |
-          echo "=== 過濾前 ==="
-          grep -r "屯門\|TMR\|Tuen Mun" --include="*.js" --include="*.ts" --include="*.tsx" --include="*.json" . 2>/dev/null | grep -v node_modules | grep -v android | head -20 || true
-          
-          # 全倉暴力刪除屯門公路相關行，唔使你手改App.js
-          find . -type f \( -name "*.js" -o -name "*.ts" -o -name "*.tsx" -o -name "*.json" \) ! -path "*/node_modules/*" ! -path "*/android/*" ! -path "*/.git/*" ! -path "*/.expo/*" -exec sed -i '/屯門公路/d; /屯門公/d; /Tuen Mun Road/d; /Tuen Mun/d; /TSUEN WAN.*TUEN MUN/d; /TMR/d; /荃→屯/d; /荃灣.*屯門/d' {} \; || true
-          
-          echo "=== 過濾後 ==="
-          grep -r "屯門\|TMR" --include="*.js" --include="*.ts" --include="*.tsx" --include="*.json" . 2>/dev/null | grep -v node_modules | grep -v android || echo "✅ 100% Clean - 11 tracks only"
+          cat > /tmp/filter.js << 'JS'
+          const fs=require('fs'); const path=require('path');
+          const banned=['屯門','Tuen Mun','TMR','TSUEN WAN -> TUEN MUN','荃→屯'];
+          function walk(dir){
+            if(!fs.existsSync(dir)) return [];
+            let res=[]; fs.readdirSync(dir).forEach(f=>{
+              const full=path.join(dir,f);
+              if(full.includes('node_modules')||full.includes('android')||full.includes('.expo')||full.includes('.git')) return;
+              const st=fs.statSync(full);
+              if(st.isDirectory()) res=res.concat(walk(full));
+              else if(/\.(json|js|ts|tsx)$/.test(full)) res.push(full);
+            }); return res;
+          }
+          let files=walk('./src'); 
+          // 再加根目錄可能有嘅 config
+          ['App.js','App.tsx','app.config.js'].forEach(f=>{ if(fs.existsSync(f)) files.push(f); });
+          files.forEach(file=>{
+            try{
+              let content=fs.readFileSync(file,'utf8');
+              if(!banned.some(k=>content.includes(k))) return;
+              // 如果係JSON array，安全過濾
+              if(file.endsWith('.json')){
+                try{
+                  let data=JSON.parse(content);
+                  if(Array.isArray(data)){
+                    let before=data.length;
+                    data=data.filter(o=>!banned.some(k=>JSON.stringify(o).includes(k)));
+                    if(data.length!=before){ fs.writeFileSync(file, JSON.stringify(data,null,2)); console.log(`✅ ${file}: ${before}->${data.length}`); }
+                  }
+                }catch{}
+              } else {
+                // JS/TS：將包含屯門的物件替換做空，唔刪行，避免crash
+                let orig=content;
+                // 匹配 { ...屯門... }, 整個替換
+                content=content.replace(/\{[^{}]*?(?:屯門|Tuen Mun|TMR|TSUEN WAN -> TUEN MUN|荃→屯)[^{}]*?\},?/gs,'');
+                // 清理雙逗號 ,, 和 [,
+                content=content.replace(/,\s*,/g,',').replace(/\[\s*,/g,'[');
+                if(content!==orig){ fs.writeFileSync(file, content); console.log(`✅ Patched ${file}`); }
+              }
+            }catch(e){ console.log(`Skip ${file} ${e.message}`); }
+          });
+          JS
+          node /tmp/filter.js
+          echo "Check result:"
+          grep -r "屯門\|TMR" src --include="*.js" --include="*.ts" --include="*.tsx" --include="*.json" 2>/dev/null | grep -v node_modules || echo "✅ 100% Clean - 11 tracks - No crash"
 
       - name: Fix minSdk 23 -> 24
         run: |
+          echo "Before:"
+          grep -r "minSdk" android --include="*.gradle" -n || true
           sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle
           sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle
-          find android -name "*.gradle" -exec sed -i 's/minSdkVersion 23/minSdkVersion 24/g' {} \; || true
+          sed -i 's/minSdkVersion = 23/minSdkVersion = 24/g' android/app/build.gradle
+          sed -i 's/minSdk = 23/minSdk = 24/g' android/app/build.gradle
+          find android -name "*.gradle" -exec sed -i 's/23/24/g' {} \; -exec grep -l "minSdk" {} \; || true
+          echo "After:"
+          grep -r "minSdk" android --include="*.gradle" -n || true
 
       - name: Use Permanent Keystore 40:0C:73 NEW
         run: |
