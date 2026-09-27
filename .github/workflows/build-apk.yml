@@ -1,7 +1,6 @@
-name: Build APK Store Clean Preview (11 Tracks For Google Screenshot)
+name: Build 90 Tracks AAB + APK - 40:0C:73
 on:
   workflow_dispatch
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,76 +14,43 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Install system deps for canvas
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
+
       - name: Install deps
-        run: npm install
+        run: npm install && npm install canvas
+
+      - name: Auto Generate 90 GREEN NEON Tracks
+        run: |
+          mkdir -p assets/tracks
+          cat > /tmp/gen.js << 'JS'
+          const {createCanvas} = require('canvas');
+          const fs=require('fs'), path=require('path');
+          const tracks=['zic','gic','guia','sic','tianma','ningbo','zhuzhou','goldenport','chengdu','wuhan','ordos','shaoxing','zhengzhou','v1','pingtan','guangzhou','jingsu','fugang','fuji','suzuka','motegi','okayama','sugo','tsukuba','autopolis','ebisu','tokachi','sendai','mine','central','sepang','buriram','bira','bangsaen','sentul','clark','inje','korea','bathurst','sydney','phillip','dubai','yas','bahrain','losail','buddh','sepang-kart','buriram-kart','monza','spa','nurburgring','lemans','silverstone','monaco','laguna','daytona','cota','interlagos','zandvoort','imola','catalunya','redbull','hungaroring'];
+          const dir='assets/tracks';
+          tracks.forEach(id=>{
+            const p=path.join(dir, id+'.jpg');
+            if(fs.existsSync(p) && fs.statSync(p).size>5000) return; // 已有真圖就唔replace
+            const c=createCanvas(800,500), ctx=c.getContext('2d');
+            ctx.fillStyle='#000'; ctx.fillRect(0,0,800,500);
+            ctx.strokeStyle='#00ff88'; ctx.lineWidth=6; ctx.shadowColor='#00ff88'; ctx.shadowBlur=18;
+            ctx.strokeRect(15,15,770,470);
+            ctx.shadowBlur=20; ctx.fillStyle='#00ff88'; ctx.font='bold 70px Arial'; ctx.textAlign='center';
+            ctx.fillText(id.toUpperCase(),400,260);
+            ctx.shadowBlur=0; ctx.fillStyle='#666'; ctx.font='18px Arial'; ctx.fillText('LAPGO • GREEN NEON • '+id,400,310);
+            fs.writeFileSync(p, c.toBuffer('image/jpeg',{quality:0.9}));
+            console.log('NEON '+id+'.jpg');
+          });
+          JS
+          node /tmp/gen.js
+          echo "Total: $(ls assets/tracks/ | wc -l)"
 
       - name: Expo prebuild clean
         run: npx expo prebuild --clean --no-install
-
-      - name: Filter to 11 Tracks SAFELY (No Crash)
+      - name: Fix minSdk
+        run: sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle; sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle || true
+      - name: Use Keystore 40:0C:73
         run: |
-          cat > /tmp/filter.js << 'JS'
-          const fs=require('fs'); const path=require('path');
-          const banned=['屯門','Tuen Mun','TMR','TSUEN WAN -> TUEN MUN','荃→屯'];
-          function walk(dir){
-            if(!fs.existsSync(dir)) return [];
-            let res=[]; fs.readdirSync(dir).forEach(f=>{
-              const full=path.join(dir,f);
-              if(full.includes('node_modules')||full.includes('android')||full.includes('.expo')||full.includes('.git')) return;
-              const st=fs.statSync(full);
-              if(st.isDirectory()) res=res.concat(walk(full));
-              else if(/\.(json|js|ts|tsx)$/.test(full)) res.push(full);
-            }); return res;
-          }
-          let files=walk('./src'); 
-          // 再加根目錄可能有嘅 config
-          ['App.js','App.tsx','app.config.js'].forEach(f=>{ if(fs.existsSync(f)) files.push(f); });
-          files.forEach(file=>{
-            try{
-              let content=fs.readFileSync(file,'utf8');
-              if(!banned.some(k=>content.includes(k))) return;
-              // 如果係JSON array，安全過濾
-              if(file.endsWith('.json')){
-                try{
-                  let data=JSON.parse(content);
-                  if(Array.isArray(data)){
-                    let before=data.length;
-                    data=data.filter(o=>!banned.some(k=>JSON.stringify(o).includes(k)));
-                    if(data.length!=before){ fs.writeFileSync(file, JSON.stringify(data,null,2)); console.log(`✅ ${file}: ${before}->${data.length}`); }
-                  }
-                }catch{}
-              } else {
-                // JS/TS：將包含屯門的物件替換做空，唔刪行，避免crash
-                let orig=content;
-                // 匹配 { ...屯門... }, 整個替換
-                content=content.replace(/\{[^{}]*?(?:屯門|Tuen Mun|TMR|TSUEN WAN -> TUEN MUN|荃→屯)[^{}]*?\},?/gs,'');
-                // 清理雙逗號 ,, 和 [,
-                content=content.replace(/,\s*,/g,',').replace(/\[\s*,/g,'[');
-                if(content!==orig){ fs.writeFileSync(file, content); console.log(`✅ Patched ${file}`); }
-              }
-            }catch(e){ console.log(`Skip ${file} ${e.message}`); }
-          });
-          JS
-          node /tmp/filter.js
-          echo "Check result:"
-          grep -r "屯門\|TMR" src --include="*.js" --include="*.ts" --include="*.tsx" --include="*.json" 2>/dev/null | grep -v node_modules || echo "✅ 100% Clean - 11 tracks - No crash"
-
-      - name: Fix minSdk 23 -> 24
-        run: |
-          echo "Before:"
-          grep -r "minSdk" android --include="*.gradle" -n || true
-          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle
-          sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle
-          sed -i 's/minSdkVersion = 23/minSdkVersion = 24/g' android/app/build.gradle
-          sed -i 's/minSdk = 23/minSdk = 24/g' android/app/build.gradle
-          find android -name "*.gradle" -exec sed -i 's/23/24/g' {} \; -exec grep -l "minSdk" {} \; || true
-          echo "After:"
-          grep -r "minSdk" android --include="*.gradle" -n || true
-
-      - name: Use Permanent Keystore 40:0C:73 NEW
-        run: |
-          echo "Using NEW keystore 40:0C:73"
-          ls -lh release.keystore
           mkdir -p android/app
           cp release.keystore android/release.keystore
           cp release.keystore android/app/release.keystore
@@ -97,15 +63,15 @@ jobs:
           echo "MYAPP_UPLOAD_KEY_ALIAS=lapgo" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=123456" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=123456" >> android/gradle.properties
-
-      - name: Build APK for Google Screenshot
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleRelease
-
-      - name: Upload APK artifact
+      - name: Build AAB + APK
+        run: cd android && chmod +x gradlew && ./gradlew bundleRelease assembleRelease
+      - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: lapgo-store-clean-11tracks-for-google-screenshot
+          name: lapgo-90tracks-AAB-40-0C-73-NEON
+          path: android/app/build/outputs/bundle/release/app-release.aab
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: lapgo-90tracks-APK-40-0C-73-NEON
           path: android/app/build/outputs/apk/release/app-release.apk
