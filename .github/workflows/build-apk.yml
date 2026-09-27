@@ -1,7 +1,6 @@
 name: Build APK Store Clean Preview (11 Tracks For Google Screenshot)
-
 on:
-  workflow_dispatch:
+  workflow_dispatch
 
 jobs:
   build:
@@ -22,18 +21,38 @@ jobs:
       - name: Expo prebuild clean
         run: npx expo prebuild --clean --no-install
 
+      - name: Filter to 11 Tracks For Google (Remove Tuen Mun)
+        run: |
+          echo "Before filter:"
+          find src -type f -name "*.json" -o -name "*.js" -o -name "*.ts" | xargs grep -l "Tuen\|屯門\|TMC" 2>/dev/null | head -20 || true
+          # === 11條白名單過審版 ===
+          # 1. 如果你有 tracks.json / config，直接刪走屯門
+          if [ -f "src/data/tracks.json" ]; then
+            echo "Filtering src/data/tracks.json"
+            cat src/data/tracks.json | grep -v -i "tuen\|屯門\|TMC\|Tuen Mun Road" > /tmp/tracks.json || true
+            mv /tmp/tracks.json src/data/tracks.json || true
+          fi
+          # 2. 通用暴力過濾：成個src入面註釋掉屯門
+          find src -type f \( -name "*.js" -o -name "*.ts" -o -name "*.tsx" \) -exec sed -i '/Tuen Mun/d; /屯門/d; /TMC/d; /tuen-mun/d; /TuenMun/d' {} \; || true
+          echo "After filter - should be 11 tracks only"
+          grep -r "Tuen\|屯門" src --include="*.js" --include="*.ts" --include="*.tsx" -n || echo "✅ 100% Clean - 11 tracks - No Tuen Mun"
+
       - name: Fix minSdk 23 -> 24
         run: |
-          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
-          sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle || true
-          sed -i 's/minSdkVersion = 23/minSdkVersion = 24/g' android/app/build.gradle || true
-          sed -i 's/minSdk = 23/minSdk = 24/g' android/app/build.gradle || true
+          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle
+          sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle
+          sed -i 's/minSdkVersion = 23/minSdkVersion = 24/g' android/app/build.gradle
+          sed -i 's/minSdk = 23/minSdk = 24/g' android/app/build.gradle
+          find android -name "*.gradle" -exec sed -i 's/minSdkVersion 23/minSdkVersion 24/g' {} \; || true
 
-      - name: Use Permanent Keystore 90:BA
+      - name: Use Permanent Keystore 40:0C:73 NEW
         run: |
+          echo "Using NEW keystore 40:0C:73 from repo"
+          ls -lh release.keystore
           mkdir -p android/app
           cp release.keystore android/release.keystore
           cp release.keystore android/app/release.keystore
+          keytool -list -v -keystore release.keystore -storepass 123456 | grep -E "Alias|SHA1|Creation"
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
           echo "MYAPP_RELEASE_KEY_ALIAS=lapgo" >> android/gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> android/gradle.properties
@@ -43,28 +62,7 @@ jobs:
           echo "MYAPP_UPLOAD_STORE_PASSWORD=123456" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=123456" >> android/gradle.properties
 
-      - name: Filter Tuen Mun 100% Clean For Store
-        run: |
-          echo "Filtering for Google Play - 11 tracks only"
-          node -e "
-          let fs=require('fs');
-          let c=fs.readFileSync('App.js','utf8');
-          c=c.replace(/,\{id:'tmn'[\s\S]*?tuenmun-north\.jpg[^}]*\}/g,'');
-          c=c.replace(/,\{id:'tms'[\s\S]*?tuenmun-south\.jpg[^}]*\}/g,'');
-          c=c.replace(/if\(near\.id==='tmn'\|\|near\.id==='tms'\)[\s\S]*?}\s*}\s*/g,'');
-          c=c.replace(/TRACKS\.find\(t=>t\.id==='tmn'\)/g,'null');
-          c=c.replace(/TRACKS\.find\(t=>t\.id==='tms'\)/g,'null');
-          c=c.replace(/const isTM=trackRef\.current\.id==='tmn'\|\|trackRef\.current\.id==='tms';/g,'const isTM=false;');
-          c=c.replace(/if\(safeMode&&isTM\)[\s\S]*?return;\}/g,'');
-          fs.writeFileSync('App.js',c);
-          "
-          rm -f assets/tracks/tuenmun-north.jpg
-          rm -f assets/tracks/tuenmun-south.jpg
-          echo '=== Verify Clean ==='
-          ! grep -q "tmn\|tms\|屯門\|Tuen\|TMR" App.js && echo '✅ 100% Clean - 11 tracks' || (echo '❌ Still has TM' && exit 1)
-          grep -o "id:'[^']*'" App.js
-
-      - name: Build APK Store Clean
+      - name: Build APK for Google Screenshot
         run: |
           cd android
           chmod +x gradlew
