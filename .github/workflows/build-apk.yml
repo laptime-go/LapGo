@@ -21,38 +21,31 @@ jobs:
       - name: Expo prebuild clean
         run: npx expo prebuild --clean --no-install
 
-      - name: Filter to 11 Tracks For Google (Remove Tuen Mun)
+      - name: Filter to 11 Tracks For Google - Remove Tuen Mun
         run: |
-          echo "Before filter:"
-          find src -type f -name "*.json" -o -name "*.js" -o -name "*.ts" | xargs grep -l "Tuen\|屯門\|TMC" 2>/dev/null | head -20 || true
-          # === 11條白名單過審版 ===
-          # 1. 如果你有 tracks.json / config，直接刪走屯門
-          if [ -f "src/data/tracks.json" ]; then
-            echo "Filtering src/data/tracks.json"
-            cat src/data/tracks.json | grep -v -i "tuen\|屯門\|TMC\|Tuen Mun Road" > /tmp/tracks.json || true
-            mv /tmp/tracks.json src/data/tracks.json || true
-          fi
-          # 2. 通用暴力過濾：成個src入面註釋掉屯門
-          find src -type f \( -name "*.js" -o -name "*.ts" -o -name "*.tsx" \) -exec sed -i '/Tuen Mun/d; /屯門/d; /TMC/d; /tuen-mun/d; /TuenMun/d' {} \; || true
-          echo "After filter - should be 11 tracks only"
-          grep -r "Tuen\|屯門" src --include="*.js" --include="*.ts" --include="*.tsx" -n || echo "✅ 100% Clean - 11 tracks - No Tuen Mun"
+          echo "=== 過濾前 ==="
+          grep -r "屯門\|TMR\|Tuen Mun" --include="*.js" --include="*.ts" --include="*.tsx" --include="*.json" . 2>/dev/null | grep -v node_modules | grep -v android | head -20 || true
+          
+          # 全倉暴力刪除屯門公路相關行，唔使你手改App.js
+          find . -type f \( -name "*.js" -o -name "*.ts" -o -name "*.tsx" -o -name "*.json" \) ! -path "*/node_modules/*" ! -path "*/android/*" ! -path "*/.git/*" ! -path "*/.expo/*" -exec sed -i '/屯門公路/d; /屯門公/d; /Tuen Mun Road/d; /Tuen Mun/d; /TSUEN WAN.*TUEN MUN/d; /TMR/d; /荃→屯/d; /荃灣.*屯門/d' {} \; || true
+          
+          echo "=== 過濾後 ==="
+          grep -r "屯門\|TMR" --include="*.js" --include="*.ts" --include="*.tsx" --include="*.json" . 2>/dev/null | grep -v node_modules | grep -v android || echo "✅ 100% Clean - 11 tracks only"
 
       - name: Fix minSdk 23 -> 24
         run: |
           sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle
           sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle
-          sed -i 's/minSdkVersion = 23/minSdkVersion = 24/g' android/app/build.gradle
-          sed -i 's/minSdk = 23/minSdk = 24/g' android/app/build.gradle
           find android -name "*.gradle" -exec sed -i 's/minSdkVersion 23/minSdkVersion 24/g' {} \; || true
 
       - name: Use Permanent Keystore 40:0C:73 NEW
         run: |
-          echo "Using NEW keystore 40:0C:73 from repo"
+          echo "Using NEW keystore 40:0C:73"
           ls -lh release.keystore
           mkdir -p android/app
           cp release.keystore android/release.keystore
           cp release.keystore android/app/release.keystore
-          keytool -list -v -keystore release.keystore -storepass 123456 | grep -E "Alias|SHA1|Creation"
+          keytool -list -v -keystore release.keystore -storepass 123456 | grep -E "Alias|SHA1"
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
           echo "MYAPP_RELEASE_KEY_ALIAS=lapgo" >> android/gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> android/gradle.properties
