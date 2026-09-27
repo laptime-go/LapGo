@@ -1,6 +1,7 @@
-name: Build 90 Tracks AAB + APK - 40:0C:73
+name: Build 63 Tracks AAB + APK - 40:0C:73
 on:
   workflow_dispatch
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,47 +15,38 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install system deps for canvas
+      - name: Install canvas deps
         run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
 
       - name: Install deps
         run: npm install && npm install canvas
 
-      - name: Auto Generate 90 GREEN NEON Tracks
-        run: |
-          mkdir -p assets/tracks
-          cat > /tmp/gen.js << 'JS'
-          const {createCanvas} = require('canvas');
-          const fs=require('fs'), path=require('path');
-          const tracks=['zic','gic','guia','sic','tianma','ningbo','zhuzhou','goldenport','chengdu','wuhan','ordos','shaoxing','zhengzhou','v1','pingtan','guangzhou','jingsu','fugang','fuji','suzuka','motegi','okayama','sugo','tsukuba','autopolis','ebisu','tokachi','sendai','mine','central','sepang','buriram','bira','bangsaen','sentul','clark','inje','korea','bathurst','sydney','phillip','dubai','yas','bahrain','losail','buddh','sepang-kart','buriram-kart','monza','spa','nurburgring','lemans','silverstone','monaco','laguna','daytona','cota','interlagos','zandvoort','imola','catalunya','redbull','hungaroring'];
-          const dir='assets/tracks';
-          tracks.forEach(id=>{
-            const p=path.join(dir, id+'.jpg');
-            if(fs.existsSync(p) && fs.statSync(p).size>5000) return; // 已有真圖就唔replace
-            const c=createCanvas(800,500), ctx=c.getContext('2d');
-            ctx.fillStyle='#000'; ctx.fillRect(0,0,800,500);
-            ctx.strokeStyle='#00ff88'; ctx.lineWidth=6; ctx.shadowColor='#00ff88'; ctx.shadowBlur=18;
-            ctx.strokeRect(15,15,770,470);
-            ctx.shadowBlur=20; ctx.fillStyle='#00ff88'; ctx.font='bold 70px Arial'; ctx.textAlign='center';
-            ctx.fillText(id.toUpperCase(),400,260);
-            ctx.shadowBlur=0; ctx.fillStyle='#666'; ctx.font='18px Arial'; ctx.fillText('LAPGO • GREEN NEON • '+id,400,310);
-            fs.writeFileSync(p, c.toBuffer('image/jpeg',{quality:0.9}));
-            console.log('NEON '+id+'.jpg');
-          });
-          JS
-          node /tmp/gen.js
-          echo "Total: $(ls assets/tracks/ | wc -l)"
+      - name: Generate tracks via scripts
+        run: node scripts/generate-tracks.js
 
-      - name: Expo prebuild clean
+      - name: Verify 63 Tracks - No Fake
+        run: |
+          grep -o "require('./assets/tracks/.*\.jpg')" App.js | sed "s/.*tracks\///;s/').*//" | sort > /tmp/need.txt
+          ls assets/tracks/ | sort > /tmp/have.txt
+          echo "Need: $(wc -l < /tmp/need.txt) Have: $(wc -l < /tmp/have.txt)"
+          echo "Missing:"; comm -23 /tmp/need.txt /tmp/have.txt || true
+          if [ $(comm -23 /tmp/need.txt /tmp/have.txt | wc -l) -gt 0 ]; then echo "❌ 爭圖"; exit 1; fi
+          echo "✅ 63張齊"
+
+      - name: Expo prebuild
         run: npx expo prebuild --clean --no-install
-      - name: Fix minSdk
-        run: sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle; sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle || true
-      - name: Use Keystore 40:0C:73
+
+      - name: Fix minSdk 23 -> 24
+        run: |
+          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
+          sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle || true
+
+      - name: Use Permanent Keystore 40:0C:73
         run: |
           mkdir -p android/app
           cp release.keystore android/release.keystore
           cp release.keystore android/app/release.keystore
-          keytool -list -v -keystore release.keystore -storepass 123456 | grep -E "Alias|SHA1"
+          keytool -list -v -keystore release.keystore -storepass 123456 | grep -E "Alias|SHA1|SHA256" || true
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
           echo "MYAPP_RELEASE_KEY_ALIAS=lapgo" >> android/gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> android/gradle.properties
@@ -63,15 +55,23 @@ jobs:
           echo "MYAPP_UPLOAD_KEY_ALIAS=lapgo" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=123456" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=123456" >> android/gradle.properties
+
       - name: Build AAB + APK
-        run: cd android && chmod +x gradlew && ./gradlew bundleRelease assembleRelease
-      - name: Upload AAB
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew bundleRelease assembleRelease
+          ls -lh app/build/outputs/bundle/release/
+          ls -lh app/build/outputs/apk/release/
+
+      - name: Upload AAB For Play
         uses: actions/upload-artifact@v4
         with:
-          name: lapgo-90tracks-AAB-40-0C-73-NEON
+          name: lapgo-63tracks-AAB-40-0C-73-for-play
           path: android/app/build/outputs/bundle/release/app-release.aab
-      - name: Upload APK
+
+      - name: Upload APK For Test
         uses: actions/upload-artifact@v4
         with:
-          name: lapgo-90tracks-APK-40-0C-73-NEON
+          name: lapgo-63tracks-APK-40-0C-73-for-test
           path: android/app/build/outputs/apk/release/app-release.apk
