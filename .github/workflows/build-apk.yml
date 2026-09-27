@@ -1,7 +1,7 @@
-name: Build APK Self Use
+name: Build APK Store Clean Preview (11 Tracks For Google Screenshot)
 
 on:
-  workflow_dispatch: # 手動按先build，唔會每次push都build
+  workflow_dispatch:
 
 jobs:
   build:
@@ -31,7 +31,6 @@ jobs:
 
       - name: Use Permanent Keystore 90:BA
         run: |
-          ls -lh release.keystore
           mkdir -p android/app
           cp release.keystore android/release.keystore
           cp release.keystore android/app/release.keystore
@@ -44,7 +43,28 @@ jobs:
           echo "MYAPP_UPLOAD_STORE_PASSWORD=123456" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=123456" >> android/gradle.properties
 
-      - name: Build APK for Self Use
+      - name: Filter Tuen Mun 100% Clean For Store
+        run: |
+          echo "Filtering for Google Play - 11 tracks only"
+          node -e "
+          let fs=require('fs');
+          let c=fs.readFileSync('App.js','utf8');
+          c=c.replace(/,\{id:'tmn'[\s\S]*?tuenmun-north\.jpg[^}]*\}/g,'');
+          c=c.replace(/,\{id:'tms'[\s\S]*?tuenmun-south\.jpg[^}]*\}/g,'');
+          c=c.replace(/if\(near\.id==='tmn'\|\|near\.id==='tms'\)[\s\S]*?}\s*}\s*/g,'');
+          c=c.replace(/TRACKS\.find\(t=>t\.id==='tmn'\)/g,'null');
+          c=c.replace(/TRACKS\.find\(t=>t\.id==='tms'\)/g,'null');
+          c=c.replace(/const isTM=trackRef\.current\.id==='tmn'\|\|trackRef\.current\.id==='tms';/g,'const isTM=false;');
+          c=c.replace(/if\(safeMode&&isTM\)[\s\S]*?return;\}/g,'');
+          fs.writeFileSync('App.js',c);
+          "
+          rm -f assets/tracks/tuenmun-north.jpg
+          rm -f assets/tracks/tuenmun-south.jpg
+          echo '=== Verify Clean ==='
+          ! grep -q "tmn\|tms\|屯門\|Tuen\|TMR" App.js && echo '✅ 100% Clean - 11 tracks' || (echo '❌ Still has TM' && exit 1)
+          grep -o "id:'[^']*'" App.js
+
+      - name: Build APK Store Clean
         run: |
           cd android
           chmod +x gradlew
@@ -53,5 +73,5 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lapgo-self-apk-tuenmun
+          name: lapgo-store-clean-11tracks-for-google-screenshot
           path: android/app/build/outputs/apk/release/app-release.apk
