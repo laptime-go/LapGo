@@ -24,13 +24,13 @@
       },
       "package": "com.lapgo.timer",
       "versionCode": 1,
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "com.google.android.gms.permission.AD_ID"]
     },
     "web": { "favicon": "./favicon.jpg" },
     "plugins": [
       [
         "expo-build-properties",
-        { "android": { "minSdkVersion": 24, "compileSdkVersion": 34, "targetSdkVersion": 34 } }
+        { "android": { "minSdkVersion": 24, "compileSdkVersion": 34, "targetSdkVersion": 34, "kotlinVersion": "1.9.22" } }
       ],
       [
         "expo-location",
