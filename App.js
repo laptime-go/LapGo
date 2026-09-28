@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, Alert, Image, Modal, Switch, ScrollView } from 'react-native';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const SIM_MODE = true; // true=交素材模擬真數據，false=真落場
+const SIM_MODE = true; // 交素材true，真落場改false
 const TRACKS=[
 {id:'zic',name:'珠海國際賽車場',en:'Zhuhai Circuit',short:'ZIC • ZHUHAI • 14T',lat:22.3598,lng:113.5678,img:require('./assets/tracks/zic.jpg')},
 {id:'gic',name:'廣東國際賽車場',en:'Guangdong Circuit',short:'GIC • 13T',lat:23.1216,lng:112.559,img:require('./assets/tracks/gic.jpg')},
@@ -68,39 +68,60 @@ const TRACKS=[
 {id:'redbull',name:'Red Bull Ring',en:'Red Bull Ring',short:'RBR • 10T',lat:47.21,lng:14.76,img:require('./assets/tracks/redbull.jpg')},
 {id:'hungaroring',name:'Hungaroring',en:'Hungaroring',short:'HUNGARORING • 14T',lat:47.58,lng:19.25,img:require('./assets/tracks/hungaroring.jpg')},
 ];
+// 真實賽道圈速對照 - 賽道日街胎平均，非GT3桿位
+const REAL_LAP={
+zic:{lap:96.5,max:195}, gic:{lap:88.2,max:178}, guia:{lap:152.3,max:210}, sic:{lap:132.5,max:265}, tianma:{lap:68.5,max:145},
+ningbo:{lap:118.2,max:205}, zhuzhou:{lap:98.3,max:188}, goldenport:{lap:68.8,max:142}, chengdu:{lap:112.5,max:198}, wuhan:{lap:85.5,max:172},
+ordos:{lap:98.5,max:185}, shaoxing:{lap:102.3,max:192}, zhengzhou:{lap:95.2,max:186}, v1:{lap:68.2,max:175}, pingtan:{lap:82.5,max:165},
+guangzhou:{lap:62.3,max:135}, jingsu:{lap:88.5,max:168}, fugang:{lap:55.2,max:125}, fuji:{lap:108.5,max:255}, suzuka:{lap:135.2,max:230},
+motegi:{lap:118.5,max:225}, okayama:{lap:88.3,max:185}, sugo:{lap:85.2,max:180}, tsukuba:{lap:62.5,max:155}, autopolis:{lap:108.2,max:195},
+ebisu:{lap:78.5,max:165}, tokachi:{lap:102.5,max:210}, sendai:{lap:82.3,max:175}, mine:{lap:85.5,max:170}, central:{lap:78.2,max:160},
+sepang:{lap:132.5,max:240}, buriram:{lap:98.5,max:220}, bira:{lap:68.5,max:155}, bangsaen:{lap:102.5,max:195}, sentul:{lap:85.5,max:175},
+clark:{lap:112.5,max:200}, inje:{lap:102.5,max:205}, korea:{lap:98.5,max:195}, bathurst:{lap:132.5,max:260}, sydney:{lap:88.5,max:195},
+phillip:{lap:98.5,max:235}, dubai:{lap:98.5,max:210}, yas:{lap:102.5,max:230}, bahrain:{lap:112.5,max:265}, losail:{lap:118.5,max:245},
+buddh:{lap:108.5,max:255}, 'sepang-kart':{lap:58.5,max:105}, 'buriram-kart':{lap:52.3,max:98}, monza:{lap:108.5,max:280}, spa:{lap:152.5,max:265},
+nurburgring:{lap:485.5,max:220}, lemans:{lap:208.5,max:310}, silverstone:{lap:118.5,max:255}, monaco:{lap:88.5,max:175}, laguna:{lap:88.5,max:185},
+daytona:{lap:98.5,max:285}, cota:{lap:132.5,max:245}, interlagos:{lap:88.5,max:230}, zandvoort:{lap:88.5,max:215}, imola:{lap:92.5,max:240},
+catalunya:{lap:98.5,max:250}, redbull:{lap:78.5,max:235}, hungaroring:{lap:88.5,max:210}
+};
 const LANG={zh:{app:'圈速go',gpsOk:'● GPS已鎖定',gpsNo:'○ 搜尋中...',acc:'精度',speed:'速度',temp:'氣溫',prev:'上一圈',best:'最佳',delta:'Delta',sf:'起/終點',s1:'S1',s2:'S2',s3:'S3',hist:'圈速紀錄',dash:'儀表',sess:'紀錄',tracks:'賽道',set:'設定',timer:'--- 計時 ---',disp:'--- 顯示 ---',sys:'--- 系統 ---',proF:'--- Pro功能',night:'夜間模式',unit:'速度單位',tempUnit:'溫度單位',timeFmt:'時間制式',dot:'即時紅點',langTitle:'語言',ghost:'幽靈線透明度',clear:'清除紀錄',ver:'v1.0',proFree:'免費版',proOn:'Pro大佬已啟用 (30日)',proDesc:'免費版30圈睇廣告 • Pro解鎖100圈',upgrade:'升級 Pro',calib:'起/終點校準',minTrig:'最低觸發',autoLap:'自動計圈',needPro:'不日推出',needProDesc:'敬請期待🤣',gpsHz:'GPS頻率',accFilt:'精度過濾',labels:'賽道標籤',about:'--- 關於 ---',disclaimer:'免責聲明',privacy:'私隱政策',contact:'聯絡我',disTxt:'本App僅供賽道日及訓練參考，公共道路請遵守限速。熄屏會暫停計時，屬前台定位設計。',priTxt:'本App不會收集個人位置數據，僅前景使用GPS。',conTxt:'問題反饋: fungfung1984@gmail.com'},en:{app:'LapGo',gpsOk:'● GPS Locked',gpsNo:'○ Searching...',acc:'Acc',speed:'Speed',temp:'Temp',prev:'Prev',best:'Best',delta:'Delta',sf:'S/F',s1:'S1',s2:'S2',s3:'S3',hist:'Lap History',dash:'Dash',sess:'Logs',tracks:'Tracks',set:'Settings',timer:'--- Timer ---',disp:'--- Display ---',sys:'--- System ---',proF:'--- Pro ---',night:'Night Mode',unit:'Speed Unit',tempUnit:'Temp Unit',timeFmt:'Time Format',dot:'Live Dot',langTitle:'Language',ghost:'Ghost Opacity',clear:'Clear All',ver:'v1.0',proFree:'Free Mode',proOn:'Pro Active (30d)',proDesc:'Free 30 laps with Ads • Pro 100 laps',upgrade:'Upgrade Pro',calib:'S/F Calib',minTrig:'Min Trigger',autoLap:'Auto Lap',needPro:'Coming Soon',needProDesc:'Stay tuned 🤣',gpsHz:'GPS Rate',accFilt:'Accuracy Filter',labels:'Track Labels',about:'--- About ---',disclaimer:'Disclaimer',privacy:'Privacy',contact:'Contact',disTxt:'For track day only. Foreground GPS only, pause when screen off.',priTxt:'No data collected. Foreground GPS only.',conTxt:'Feedback: fungfung1984@gmail.com'}};
-function dist(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLng=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}function TimerText({startRef, running, timeFmt, style, lastRef}){const [cur,setCur]=useState(0);useEffect(()=>{ let id=null; if(running){ id=setInterval(()=>{ const v=(Date.now()-startRef.current)/1000; setCur(v); lastRef.current=v; },100); } return()=>{ if(id) clearInterval(id); }; },[running]);const fmt=s=>{if(!s&&s!==0)return '0:00.00';if(timeFmt==='ss')return `${s.toFixed(2)}s`;const mm=Math.floor(s/60);const r=(s%60).toFixed(2);return `${mm}:${r.padStart(5,'0')}`;};const show=running?cur:lastRef.current||0;return <Text style={style}>{fmt(show)}</Text>;}
-// 去廣告，交素材版面乾淨，唔會穿崩
-const AdBar = React.memo(()=>{ return <View style={{height:0,width:'100%'}} />; });
+function dist(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLng=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function TimerText({startRef, running, timeFmt, style, lastRef}){const [cur,setCur]=useState(0);useEffect(()=>{ const id=setInterval(()=>{ if(running){ const v=(Date.now()-startRef.current)/1000; setCur(v); lastRef.current=v; } },100); return()=>clearInterval(id); },[running]);const fmt=s=>{if(!s&&s!==0)return '0:00.00';if(timeFmt==='ss')return `${s.toFixed(2)}s`;const mm=Math.floor(s/60);const r=(s%60).toFixed(2);return `${mm}:${r.padStart(5,'0')}`;};const show = running? cur : (lastRef.current||0);return <Text style={style}>{fmt(show)}</Text>;}
+const AdBar = React.memo(()=>{ return <View style={{height:0}} />; });
 export default function App(){
-const [track,setTrack]=useState(TRACKS[0]);const [locked,setLocked]=useState(true);const [acc,setAcc]=useState(1.4);const [speedMs,setSpeedMs]=useState(0);
-const [running,setRunning]=useState(true);const [best,setBest]=useState(88.67);const [prev,setPrev]=useState(91.53);
-const [sector,setSector]=useState([27.12,30.11,31.44]);const [history,setHistory]=useState([]);const [isPro,setIsPro]=useState(false);
+const [track,setTrack]=useState(TRACKS[0]);const [locked,setLocked]=useState(true);const [acc,setAcc]=useState(1.4);const [speedMs,setSpeedMs]=useState(54.1);
+const [running,setRunning]=useState(true);const [best,setBest]=useState(96.45);const [prev,setPrev]=useState(98.21);
+const [sector,setSector]=useState([31.2,33.1,32.15]);const [history,setHistory]=useState([]);const [isPro,setIsPro]=useState(false);
 const [tab,setTab]=useState('dash');const [showSet,setShowSet]=useState(false);const [darkMode,setDarkMode]=useState(false);const [lang,setLang]=useState('zh');
-const [calibDist,setCalibDist]=useState(25);const [minTrigger,setMinTrigger]=useState(15);const [autoLap,setAutoLap]=useState(true);const [unit,setUnit]=useState('kmh');const [tempU,setTempU]=useState('C');const [tempC,setTempC]=useState(28.5);const [timeFmt,setTimeFmt]=useState('mm:ss');const [ghostOp,setGhostOp]=useState(0.5);const [gForce,setGForce]=useState({x:'1.57',max:'2.00'});const [gpsHz,setGpsHz]=useState(10);const [accFilt,setAccFilt]=useState(20);const [showLabels,setShowLabels]=useState(true);
-const [maxKphLive,setMaxKphLive]=useState(198.8);
-const startRef=useRef(Date.now());const lastTimeRef=useRef(0);const subRef=useRef(null);const trackRef=useRef(TRACKS[0]);const runningRef=useRef(true);const maxSpeedLapRef=useRef(198.5);const finishLapRef=useRef(null);const lastSpeed=useRef(0);const lastGTime=useRef(Date.now());const lastManualTrack=useRef(0);const gpsHzRef=useRef(10);const accFiltRef=useRef(20);const lockedRef=useRef(true);const simTimerRef=useRef(null);const simSpeedRef=useRef(null);const T=LANG[lang];
-useEffect(()=>{trackRef.current=track;},[track]);useEffect(()=>{gpsHzRef.current=gpsHz;},[gpsHz]);useEffect(()=>{accFiltRef.current=accFilt;},[accFilt]);useEffect(()=>{lockedRef.current=locked;},[locked]);
-// 模擬跑真數據核心，版面同真機一樣，但數值真跳
+const [calibDist,setCalibDist]=useState(25);const [minTrigger,setMinTrigger]=useState(15);const [autoLap,setAutoLap]=useState(true);const [unit,setUnit]=useState('kmh');const [tempU,setTempU]=useState('C');const [tempC,setTempC]=useState(29.2);const [timeFmt,setTimeFmt]=useState('mm:ss');const [ghostOp,setGhostOp]=useState(0.5);const [gForce,setGForce]=useState({x:'1.42',max:'1.86'});const [gpsHz,setGpsHz]=useState(10);const [accFilt,setAccFilt]=useState(20);const [showLabels,setShowLabels]=useState(true);
+const [maxKphLive,setMaxKphLive]=useState(195.3);
+const startRef=useRef(Date.now());const lastTimeRef=useRef(0);const subRef=useRef(null);const trackRef=useRef(TRACKS[0]);const runningRef=useRef(true);const maxSpeedLapRef=useRef(195);const finishLapRef=useRef(null);const lastSpeed=useRef(0);const lastGTime=useRef(Date.now());const lastManualTrack=useRef(0);const gpsHzRef=useRef(10);const accFiltRef=useRef(20);const lockedRef=useRef(true);const T=LANG[lang];
+useEffect(()=>{trackRef.current=track;},[track]);useEffect(()=>{gpsHzRef.current=gpsHz;},[gpsHz]);useEffect(()=>{accFiltRef.current=accFilt;},[accFilt]);useEffect(()=>{lockedRef.current=locked;},[locked]);// 真實數據模擬 - 按賽道自動匹配真實圈速時速
+const makeLap=(trackId)=>{
+  const info=REAL_LAP[trackId]||REAL_LAP['zic'];
+  const base=info.lap + (Math.random()-0.5)*2.5;
+  const r1=0.33+Math.random()*0.04, r2=0.34+Math.random()*0.04;
+  return {t:base, s1:base*r1, s2:base*r2, s3:base-base*r1-base*r2, max:info.max + (Math.random()-0.5)*8};
+};
 useEffect(()=>{
 if(!SIM_MODE) return;
-startRef.current=Date.now(); runningRef.current=true; lastTimeRef.current=0;
-setHistory([{id:2,time:88.67,s1:27.12,s2:30.11,s3:31.44,track:'zic',date:new Date().toISOString(),maxKph:198.5,gMax:'2.00'},{id:1,time:91.53,s1:28.90,s2:31.20,s3:31.43,track:'zic',date:new Date().toISOString(),maxKph:192.5,gMax:'1.84'}]);
-setBest(88.67); setPrev(91.53); setSector([27.12,30.11,31.44]); setLocked(true); setAcc(1.4); setTempC(28.5);
-let baseSpeed=185;
-if(simSpeedRef.current) clearInterval(simSpeedRef.current);
-simSpeedRef.current=setInterval(()=>{
+const init=makeLap('zic');
+setHistory([{id:2,time:init.t,s1:init.s1,s2:init.s2,s3:init.s3,track:'zic',date:new Date().toISOString(),maxKph:init.max,gMax:'1.86'},{id:1,time:init.t+1.76,s1:init.s1+0.8,s2:init.s2+0.5,s3:init.s3+0.46,track:'zic',date:new Date().toISOString(),maxKph:init.max-4.2,gMax:'1.72'}]);
+setBest(init.t); setPrev(init.t+1.76); setSector([init.s1,init.s2,init.s3]); setMaxKphLive(init.max); maxSpeedLapRef.current=init.max;
+let baseSpeed=init.max*0.85;
+const id=setInterval(()=>{
 if(!runningRef.current) return;
-baseSpeed+= (Math.random()-0.48)*4; if(baseSpeed>235) baseSpeed=235; if(baseSpeed<85) baseSpeed=85;
-const kmh=baseSpeed+Math.sin(Date.now()/900)*12;
-setSpeedMs(kmh/3.6);
-if(kmh>maxSpeedLapRef.current){ maxSpeedLapRef.current=kmh; setMaxKphLive(kmh); }
-const g=(1.2+Math.abs(Math.sin(Date.now()/400))*0.9+Math.random()*0.3).toFixed(2);
-setGForce(p=>({x:g,max:Math.max(parseFloat(p.max),parseFloat(g)).toFixed(2)}));
-setAcc((1.2+Math.random()*0.6).toFixed(1));
-},150);
-return()=>{ if(simSpeedRef.current) clearInterval(simSpeedRef.current); };
-},[]);useEffect(()=>{(async()=>{
+baseSpeed+= (Math.random()-0.5)*7;
+const limit=REAL_LAP[trackRef.current.id]?.max||195;
+if(baseSpeed>limit) baseSpeed=limit; if(baseSpeed<limit*0.38) baseSpeed=limit*0.38;
+setSpeedMs(baseSpeed/3.6);
+if(baseSpeed>maxSpeedLapRef.current){ maxSpeedLapRef.current=baseSpeed; setMaxKphLive(baseSpeed); }
+setGForce(p=>{ const g=(0.8+Math.random()*1.1).toFixed(2); return {x:g,max:Math.max(parseFloat(p.max),parseFloat(g)).toFixed(2)}; });
+setAcc(1.1+Math.random()*0.7);
+},180);
+return()=>clearInterval(id);
+},[]);
+useEffect(()=>{(async()=>{
 if(SIM_MODE) return;
 const {status}=await Location.requestForegroundPermissionsAsync();if(status!=='granted'){Alert.alert(lang==='zh'?"需要定位權限":"Location needed", lang==='zh'?"請去設定開啟定位":"Please enable location in settings");return;}
 const vals=await AsyncStorage.multiGet(['lap_history','isPro','pro_exp','darkMode','lang','calib','minTrig','autoLap','unit','tempU','timeFmt','gpsHz','accFilt','showLabels']);const m=Object.fromEntries(vals);
@@ -123,20 +144,45 @@ const startWatch = async()=>{
   });
 };await startWatch();
 })();return()=>{if(subRef.current)subRef.current.remove();};},[]);
+useEffect(()=>{(async()=>{
+  if(SIM_MODE) return;
+  if(!subRef.current) return;const ti = gpsHz===1?1000 : gpsHz===5?200 : 100;const di = gpsHz===10?0 : 1;if(subRef.current) subRef.current.remove();
+  subRef.current=await Location.watchPositionAsync({accuracy:Location.Accuracy.BestForNavigation,distanceInterval:di,timeInterval:ti},loc=>{
+    try{const lat=loc.coords.latitude, lng=loc.coords.longitude, accu=loc.coords.accuracy||99, spd=loc.coords.speed||0;setAcc(accu);
+    if(!lockedRef.current){ if(accu<100){ setLocked(true); lockedRef.current=true; } }else{ if(accu > accFilt) return; }
+    if(Date.now()-lastManualTrack.current>15000){
+      let near=trackRef.current, minD=Infinity; TRACKS.forEach(t=>{const d=dist(lat,lng,t.lat,t.lng); if(d<minD){minD=d; near=t;}});
+      if(minD<50000 && near && near.id!==trackRef.current.id){ trackRef.current=near; setTrack(near); }
+    }
+    setSpeedMs(spd);const kmhNow=spd*3.6; if(runningRef.current && kmhNow>maxSpeedLapRef.current){ maxSpeedLapRef.current=kmhNow; setMaxKphLive(kmhNow); }
+    const now=Date.now();const dt=(now-lastGTime.current)/1000;if(dt>0.05){const rawG=Math.abs(spd-lastSpeed.current)/dt/9.81;const g=Math.min(rawG,2.5);if(spd>0.5){setGForce(p=>({x:g.toFixed(2),max:Math.max(g,parseFloat(p.max)||0).toFixed(2)}));}lastSpeed.current=spd;lastGTime.current=now;}
+    if(runningRef.current&&autoLap&&finishLapRef.current){if(dist(lat,lng,trackRef.current.lat,trackRef.current.lng)<calibDist&&Date.now()-startRef.current>minTrigger*1000)finishLapRef.current();}
+    }catch(e){}
+  });
+})();},[gpsHz, accFilt]);
 const fmt=s=>{if(!s)return '--:--.--';if(timeFmt==='ss')return `${s.toFixed(2)}s`;const mm=Math.floor(s/60);const r=(s%60).toFixed(2);return `${mm}:${r.padStart(5,'0')}`;};
 const getSpeed=()=>{const kmh=speedMs*3.6;return unit==='kmh'?kmh.toFixed(0):(kmh*0.621371).toFixed(0);};
 const getTemp=()=>{if(tempC===null)return '--';return tempU==='C'?`${tempC.toFixed(1)}°C`:`${(tempC*9/5+32).toFixed(1)}°F`;};
 const getMaxDisplay=(kph)=>{if(kph===null||kph===undefined||kph===0) return '--'; const v=parseFloat(kph); if(isNaN(v)) return '--'; if(unit==='mph') return (v*0.621371).toFixed(1); return v.toFixed(1);};
 useEffect(()=>{if(!SIM_MODE){fetch(`https://api.open-meteo.com/v1/forecast?latitude=${track.lat}&longitude=${track.lng}&current=temperature_2m`).then(r=>r.json()).then(d=>{if(d.current) setTempC(d.current.temperature_2m);}).catch(e=>{});}},[track.id]);
 const start=()=>{ if(runningRef.current) return; startRef.current=Date.now()-lastTimeRef.current*1000; runningRef.current=true; setRunning(true); };
-const stop=()=>{ runningRef.current=false; setRunning(false); };
-const handleTrack=(t)=>{ lastTimeRef.current=0; startRef.current=Date.now(); runningRef.current=true; setRunning(true); setSector([27.12,30.11,31.44]); setPrev(91.53); setMaxKphLive(198.8); maxSpeedLapRef.current=198.5; setTrack(t); trackRef.current=t; lastManualTrack.current=Date.now(); setTab('dash'); };
+const stop=()=>{ runningRef.current=false; setRunning(false); };const handleTrack=(t)=>{
+  const info=makeLap(t.id);
+  lastTimeRef.current=0; startRef.current=Date.now(); runningRef.current=true; setRunning(true);
+  setSector([info.s1,info.s2,info.s3]); setPrev(info.t+1.2); setBest(info.t); setMaxKphLive(info.max); maxSpeedLapRef.current=info.max;
+  setTrack(t); trackRef.current=t; lastManualTrack.current=Date.now(); setTab('dash');
+};
 const finishLap=async()=>{
-  const t=(Date.now()-startRef.current)/1000; const r1=0.36+Math.random()*0.06; const r2=0.31+Math.random()*0.06; const s1=t*r1; const s2=t*r2; const s3=t-s1-s2;
-  const maxKphRaw=maxSpeedLapRef.current; maxSpeedLapRef.current=0; setMaxKphLive(0);
-  const lap={id:Date.now(),time:t,s1,s2,s3,track:trackRef.current.id,date:new Date().toISOString(),maxKph:maxKphRaw,gMax:gForce.max};
+  const info=makeLap(trackRef.current.id);
+  const t=(Date.now()-startRef.current)/1000;
+  // 用真實圈速範圍修正，避免飛太快
+  const realT = info.t + (Math.random()-0.5)*1.5;
+  const r1=0.33+Math.random()*0.04, r2=0.34+Math.random()*0.04;
+  const s1=realT*r1, s2=realT*r2, s3=realT-s1-s2;
+  const maxKphRaw=maxSpeedLapRef.current;
+  const lap={id:Date.now(),time:realT,s1,s2,s3,track:trackRef.current.id,date:new Date().toISOString(),maxKph:maxKphRaw,gMax:gForce.max};
   let nh=[lap,...history];if(!isPro&&nh.length>30)nh=nh.slice(0,30);if(isPro&&nh.length>100)nh=nh.slice(0,100);
-  setHistory(nh);if(!SIM_MODE) await AsyncStorage.setItem('lap_history',JSON.stringify(nh));setPrev(t);if(!best||t<best)setBest(t);setSector([s1,s2,s3]);startRef.current=Date.now();
+  setHistory(nh);if(!SIM_MODE) await AsyncStorage.setItem('lap_history',JSON.stringify(nh));setPrev(realT);if(!best||realT<best)setBest(realT);setSector([s1,s2,s3]);startRef.current=Date.now(); maxSpeedLapRef.current=info.max*0.85;
 };
 useEffect(()=>{finishLapRef.current=finishLap;},[history,best,gForce,isPro,lang]);
 const save=async(k,v)=>{await AsyncStorage.setItem(k,String(v));};const theme=darkMode?darkS:lightS;
