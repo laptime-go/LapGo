@@ -16,7 +16,7 @@ jobs:
           java-version: '17'
 
       - name: Install deps
-        run: npm ci
+        run: npm install
 
       - name: Generate tracks if script exists
         run: |
@@ -37,7 +37,7 @@ jobs:
           if [ $(comm -23 /tmp/need.txt /tmp/have.txt | wc -l) -gt 0 ]; then echo "❌ 爭圖"; exit 1; fi
 
       - name: Expo prebuild
-        run: npx expo prebuild --clean --no-install
+        run: npx expo prebuild --clean
 
       - name: Fix minSdk 23 -> 24
         run: |
