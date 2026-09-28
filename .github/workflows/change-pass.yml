@@ -1,0 +1,15 @@
+name: Change 123456 to Strong Now
+on: workflow_dispatch
+jobs:
+  f:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '17' }
+      - run: |
+          KS=$(find . -type f -name "*.keystore" | head -n1)
+          keytool -storepasswd -keystore $KS -storepass 123456 -new LapGo2026#40Secure!
+          keytool -keypasswd -alias lapgo -keystore $KS -storepass LapGo2026#40Secure! -keypass 123456 -new LapGo2026#40Secure! || true
+          keytool -list -v -keystore $KS -storepass LapGo2026#40Secure! | grep -E "SHA1|Alias"
+          base64 -w0 $KS
