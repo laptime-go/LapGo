@@ -9,29 +9,32 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install canvas deps
-        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
-
       - name: Install deps
-        run: npm install && npm install canvas
+        run: npm ci
 
-      - name: Generate tracks via scripts
-        run: node scripts/generate-tracks.js
+      - name: Generate tracks if script exists
+        run: |
+          if [ -f scripts/generate-tracks.js ]; then
+            sudo apt-get update && sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
+            npm install canvas
+            node scripts/generate-tracks.js
+          else
+            echo "No generate script, skip"
+          fi
 
-      - name: Verify 63 Tracks - No Fake
+      - name: Verify 63 Tracks
         run: |
           grep -o "require('./assets/tracks/.*\.jpg')" App.js | sed "s/.*tracks\///;s/').*//" | sort > /tmp/need.txt
           ls assets/tracks/ | sort > /tmp/have.txt
           echo "Need: $(wc -l < /tmp/need.txt) Have: $(wc -l < /tmp/have.txt)"
-          echo "Missing:"; comm -23 /tmp/need.txt /tmp/have.txt || true
+          comm -23 /tmp/need.txt /tmp/have.txt || true
           if [ $(comm -23 /tmp/need.txt /tmp/have.txt | wc -l) -gt 0 ]; then echo "❌ 爭圖"; exit 1; fi
-          echo "✅ 63張齊"
 
       - name: Expo prebuild
         run: npx expo prebuild --clean --no-install
@@ -39,14 +42,12 @@ jobs:
       - name: Fix minSdk 23 -> 24
         run: |
           sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
-          sed -i 's/minSdk 23/minSdk 24/g' android/app/build.gradle || true
 
       - name: Use Permanent Keystore 40:0C:73
         run: |
           mkdir -p android/app
           cp release.keystore android/release.keystore
           cp release.keystore android/app/release.keystore
-          keytool -list -v -keystore release.keystore -storepass 123456 | grep -E "Alias|SHA1|SHA256" || true
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
           echo "MYAPP_RELEASE_KEY_ALIAS=lapgo" >> android/gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> android/gradle.properties
@@ -61,8 +62,6 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew bundleRelease assembleRelease
-          ls -lh app/build/outputs/bundle/release/
-          ls -lh app/build/outputs/apk/release/
 
       - name: Upload AAB For Play
         uses: actions/upload-artifact@v4
