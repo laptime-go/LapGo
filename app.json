@@ -12,7 +12,6 @@
       "resizeMode": "contain",
       "backgroundColor": "#121212"
     },
-    "assetBundlePatterns": ["assets/tracks/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lapgo.timer"
@@ -29,26 +28,9 @@
     },
     "web": { "favicon": "./favicon.jpg" },
     "plugins": [
-      [
-        "expo-build-properties",
-        { "android": { "minSdkVersion": 24, "compileSdkVersion": 34, "targetSdkVersion": 34, "kotlinVersion": "1.9.22" } }
-      ],
-      [
-        "expo-location",
-        {
-          "locationWhenInUsePermission": "Allow LapTime Go to use location for lap timing. Foreground only, pauses when screen off.",
-          "isIosBackgroundLocationEnabled": false,
-          "isAndroidBackgroundLocationEnabled": false
-        }
-      ],
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-9890149028563226~9678218420",
-          "iosAppId": "ca-app-pub-9890149028563226~9678218420",
-          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
-        }
-      ]
+      ["expo-build-properties", { "android": { "minSdkVersion": 24, "compileSdkVersion": 34, "targetSdkVersion": 34, "kotlinVersion": "1.9.22" } }],
+      ["expo-location", { "locationWhenInUsePermission": "Allow LapTime Go to use location for lap timing. Foreground only, pauses when screen off.", "isIosBackgroundLocationEnabled": false, "isAndroidBackgroundLocationEnabled": false }],
+      ["react-native-google-mobile-ads", { "androidAppId": "ca-app-pub-9890149028563226~9678218420", "iosAppId": "ca-app-pub-9890149028563226~9678218420", "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you." }]
     ],
     "extra": {
       "eas": { "projectId": "075ddfb4-4fc5-47dd-acd4-d398b1319a94" },
