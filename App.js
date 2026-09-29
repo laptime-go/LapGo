@@ -24,8 +24,10 @@ const TRACKS=[
 {id:'pingtan',name:'平潭如意湖',en:'Pingtan Circuit',short:'PINGTAN • 13T',lat:25.50,lng:119.78,r1:0.35,r2:0.31,img:require('./assets/tracks/pingtan.jpg')},
 {id:'guangzhou',name:'廣州從化',en:'Conghua Circuit',short:'CONGHUA • 10T',lat:23.54,lng:113.58,r1:0.36,r2:0.30,img:require('./assets/tracks/guangzhou.jpg')},
 {id:'jingsu',name:'廣東競速',en:'Guangdong Jingsu',short:'JINGSU • 13T',lat:23.02,lng:113.63,r1:0.34,r2:0.32,img:require('./assets/tracks/jingsu.jpg')},
-{id:'fugang',name:'惠州福崗',en:'Fugang Circuit',short:'FUGANG • 8T',lat:23.11,lng:114.41,r1:0.35,r2:0.33,img:require('./assets/tracks/fugang.jpg')},{id:'fuji',name:'富士賽道',en:'Fuji Speedway',short:'FUJI • 16T',lat:35.3717,lng:138.927,r1:0.36,r2:0.32,img:require('./assets/tracks/fuji.jpg')},
-{id:'suzuka',name:'鈴鹿賽道',en:'Suzuka Circuit',short:'SUZUKA • 18T',lat:34.8431,lng:136.5409,r1:0.34,r2:0.35,img:require('./assets/tracks/suzuka.jpg')},{id:'motegi',name:'茂木賽道',en:'Twin Ring Motegi',short:'MOTEGI • 14T',lat:36.534,lng:140.230,r1:0.32,r2:0.33,img:require('./assets/tracks/motegi.jpg')},
+{id:'fugang',name:'惠州福崗',en:'Fugang Circuit',short:'FUGANG • 8T',lat:23.11,lng:114.41,r1:0.35,r2:0.33,img:require('./assets/tracks/fugang.jpg')},
+{id:'fuji',name:'富士賽道',en:'Fuji Speedway',short:'FUJI • 16T',lat:35.3717,lng:138.927,r1:0.36,r2:0.32,img:require('./assets/tracks/fuji.jpg')},
+{id:'suzuka',name:'鈴鹿賽道',en:'Suzuka Circuit',short:'SUZUKA • 18T',lat:34.8431,lng:136.5409,r1:0.34,r2:0.35,img:require('./assets/tracks/suzuka.jpg')},
+{id:'motegi',name:'茂木賽道',en:'Twin Ring Motegi',short:'MOTEGI • 14T',lat:36.534,lng:140.230,r1:0.32,r2:0.33,img:require('./assets/tracks/motegi.jpg')},
 {id:'okayama',name:'岡山國際',en:'Okayama Circuit',short:'OKAYAMA • 11T',lat:34.915,lng:134.212,r1:0.33,r2:0.32,img:require('./assets/tracks/okayama.jpg')},
 {id:'sugo',name:'菅生賽道',en:'Sportsland SUGO',short:'SUGO • 12T',lat:38.139,lng:140.617,r1:0.30,r2:0.36,img:require('./assets/tracks/sugo.jpg')},
 {id:'tsukuba',name:'筑波賽道',en:'Tsukuba Circuit',short:'TSUKUBA • 9T',lat:36.083,lng:140.075,r1:0.38,r2:0.30,img:require('./assets/tracks/tsukuba.jpg')},
@@ -70,24 +72,8 @@ const TRACKS=[
 {id:'hungaroring',name:'Hungaroring',en:'Hungaroring',short:'HUNGARORING • 14T',lat:47.58,lng:19.25,r1:0.34,r2:0.33,img:require('./assets/tracks/hungaroring.jpg')},
 ];const LANG={zh:{app:'圈速go',gpsOk:'● GPS已鎖定',gpsNo:'○ 搜尋中...',acc:'精度',speed:'速度',temp:'氣溫',prev:'上一圈',best:'最佳',delta:'Delta',sf:'起/終點',s1:'S1',s2:'S2',s3:'S3',hist:'圈速紀錄 可滾動',dash:'儀表',sess:'紀錄',tracks:'賽道',set:'設定',timer:'--- 計時 ---',disp:'--- 顯示 ---',sys:'--- 系統 ---',proF:'--- Pro功能',night:'夜間模式',unit:'速度單位',tempUnit:'溫度單位',timeFmt:'時間制式',dot:'即時紅點',langTitle:'語言',ghost:'幽靈線透明度',clear:'清除紀錄',ver:'v1.0',proFree:'免費版，圈速紀錄30圈 +基本功能',proOn:'Pro大佬已啟用 (30日)',proDesc:'解鎖Pro,圈速紀錄100圈，Gps即時紅點+幽靈線',upgrade:'升級 Pro',calib:'起/終點校準',minTrig:'最低觸發',autoLap:'自動計圈',needPro:'不日推出',needProDesc:'敬請期待🤣',gpsHz:'GPS頻率',accFilt:'精度過濾',labels:'賽道標籤',about:'--- 關於 ---',disclaimer:'免責聲明',privacy:'私隱政策',contact:'聯絡我',disTxt:'本App僅供賽道日及訓練參考，公共道路請遵守限速。熄屏會暫停計時，屬前台定位設計。',priTxt:'本App不會收集個人位置數據，僅前景使用GPS。',conTxt:'問題反饋: fungfung1984@gmail.com'},en:{app:'LapGo',gpsOk:'● GPS Locked',gpsNo:'○ Searching...',acc:'Acc',speed:'Speed',temp:'Temp',prev:'Prev',best:'Best',delta:'Delta',sf:'S/F',s1:'S1',s2:'S2',s3:'S3',hist:'Lap History Scrollable',dash:'Dash',sess:'Logs',tracks:'Tracks',set:'Settings',timer:'--- Timer ---',disp:'--- Display ---',sys:'--- System ---',proF:'--- Pro ---',night:'Night Mode',unit:'Speed Unit',tempUnit:'Temp Unit',timeFmt:'Time Format',dot:'Live Dot',langTitle:'Language',ghost:'Ghost Opacity',clear:'Clear All',ver:'v1.0',proFree:'Free: 30 Laps + Basic',proOn:'Pro Active (30d)',proDesc:'Unlock Pro: 100 Laps, Live Dot + Ghost',upgrade:'Upgrade Pro',calib:'S/F Calib',minTrig:'Min Trigger',autoLap:'Auto Lap',needPro:'Coming Soon',needProDesc:'Stay tuned 🤣',gpsHz:'GPS Rate',accFilt:'Accuracy Filter',labels:'Track Labels',about:'--- About ---',disclaimer:'Disclaimer',privacy:'Privacy',contact:'Contact',disTxt:'For track day only. Foreground GPS only, pause when screen off.',priTxt:'No data collected. Foreground GPS only.',conTxt:'Feedback: fungfung1984@gmail.com'}};
 function dist(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLng=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
-function TimerText({startRef, running, timeFmt, style, lastRef}){
-  const [,force]=useState(0);
-  useEffect(()=>{ if(!running) return; const id=setInterval(()=>force(v=>v+1),80); return()=>clearInterval(id); },[running]);
-  const sec = running? (Date.now()-startRef.current)/1000 : (lastRef.current||0);
-  if(running) lastRef.current=sec;
-  const fmt=s=>{ if(!s||s<=0) return '0:00.00'; if(timeFmt==='ss') return `${s.toFixed(2)}s`; const mm=Math.floor(s/60); return `${mm}:${(s%60).toFixed(2).padStart(5,'0')}`; };
-  return <Text style={style}>{fmt(sec)}</Text>;
-}
-const AdBar = React.memo(({theme})=>{
-  const [fail,setFail]=useState(false);
-  const shellStyle = [{width:'100%',height:60,borderTopWidth:1,alignItems:'center',justifyContent:'center',marginTop:6}, theme.gps, {borderColor: theme.gps.borderColor||'#222'}];
-  if(fail ||!BannerAd){ return <View style={shellStyle} />; }
-  return(
-    <View style={shellStyle}>
-      <BannerAd unitId={BANNER_ID} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} onAdFailedToLoad={()=>setFail(true)} />
-    </View>
-  );
-});export default function App(){
+function TimerText({startRef, running, timeFmt, style, lastRef}){const [,force]=useState(0);useEffect(()=>{ if(!running) return; const id=setInterval(()=>force(v=>v+1),80); return()=>clearInterval(id); },[running]);const sec = running? (Date.now()-startRef.current)/1000 : (lastRef.current||0);if(running) lastRef.current=sec;const fmt=s=>{ if(!s||s<=0) return '0:00.00'; if(timeFmt==='ss') return `${s.toFixed(2)}s`; const mm=Math.floor(s/60); return `${mm}:${(s%60).toFixed(2).padStart(5,'0')}`; };return <Text style={style}>{fmt(sec)}</Text>;}
+const AdBar = React.memo(({theme})=>{const [fail,setFail]=useState(false);const shellStyle = [{width:'100%',height:60,borderTopWidth:1,alignItems:'center',justifyContent:'center',marginTop:6}, theme.gps, {borderColor: theme.gps.borderColor||'#222'}];if(fail ||!BannerAd){ return <View style={shellStyle} />; }return(<View style={shellStyle}><BannerAd unitId={BANNER_ID} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} onAdFailedToLoad={()=>setFail(true)} /></View>);});export default function App(){
 const [track,setTrack]=useState(TRACKS[0]);const [locked,setLocked]=useState(false);const [acc,setAcc]=useState(0);const [speedMs,setSpeedMs]=useState(0);
 const [running,setRunning]=useState(false);const [best,setBest]=useState(null);const [prev,setPrev]=useState(null);
 const [sector,setSector]=useState([0,0,0]);const [history,setHistory]=useState([]);const [isPro,setIsPro]=useState(false);
@@ -102,7 +88,9 @@ try{ if(MobileAds){ await MobileAds().initialize(); } }catch(e){}
 const {status}=await Location.requestForegroundPermissionsAsync();if(status!=='granted'){Alert.alert(lang==='zh'?"需要定位權限":"Location needed", lang==='zh'?"請去設定開啟定位":"Please enable location in settings");return;}
 const vals=await AsyncStorage.multiGet(['lap_history','isPro','pro_exp','darkMode','lang','calib','minTrig','autoLap','unit','tempU','timeFmt','gpsHz','accFilt','showLabels']);const m=Object.fromEntries(vals);
 if(m.lap_history)try{ const parsed=JSON.parse(m.lap_history); setHistory(parsed); if(parsed.length>0){ const valid=parsed.filter(p=>p.time>0).map(p=>p.time); if(valid.length) setBest(Math.min(...valid)); } }catch(e){};
-if(m.isPro && m.pro_exp){const exp=parseInt(m.pro_exp);if(Date.now()<exp){setIsPro(true);}else{await AsyncStorage.multiRemove(['isPro','pro_exp']);}}if(m.darkMode!==null)setDarkMode(m.darkMode==='1');if(m.lang)setLang(m.lang);if(m.calib)setCalibDist(parseInt(m.calib));if(m.minTrig)setMinTrigger(parseInt(m.minTrig));if(m.autoLap!==null)setAutoLap(m.autoLap==='1');if(m.unit)setUnit(m.unit);if(m.tempU)setTempU(m.tempU);if(m.timeFmt)setTimeFmt(m.timeFmt);if(m.gpsHz){setGpsHz(parseInt(m.gpsHz));gpsHzRef.current=parseInt(m.gpsHz);}if(m.accFilt){setAccFilt(parseInt(m.accFilt));accFiltRef.current=parseInt(m.accFilt);}if(m.showLabels!==null)setShowLabels(m.showLabels==='1');
+// === 已修正 ===
+if(m.isPro && m.pro_exp){const exp=parseInt(m.pro_exp);if(Date.now()<exp){setIsPro(true);}else{await AsyncStorage.multiRemove(['isPro','pro_exp']);}}
+if(m.darkMode!==null)setDarkMode(m.darkMode==='1');if(m.lang)setLang(m.lang);if(m.calib)setCalibDist(parseInt(m.calib));if(m.minTrig)setMinTrigger(parseInt(m.minTrig));if(m.autoLap!==null)setAutoLap(m.autoLap==='1');if(m.unit)setUnit(m.unit);if(m.tempU)setTempU(m.tempU);if(m.timeFmt)setTimeFmt(m.timeFmt);if(m.gpsHz){setGpsHz(parseInt(m.gpsHz));gpsHzRef.current=parseInt(m.gpsHz);}if(m.accFilt){setAccFilt(parseInt(m.accFilt));accFiltRef.current=parseInt(m.accFilt);}if(m.showLabels!==null)setShowLabels(m.showLabels==='1');
 const startWatch = async()=>{
   if(subRef.current){try{subRef.current.remove();}catch(e){}}
   const hz=gpsHzRef.current;const ti=hz===1?1000:hz===5?200:100;const di=hz===10?0:1;
@@ -117,8 +105,7 @@ const startWatch = async()=>{
     }catch(e){}
   });
 };await startWatch();
-})();return()=>{if(subRef.current)try{subRef.current.remove();}catch(e){};};},[]);
-useEffect(()=>{(async()=>{
+})();return()=>{if(subRef.current)try{subRef.current.remove();}catch(e){};};},[]);useEffect(()=>{(async()=>{
   if(!subRef.current) return;
   const ti = gpsHz===1?1000 : gpsHz===5?200 : 100;const di = gpsHz===10?0 : 1;
   try{subRef.current.remove();}catch(e){}
