@@ -1,11 +1,15 @@
-# Sample Snack app
+# 圈速go / LapGo - v1.0 Foreground Only
 
-Open the `App.js` file to start writing some code. You can preview the changes directly on your phone or tablet by scanning the **QR code** or use the iOS or Android emulators. When you're done, click **Save** and share the link!
+> 前台GPS圈速App，僅前景定位，熄屏自動暫停計時，符合Play政策。
 
-When you're ready to see everything that Expo provides (or if you want to use your own editor) you can **Download** your project and use it with [expo cli](https://docs.expo.dev/get-started/installation/#expo-cli)).
+### 📦 點解 `assets/tracks/` 係空嘅？（唔係Bug）
+呢個係最易誤會位，特此說明：
 
-All projects created in Snack are publicly available, so you can easily share the link to this project via link, or embed it on a web page with the `<>` button.
+1.  本地Repo唔提交63張賽道圖，只提交一個空folder + `.gitkeep`
+2.  63張圖由 `scripts/generate-tracks.js` 在 GitHub Actions 雲端即時生成
+3.  流程：`workflow跑 → node scripts/generate-tracks.js → 生成assets/tracks/*.jpg → 再eas build`
+4.  `App.js` 入面有63個 `require('./assets/tracks/xxx.jpg')`，所以一定要等腳本生成完先build到，唔係漏咗圖
 
-If you're having problems, you can tweet to us [@expo](https://twitter.com/expo) or ask in our [forums](https://forums.expo.dev/c/expo-dev-tools/61) or [Discord](https://chat.expo.dev/).
+**結論：本地見唔到圖係正常，雲端build會有。**
 
-Snack is Open Source. You can find the code on the [GitHub repo](https://github.com/expo/snack).
+### 🔨 Build指令
