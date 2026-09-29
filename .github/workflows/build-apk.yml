@@ -20,21 +20,23 @@ jobs:
 
       - name: Generate tracks if script exists
         run: |
+          mkdir -p assets/tracks
           if [ -f scripts/generate-tracks.js ]; then
-            sudo apt-get update && sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
+            sudo apt-get update && sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev || true
             npm install canvas
             node scripts/generate-tracks.js
           else
             echo "No generate script, skip"
           fi
+          echo "Have $(ls assets/tracks/*.jpg 2>/dev/null | wc -l) images"
 
       - name: Verify 63 Tracks
         run: |
-          grep -o "require('./assets/tracks/.*\.jpg')" App.js | sed "s/.*tracks\///;s/').*//" | sort > /tmp/need.txt
+          grep -oE "require\(['\"]\./assets/tracks/.*\.jpg['\"]\)" App.js | sed -E "s/.*tracks\///;s/['\"\)]//g" | sort > /tmp/need.txt
           ls assets/tracks/ | sort > /tmp/have.txt || touch /tmp/have.txt
           echo "Need: $(wc -l < /tmp/need.txt) Have: $(wc -l < /tmp/have.txt)"
           comm -23 /tmp/need.txt /tmp/have.txt || true
-          if [ $(comm -23 /tmp/need.txt /tmp/have.txt | wc -l) -gt 0 ]; then echo "❌ 爭圖"; exit 1; fi
+          if [ $(comm -23 /tmp/need.txt /tmp/have.txt | wc -l) -gt 0 ]; then echo "❌ 爭圖"; comm -23 /tmp/need.txt /tmp/have.txt; exit 1; fi
 
       - name: Expo prebuild
         run: npx expo prebuild --clean
