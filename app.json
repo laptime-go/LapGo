@@ -12,7 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#121212"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": ["assets/tracks/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lapgo.timer"
@@ -24,7 +24,8 @@
       },
       "package": "com.lapgo.timer",
       "versionCode": 1,
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "com.google.android.gms.permission.AD_ID"]
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "com.google.android.gms.permission.AD_ID"],
+      "blockedPermissions": ["ACCESS_BACKGROUND_LOCATION"]
     },
     "web": { "favicon": "./favicon.jpg" },
     "plugins": [
@@ -49,6 +50,9 @@
         }
       ]
     ],
-    "extra": { "eas": { "projectId": "075ddfb4-4fc5-47dd-acd4-d398b1319a94" } }
+    "extra": {
+      "eas": { "projectId": "075ddfb4-4fc5-47dd-acd4-d398b1319a94" },
+      "adUnitId": "ca-app-pub-9890149028563226/7083933962"
+    }
   }
 }
