@@ -1,4 +1,4 @@
-name: Build 63 Tracks AAB + APK - 40:0C:73
+name: Build 63 Tracks AAB + APK - 40:0C:73 SECURE
 on:
   workflow_dispatch
 
@@ -8,54 +8,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+        with: { node-version: 20 }
       - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+        with: { distribution: 'temurin', java-version: '17' }
 
       - name: Install deps
         run: npm install
-
-      - name: Generate tracks if script exists
-        run: |
-          if [ -f scripts/generate-tracks.js ]; then
-            sudo apt-get update && sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev
-            npm install canvas
-            node scripts/generate-tracks.js
-          else
-            echo "No generate script, skip"
-          fi
 
       - name: Verify 63 Tracks
         run: |
           grep -o "require('./assets/tracks/.*\.jpg')" App.js | sed "s/.*tracks\///;s/').*//" | sort > /tmp/need.txt
           ls assets/tracks/ | sort > /tmp/have.txt
           echo "Need: $(wc -l < /tmp/need.txt) Have: $(wc -l < /tmp/have.txt)"
-          comm -23 /tmp/need.txt /tmp/have.txt || true
           if [ $(comm -23 /tmp/need.txt /tmp/have.txt | wc -l) -gt 0 ]; then echo "❌ 爭圖"; exit 1; fi
 
       - name: Expo prebuild
         run: npx expo prebuild --clean
 
       - name: Fix minSdk 23 -> 24
-        run: |
-          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
+        run: sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
 
-      - name: Use Permanent Keystore 40:0C:73
+      - name: Use Permanent Keystore 40:0C:73 from Secrets
         run: |
           mkdir -p android/app
-          cp release.keystore android/release.keystore
-          cp release.keystore android/app/release.keystore
+          echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/release.keystore
+          echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/app/release.keystore
+          ls -lh android/app/release.keystore
+
+      - name: Inject signing with Secrets 40:0C:73
+        run: |
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
-          echo "MYAPP_RELEASE_KEY_ALIAS=lapgo" >> android/gradle.properties
-          echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> android/gradle.properties
-          echo "MYAPP_RELEASE_KEY_PASSWORD=123456" >> android/gradle.properties
+          echo "MYAPP_RELEASE_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
+          echo "MYAPP_RELEASE_STORE_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
+          echo "MYAPP_RELEASE_KEY_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_FILE=release.keystore" >> android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_ALIAS=lapgo" >> android/gradle.properties
-          echo "MYAPP_UPLOAD_STORE_PASSWORD=123456" >> android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_PASSWORD=123456" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
 
       - name: Build AAB + APK
         run: |
