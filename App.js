@@ -9,67 +9,67 @@ const BANNER_ID = __DEV__? "ca-app-pub-3940256099942544/6300978111" : (Constants
 const TRACKS=[
 {id:'zic',name:'珠海國際賽車場',en:'Zhuhai Circuit',short:'ZIC • ZHUHAI • 14T',lat:22.3598,lng:113.5678,r1:0.30,r2:0.32,avg:94.06,avgKph:235,img:require('./assets/tracks/zic.jpg')},
 {id:'gic',name:'廣東國際賽車場',en:'Guangdong Circuit',short:'GIC • 13T',lat:23.1216,lng:112.559,r1:0.33,r2:0.30,avg:85.2,avgKph:210,img:require('./assets/tracks/gic.jpg')},
-{id:'guia',name:'東望洋賽道',en:'Guia Circuit',short:'GUIA • MACAU • 22T',lat:22.197,lng:113.555,r1:0.35,r2:0.28,avg:142.5,avgKph:200,img:require('./assets/tracks/guia.jpg')},
+{id:'guia',name:'東望洋賽道',en:'Guia Circuit',short:'GUIA • MACAU • 22T',lat:22.197,lng:113.555,r1:0.35,r2:0.28,avg:142.5,avgKph:202,img:require('./assets/tracks/guia.jpg')},
 {id:'sic',name:'上海國際賽道',en:'Shanghai Circuit',short:'SIC • 16T',lat:31.339,lng:121.221,r1:0.32,r2:0.33,avg:128.8,avgKph:295,img:require('./assets/tracks/sic.jpg')},
-{id:'tianma',name:'上海天馬',en:'Shanghai Tianma',short:'TIANMA • 14T',lat:31.076,lng:121.131,r1:0.31,r2:0.33,avg:68.5,avgKph:180,img:require('./assets/tracks/tianma.jpg')},
-{id:'ningbo',name:'寧波國際',en:'Ningbo Circuit',short:'NINGBO • 22T',lat:30.33,lng:121.45,r1:0.29,r2:0.35,avg:118.5,avgKph:220,img:require('./assets/tracks/ningbo.jpg')},
-{id:'zhuzhou',name:'株洲國際',en:'Zhuzhou Circuit',short:'ZHUZHOU • 14T',lat:27.85,lng:113.15,r1:0.30,r2:0.32,avg:98.2,avgKph:230,img:require('./assets/tracks/zhuzhou.jpg')},
-{id:'goldenport',name:'北京金港',en:'Goldenport',short:'GOLDENPORT • 16T',lat:39.98,lng:116.51,r1:0.31,r2:0.30,avg:68.8,avgKph:170,img:require('./assets/tracks/goldenport.jpg')},
+{id:'tianma',name:'上海天馬',en:'Shanghai Tianma',short:'TIANMA • 14T',lat:31.076,lng:121.131,r1:0.31,r2:0.33,avg:68.5,avgKph:182,img:require('./assets/tracks/tianma.jpg')},
+{id:'ningbo',name:'寧波國際',en:'Ningbo Circuit',short:'NINGBO • 22T',lat:30.33,lng:121.45,r1:0.29,r2:0.35,avg:118.5,avgKph:222,img:require('./assets/tracks/ningbo.jpg')},
+{id:'zhuzhou',name:'株洲國際',en:'Zhuzhou Circuit',short:'ZHUZHOU • 14T',lat:27.85,lng:113.15,r1:0.30,r2:0.32,avg:98.2,avgKph:232,img:require('./assets/tracks/zhuzhou.jpg')},
+{id:'goldenport',name:'北京金港',en:'Goldenport',short:'GOLDENPORT • 16T',lat:39.98,lng:116.51,r1:0.31,r2:0.30,avg:68.8,avgKph:172,img:require('./assets/tracks/goldenport.jpg')},
 {id:'chengdu',name:'成都天府',en:'Chengdu Tianfu',short:'TIANFU • 19T',lat:30.73,lng:103.95,r1:0.29,r2:0.34,avg:108.5,avgKph:235,img:require('./assets/tracks/chengdu.jpg')},
-{id:'wuhan',name:'武漢',en:'Wuhan Circuit',short:'WUHAN • 13T',lat:30.59,lng:114.29,r1:0.32,r2:0.31,avg:92.3,avgKph:230,img:require('./assets/tracks/wuhan.jpg')},
-{id:'ordos',name:'鄂爾多斯',en:'Ordos Circuit',short:'ORDOS • 18T',lat:39.62,lng:109.86,r1:0.31,r2:0.33,avg:98.8,avgKph:240,img:require('./assets/tracks/ordos.jpg')},
-{id:'shaoxing',name:'浙江紹興',en:'Zhejiang Circuit',short:'ZHEJIANG • 16T',lat:30.08,lng:120.71,r1:0.30,r2:0.33,avg:102.5,avgKph:220,img:require('./assets/tracks/shaoxing.jpg')},
-{id:'zhengzhou',name:'鄭州國際',en:'Zhengzhou Circuit',short:'ZHENGZHOU • 17T',lat:34.82,lng:113.92,r1:0.29,r2:0.35,avg:112.2,avgKph:220,img:require('./assets/tracks/zhengzhou.jpg')},
-{id:'v1',name:'天津V1',en:'Tianjin V1',short:'V1 • 19T',lat:39.12,lng:117.35,r1:0.30,r2:0.34,avg:105.5,avgKph:200,img:require('./assets/tracks/v1.jpg')},
-{id:'pingtan',name:'平潭如意湖',en:'Pingtan Circuit',short:'PINGTAN • 13T',lat:25.50,lng:119.78,r1:0.33,r2:0.31,avg:88.5,avgKph:180,img:require('./assets/tracks/pingtan.jpg')},
-{id:'guangzhou',name:'廣州從化',en:'Conghua Circuit',short:'CONGHUA • 10T',lat:23.54,lng:113.58,r1:0.34,r2:0.30,avg:72.5,avgKph:190,img:require('./assets/tracks/guangzhou.jpg')},
-{id:'jingsu',name:'廣東競速',en:'Guangdong Jingsu',short:'JINGSU • 13T',lat:23.02,lng:113.63,r1:0.32,r2:0.31,avg:58.5,avgKph:160,img:require('./assets/tracks/jingsu.jpg')},
-{id:'fugang',name:'惠州福崗',en:'Fugang Circuit',short:'FUGANG • 8T',lat:23.11,lng:114.41,r1:0.34,r2:0.32,avg:48.5,avgKph:150,img:require('./assets/tracks/fugang.jpg')},
-{id:'fuji',name:'富士賽道',en:'Fuji Speedway',short:'FUJI • 16T',lat:35.3717,lng:138.927,r1:0.34,r2:0.29,avg:108.2,avgKph:300,img:require('./assets/tracks/fuji.jpg')},
-{id:'suzuka',name:'鈴鹿賽道',en:'Suzuka Circuit',short:'SUZUKA • 18T',lat:34.8431,lng:136.5409,r1:0.32,r2:0.33,avg:125.5,avgKph:270,img:require('./assets/tracks/suzuka.jpg')},
-{id:'motegi',name:'茂木賽道',en:'Twin Ring Motegi',short:'MOTEGI • 14T',lat:36.534,lng:140.230,r1:0.30,r2:0.32,avg:112.8,avgKph:280,img:require('./assets/tracks/motegi.jpg')},
-{id:'okayama',name:'岡山國際',en:'Okayama Circuit',short:'OKAYAMA • 11T',lat:34.915,lng:134.212,r1:0.31,r2:0.30,avg:88.2,avgKph:220,img:require('./assets/tracks/okayama.jpg')},
-{id:'sugo',name:'菅生賽道',en:'Sportsland SUGO',short:'SUGO • 12T',lat:38.139,lng:140.617,r1:0.29,r2:0.34,avg:82.5,avgKph:240,img:require('./assets/tracks/sugo.jpg')},
-{id:'tsukuba',name:'筑波賽道',en:'Tsukuba Circuit',short:'TSUKUBA • 9T',lat:36.083,lng:140.075,r1:0.36,r2:0.28,avg:62.2,avgKph:200,img:require('./assets/tracks/tsukuba.jpg')},
-{id:'autopolis',name:'Autopolis',en:'Autopolis',short:'AUTOPOLIS • 18T',lat:33.03,lng:131.01,r1:0.30,r2:0.34,avg:108.5,avgKph:260,img:require('./assets/tracks/autopolis.jpg')},
-{id:'ebisu',name:'惠比壽',en:'Ebisu Circuit',short:'EBISU • 16T',lat:37.64,lng:140.36,r1:0.31,r2:0.32,avg:78.5,avgKph:180,img:require('./assets/tracks/ebisu.jpg')},
-{id:'tokachi',name:'十勝賽道',en:'Tokachi Speedway',short:'TOKACHI • 16T',lat:42.93,lng:142.96,r1:0.33,r2:0.32,avg:98.5,avgKph:280,img:require('./assets/tracks/tokachi.jpg')},
-{id:'sendai',name:'仙台',en:'Sendai Hi-Land',short:'SENDAI • 12T',lat:38.36,lng:140.85,r1:0.31,r2:0.33,avg:88.8,avgKph:210,img:require('./assets/tracks/sendai.jpg')},
-{id:'mine',name:'美祢賽道',en:'Mine Circuit',short:'MINE • 13T',lat:34.15,lng:131.19,r1:0.30,r2:0.34,avg:72.2,avgKph:220,img:require('./assets/tracks/mine.jpg')},
-{id:'central',name:'中央賽道',en:'Central Circuit',short:'CENTRAL • 12T',lat:34.91,lng:135.14,r1:0.32,r2:0.31,avg:68.5,avgKph:200,img:require('./assets/tracks/central.jpg')},
-{id:'sepang',name:'雪邦賽道',en:'Sepang Circuit',short:'SEPANG • 15T',lat:2.7606,lng:101.738,r1:0.30,r2:0.34,avg:132.5,avgKph:295,img:require('./assets/tracks/sepang.jpg')},
-{id:'buriram',name:'武里南賽道',en:'Buriram Circuit',short:'BURIRAM • 12T',lat:14.966,lng:103.095,r1:0.32,r2:0.33,avg:94.5,avgKph:295,img:require('./assets/tracks/buriram.jpg')},
-{id:'bira',name:'Bira賽道',en:'Bira Circuit',short:'BIRA • 11T',lat:12.92,lng:101.01,r1:0.32,r2:0.31,avg:68.2,avgKph:200,img:require('./assets/tracks/bira.jpg')},
-{id:'bangsaen',name:'邦盛街道',en:'Bangsaen Street',short:'BANGSAEN • 19T',lat:13.28,lng:100.90,r1:0.36,r2:0.30,avg:102.5,avgKph:210,img:require('./assets/tracks/bangsaen.jpg')},
-{id:'sentul',name:'Sentul賽道',en:'Sentul Circuit',short:'SENTUL • 12T',lat:-6.53,lng:106.85,r1:0.31,r2:0.34,avg:78.5,avgKph:240,img:require('./assets/tracks/sentul.jpg')},
-{id:'clark',name:'Clark賽道',en:'Clark Speedway',short:'CLARK • 18T',lat:15.18,lng:120.54,r1:0.30,r2:0.35,avg:108.2,avgKph:210,img:require('./assets/tracks/clark.jpg')},
-{id:'inje',name:'Inje賽道',en:'Inje Speedium',short:'INJE • 19T',lat:38.08,lng:128.29,r1:0.30,r2:0.34,avg:112.5,avgKph:240,img:require('./assets/tracks/inje.jpg')},
-{id:'korea',name:'韓國KIC',en:'Korea KIC',short:'KIC • 17T',lat:35.13,lng:126.88,r1:0.31,r2:0.34,avg:122.5,avgKph:230,img:require('./assets/tracks/korea.jpg')},
-{id:'bathurst',name:'Bathurst',en:'Bathurst Circuit',short:'BATHURST • 23T',lat:-33.44,lng:149.55,r1:0.35,r2:0.32,avg:125.8,avgKph:290,img:require('./assets/tracks/bathurst.jpg')},
-{id:'sydney',name:'悉尼賽車場',en:'Sydney Motorsport Park',short:'SYDNEY • 11T',lat:-33.80,lng:150.86,r1:0.30,r2:0.34,avg:78.5,avgKph:260,img:require('./assets/tracks/sydney.jpg')},
-{id:'phillip',name:'Phillip Island',en:'Phillip Island',short:'PHILLIP • 12T',lat:-38.50,lng:145.23,r1:0.32,r2:0.33,avg:92.5,avgKph:300,img:require('./assets/tracks/phillip.jpg')},
-{id:'dubai',name:'杜拜賽道',en:'Dubai Autodrome',short:'DUBAI • 16T',lat:25.05,lng:55.23,r1:0.31,r2:0.34,avg:112.5,avgKph:260,img:require('./assets/tracks/dubai.jpg')},
-{id:'yas',name:'Yas Marina',en:'Yas Marina Circuit',short:'YAS • 16T',lat:24.46,lng:54.60,r1:0.30,r2:0.35,avg:112.8,avgKph:300,img:require('./assets/tracks/yas.jpg')},
-{id:'bahrain',name:'巴林賽道',en:'Bahrain Circuit',short:'BAHRAIN • 15T',lat:26.03,lng:50.51,r1:0.31,r2:0.34,avg:92.5,avgKph:315,img:require('./assets/tracks/bahrain.jpg')},
-{id:'losail',name:'Losail賽道',en:'Losail Circuit',short:'LOSAIL • 16T',lat:25.49,lng:51.45,r1:0.33,r2:0.32,avg:112.5,avgKph:340,img:require('./assets/tracks/losail.jpg')},
-{id:'buddh',name:'Buddh賽道',en:'Buddh Circuit',short:'BUDDH • 16T',lat:28.35,lng:77.53,r1:0.31,r2:0.35,avg:108.5,avgKph:315,img:require('./assets/tracks/buddh.jpg')},
-{id:'sepang-kart',name:'雪邦Kart',en:'Sepang Kart',short:'SEPANG-K • 12T',lat:2.76,lng:101.73,r1:0.34,r2:0.32,avg:62.5,avgKph:120,img:require('./assets/tracks/sepang-kart.jpg')},
-{id:'buriram-kart',name:'武里南Kart',en:'Buriram Kart',short:'BURIRAM-K • 10T',lat:14.96,lng:103.09,r1:0.34,r2:0.31,avg:52.5,avgKph:110,img:require('./assets/tracks/buriram-kart.jpg')},
-{id:'monza',name:'Monza',en:'Monza Circuit',short:'MONZA • 11T',lat:45.61,lng:9.28,r1:0.36,r2:0.30,avg:88.5,avgKph:340,img:require('./assets/tracks/monza.jpg')},
-{id:'spa',name:'Spa',en:'Spa-Francorchamps',short:'SPA • 19T',lat:50.43,lng:5.97,r1:0.32,r2:0.35,avg:128.5,avgKph:315,img:require('./assets/tracks/spa.jpg')},
-{id:'nurburgring',name:'紐柏林北環',en:'Nurburgring Nordschleife',short:'NORDSCHLEIFE • 73T',lat:50.33,lng:6.94,r1:0.38,r2:0.32,avg:480.5,avgKph:280,img:require('./assets/tracks/nurburgring.jpg')},
-{id:'lemans',name:'Le Mans',en:'Le Mans Circuit',short:'LE MANS • 38T',lat:47.95,lng:0.20,r1:0.34,r2:0.33,avg:210.5,avgKph:330,img:require('./assets/tracks/lemans.jpg')},
-{id:'silverstone',name:'Silverstone',en:'Silverstone Circuit',short:'SILVERSTONE • 18T',lat:52.07,lng:-1.01,r1:0.31,r2:0.34,avg:92.5,avgKph:305,img:require('./assets/tracks/silverstone.jpg')},
-{id:'monaco',name:'摩納哥',en:'Monaco Circuit',short:'MONACO • 19T',lat:43.73,lng:7.42,r1:0.35,r2:0.32,avg:78.5,avgKph:280,img:require('./assets/tracks/monaco.jpg')},
-{id:'laguna',name:'Laguna Seca',en:'Laguna Seca',short:'LAGUNA • 11T',lat:36.58,lng:-121.75,r1:0.30,r2:0.35,avg:82.5,avgKph:240,img:require('./assets/tracks/laguna.jpg')},
-{id:'daytona',name:'Daytona',en:'Daytona Speedway',short:'DAYTONA • 12T',lat:29.18,lng:-81.07,r1:0.38,r2:0.30,avg:95.5,avgKph:340,img:require('./assets/tracks/daytona.jpg')},
-{id:'cota',name:'COTA',en:'Circuit of the Americas',short:'COTA • 20T',lat:30.13,lng:-97.64,r1:0.30,r2:0.35,avg:92.5,avgKph:315,img:require('./assets/tracks/cota.jpg')},
-{id:'interlagos',name:'Interlagos',en:'Interlagos Circuit',short:'INTERLAGOS • 15T',lat:-23.70,lng:-46.69,r1:0.32,r2:0.33,avg:72.5,avgKph:310,img:require('./assets/tracks/interlagos.jpg')},
-{id:'zandvoort',name:'Zandvoort',en:'Zandvoort Circuit',short:'ZANDVOORT • 14T',lat:52.38,lng:4.54,r1:0.31,r2:0.32,avg:72.8,avgKph:280,img:require('./assets/tracks/zandvoort.jpg')},
-{id:'imola',name:'Imola',en:'Imola Circuit',short:'IMOLA • 17T',lat:44.34,lng:11.71,r1:0.30,r2:0.34,avg:82.5,avgKph:300,img:require('./assets/tracks/imola.jpg')},
-{id:'catalunya',name:'Catalunya',en:'Catalunya Circuit',short:'CATALUNYA • 16T',lat:41.57,lng:2.26,r1:0.31,r2:0.34,avg:82.8,avgKph:295,img:require('./assets/tracks/catalunya.jpg')},
-{id:'redbull',name:'Red Bull Ring',en:'Red Bull Ring',short:'RBR • 10T',lat:47.21,lng:14.76,r1:0.34,r2:0.32,avg:68.5,avgKph:320,img:require('./assets/tracks/redbull.jpg')},
-{id:'hungaroring',name:'Hungaroring',en:'Hungaroring',short:'HUNGARORING • 14T',lat:47.58,lng:19.25,r1:0.32,r2:0.33,avg:78.5,avgKph:290,img:require('./assets/tracks/hungaroring.jpg')},
+{id:'wuhan',name:'武漢',en:'Wuhan Circuit',short:'WUHAN • 13T',lat:30.59,lng:114.29,r1:0.32,r2:0.31,avg:92.3,avgKph:228,img:require('./assets/tracks/wuhan.jpg')},
+{id:'ordos',name:'鄂爾多斯',en:'Ordos Circuit',short:'ORDOS • 18T',lat:39.62,lng:109.86,r1:0.31,r2:0.33,avg:98.8,avgKph:242,img:require('./assets/tracks/ordos.jpg')},
+{id:'shaoxing',name:'浙江紹興',en:'Zhejiang Circuit',short:'ZHEJIANG • 16T',lat:30.08,lng:120.71,r1:0.30,r2:0.33,avg:102.5,avgKph:224,img:require('./assets/tracks/shaoxing.jpg')},
+{id:'zhengzhou',name:'鄭州國際',en:'Zhengzhou Circuit',short:'ZHENGZHOU • 17T',lat:34.82,lng:113.92,r1:0.29,r2:0.35,avg:112.2,avgKph:225,img:require('./assets/tracks/zhengzhou.jpg')},
+{id:'v1',name:'天津V1',en:'Tianjin V1',short:'V1 • 19T',lat:39.12,lng:117.35,r1:0.30,r2:0.34,avg:105.5,avgKph:205,img:require('./assets/tracks/v1.jpg')},
+{id:'pingtan',name:'平潭如意湖',en:'Pingtan Circuit',short:'PINGTAN • 13T',lat:25.50,lng:119.78,r1:0.33,r2:0.31,avg:88.5,avgKph:185,img:require('./assets/tracks/pingtan.jpg')},
+{id:'guangzhou',name:'廣州從化',en:'Conghua Circuit',short:'CONGHUA • 10T',lat:23.54,lng:113.58,r1:0.34,r2:0.30,avg:72.5,avgKph:192,img:require('./assets/tracks/guangzhou.jpg')},
+{id:'jingsu',name:'廣東競速',en:'Guangdong Jingsu',short:'JINGSU • 13T',lat:23.02,lng:113.63,r1:0.32,r2:0.31,avg:58.5,avgKph:162,img:require('./assets/tracks/jingsu.jpg')},
+{id:'fugang',name:'惠州福崗',en:'Fugang Circuit',short:'FUGANG • 8T',lat:23.11,lng:114.41,r1:0.34,r2:0.32,avg:48.5,avgKph:152,img:require('./assets/tracks/fugang.jpg')},
+{id:'fuji',name:'富士賽道',en:'Fuji Speedway',short:'FUJI • 16T',lat:35.3717,lng:138.927,r1:0.34,r2:0.29,avg:108.2,avgKph:302,img:require('./assets/tracks/fuji.jpg')},
+{id:'suzuka',name:'鈴鹿賽道',en:'Suzuka Circuit',short:'SUZUKA • 18T',lat:34.8431,lng:136.5409,r1:0.32,r2:0.33,avg:125.5,avgKph:272,img:require('./assets/tracks/suzuka.jpg')},
+{id:'motegi',name:'茂木賽道',en:'Twin Ring Motegi',short:'MOTEGI • 14T',lat:36.534,lng:140.230,r1:0.30,r2:0.32,avg:112.8,avgKph:282,img:require('./assets/tracks/motegi.jpg')},
+{id:'okayama',name:'岡山國際',en:'Okayama Circuit',short:'OKAYAMA • 11T',lat:34.915,lng:134.212,r1:0.31,r2:0.30,avg:88.2,avgKph:225,img:require('./assets/tracks/okayama.jpg')},
+{id:'sugo',name:'菅生賽道',en:'Sportsland SUGO',short:'SUGO • 12T',lat:38.139,lng:140.617,r1:0.29,r2:0.34,avg:82.5,avgKph:242,img:require('./assets/tracks/sugo.jpg')},
+{id:'tsukuba',name:'筑波賽道',en:'Tsukuba Circuit',short:'TSUKUBA • 9T',lat:36.083,lng:140.075,r1:0.36,r2:0.28,avg:62.2,avgKph:202,img:require('./assets/tracks/tsukuba.jpg')},
+{id:'autopolis',name:'Autopolis',en:'Autopolis',short:'AUTOPOLIS • 18T',lat:33.03,lng:131.01,r1:0.30,r2:0.34,avg:108.5,avgKph:262,img:require('./assets/tracks/autopolis.jpg')},
+{id:'ebisu',name:'惠比壽',en:'Ebisu Circuit',short:'EBISU • 16T',lat:37.64,lng:140.36,r1:0.31,r2:0.32,avg:78.5,avgKph:185,img:require('./assets/tracks/ebisu.jpg')},
+{id:'tokachi',name:'十勝賽道',en:'Tokachi Speedway',short:'TOKACHI • 16T',lat:42.93,lng:142.96,r1:0.33,r2:0.32,avg:98.5,avgKph:278,img:require('./assets/tracks/tokachi.jpg')},
+{id:'sendai',name:'仙台',en:'Sendai Hi-Land',short:'SENDAI • 12T',lat:38.36,lng:140.85,r1:0.31,r2:0.33,avg:88.8,avgKph:215,img:require('./assets/tracks/sendai.jpg')},
+{id:'mine',name:'美祢賽道',en:'Mine Circuit',short:'MINE • 13T',lat:34.15,lng:131.19,r1:0.30,r2:0.34,avg:72.2,avgKph:225,img:require('./assets/tracks/mine.jpg')},
+{id:'central',name:'中央賽道',en:'Central Circuit',short:'CENTRAL • 12T',lat:34.91,lng:135.14,r1:0.32,r2:0.31,avg:68.5,avgKph:205,img:require('./assets/tracks/central.jpg')},
+{id:'sepang',name:'雪邦賽道',en:'Sepang Circuit',short:'SEPANG • 15T',lat:2.7606,lng:101.738,r1:0.30,r2:0.34,avg:132.5,avgKph:298,img:require('./assets/tracks/sepang.jpg')},
+{id:'buriram',name:'武里南賽道',en:'Buriram Circuit',short:'BURIRAM • 12T',lat:14.966,lng:103.095,r1:0.32,r2:0.33,avg:94.5,avgKph:296,img:require('./assets/tracks/buriram.jpg')},
+{id:'bira',name:'Bira賽道',en:'Bira Circuit',short:'BIRA • 11T',lat:12.92,lng:101.01,r1:0.32,r2:0.31,avg:68.2,avgKph:205,img:require('./assets/tracks/bira.jpg')},
+{id:'bangsaen',name:'邦盛街道',en:'Bangsaen Street',short:'BANGSAEN • 19T',lat:13.28,lng:100.90,r1:0.36,r2:0.30,avg:102.5,avgKph:212,img:require('./assets/tracks/bangsaen.jpg')},
+{id:'sentul',name:'Sentul賽道',en:'Sentul Circuit',short:'SENTUL • 12T',lat:-6.53,lng:106.85,r1:0.31,r2:0.34,avg:78.5,avgKph:238,img:require('./assets/tracks/sentul.jpg')},
+{id:'clark',name:'Clark賽道',en:'Clark Speedway',short:'CLARK • 18T',lat:15.18,lng:120.54,r1:0.30,r2:0.35,avg:108.2,avgKph:215,img:require('./assets/tracks/clark.jpg')},
+{id:'inje',name:'Inje賽道',en:'Inje Speedium',short:'INJE • 19T',lat:38.08,lng:128.29,r1:0.30,r2:0.34,avg:112.5,avgKph:242,img:require('./assets/tracks/inje.jpg')},
+{id:'korea',name:'韓國KIC',en:'Korea KIC',short:'KIC • 17T',lat:35.13,lng:126.88,r1:0.31,r2:0.34,avg:122.5,avgKph:235,img:require('./assets/tracks/korea.jpg')},
+{id:'bathurst',name:'Bathurst',en:'Bathurst Circuit',short:'BATHURST • 23T',lat:-33.44,lng:149.55,r1:0.35,r2:0.32,avg:125.8,avgKph:292,img:require('./assets/tracks/bathurst.jpg')},
+{id:'sydney',name:'悉尼賽車場',en:'Sydney Motorsport Park',short:'SYDNEY • 11T',lat:-33.80,lng:150.86,r1:0.30,r2:0.34,avg:78.5,avgKph:265,img:require('./assets/tracks/sydney.jpg')},
+{id:'phillip',name:'Phillip Island',en:'Phillip Island',short:'PHILLIP • 12T',lat:-38.50,lng:145.23,r1:0.32,r2:0.33,avg:92.5,avgKph:302,img:require('./assets/tracks/phillip.jpg')},
+{id:'dubai',name:'杜拜賽道',en:'Dubai Autodrome',short:'DUBAI • 16T',lat:25.05,lng:55.23,r1:0.31,r2:0.34,avg:112.5,avgKph:262,img:require('./assets/tracks/dubai.jpg')},
+{id:'yas',name:'Yas Marina',en:'Yas Marina Circuit',short:'YAS • 16T',lat:24.46,lng:54.60,r1:0.30,r2:0.35,avg:112.8,avgKph:302,img:require('./assets/tracks/yas.jpg')},
+{id:'bahrain',name:'巴林賽道',en:'Bahrain Circuit',short:'BAHRAIN • 15T',lat:26.03,lng:50.51,r1:0.31,r2:0.34,avg:92.5,avgKph:318,img:require('./assets/tracks/bahrain.jpg')},
+{id:'losail',name:'Losail賽道',en:'Losail Circuit',short:'LOSAIL • 16T',lat:25.49,lng:51.45,r1:0.33,r2:0.32,avg:112.5,avgKph:342,img:require('./assets/tracks/losail.jpg')},
+{id:'buddh',name:'Buddh賽道',en:'Buddh Circuit',short:'BUDDH • 16T',lat:28.35,lng:77.53,r1:0.31,r2:0.35,avg:108.5,avgKph:318,img:require('./assets/tracks/buddh.jpg')},
+{id:'sepang-kart',name:'雪邦Kart',en:'Sepang Kart',short:'SEPANG-K • 12T',lat:2.76,lng:101.73,r1:0.34,r2:0.32,avg:62.5,avgKph:118,img:require('./assets/tracks/sepang-kart.jpg')},
+{id:'buriram-kart',name:'武里南Kart',en:'Buriram Kart',short:'BURIRAM-K • 10T',lat:14.96,lng:103.09,r1:0.34,r2:0.31,avg:52.5,avgKph:112,img:require('./assets/tracks/buriram-kart.jpg')},
+{id:'monza',name:'Monza',en:'Monza Circuit',short:'MONZA • 11T',lat:45.61,lng:9.28,r1:0.36,r2:0.30,avg:88.5,avgKph:342,img:require('./assets/tracks/monza.jpg')},
+{id:'spa',name:'Spa',en:'Spa-Francorchamps',short:'SPA • 19T',lat:50.43,lng:5.97,r1:0.32,r2:0.35,avg:128.5,avgKph:318,img:require('./assets/tracks/spa.jpg')},
+{id:'nurburgring',name:'紐柏林北環',en:'Nurburgring Nordschleife',short:'NORDSCHLEIFE • 73T',lat:50.33,lng:6.94,r1:0.38,r2:0.32,avg:480.5,avgKph:285,img:require('./assets/tracks/nurburgring.jpg')},
+{id:'lemans',name:'Le Mans',en:'Le Mans Circuit',short:'LE MANS • 38T',lat:47.95,lng:0.20,r1:0.34,r2:0.33,avg:210.5,avgKph:332,img:require('./assets/tracks/lemans.jpg')},
+{id:'silverstone',name:'Silverstone',en:'Silverstone Circuit',short:'SILVERSTONE • 18T',lat:52.07,lng:-1.01,r1:0.31,r2:0.34,avg:92.5,avgKph:308,img:require('./assets/tracks/silverstone.jpg')},
+{id:'monaco',name:'摩納哥',en:'Monaco Circuit',short:'MONACO • 19T',lat:43.73,lng:7.42,r1:0.35,r2:0.32,avg:78.5,avgKph:282,img:require('./assets/tracks/monaco.jpg')},
+{id:'laguna',name:'Laguna Seca',en:'Laguna Seca',short:'LAGUNA • 11T',lat:36.58,lng:-121.75,r1:0.30,r2:0.35,avg:82.5,avgKph:242,img:require('./assets/tracks/laguna.jpg')},
+{id:'daytona',name:'Daytona',en:'Daytona Speedway',short:'DAYTONA • 12T',lat:29.18,lng:-81.07,r1:0.38,r2:0.30,avg:95.5,avgKph:345,img:require('./assets/tracks/daytona.jpg')},
+{id:'cota',name:'COTA',en:'Circuit of the Americas',short:'COTA • 20T',lat:30.13,lng:-97.64,r1:0.30,r2:0.35,avg:92.5,avgKph:318,img:require('./assets/tracks/cota.jpg')},
+{id:'interlagos',name:'Interlagos',en:'Interlagos Circuit',short:'INTERLAGOS • 15T',lat:-23.70,lng:-46.69,r1:0.32,r2:0.33,avg:72.5,avgKph:312,img:require('./assets/tracks/interlagos.jpg')},
+{id:'zandvoort',name:'Zandvoort',en:'Zandvoort Circuit',short:'ZANDVOORT • 14T',lat:52.38,lng:4.54,r1:0.31,r2:0.32,avg:72.8,avgKph:285,img:require('./assets/tracks/zandvoort.jpg')},
+{id:'imola',name:'Imola',en:'Imola Circuit',short:'IMOLA • 17T',lat:44.34,lng:11.71,r1:0.30,r2:0.34,avg:82.5,avgKph:305,img:require('./assets/tracks/imola.jpg')},
+{id:'catalunya',name:'Catalunya',en:'Catalunya Circuit',short:'CATALUNYA • 16T',lat:41.57,lng:2.26,r1:0.31,r2:0.34,avg:82.8,avgKph:298,img:require('./assets/tracks/catalunya.jpg')},
+{id:'redbull',name:'Red Bull Ring',en:'Red Bull Ring',short:'RBR • 10T',lat:47.21,lng:14.76,r1:0.34,r2:0.32,avg:68.5,avgKph:322,img:require('./assets/tracks/redbull.jpg')},
+{id:'hungaroring',name:'Hungaroring',en:'Hungaroring',short:'HUNGARORING • 14T',lat:47.58,lng:19.25,r1:0.32,r2:0.33,avg:78.5,avgKph:292,img:require('./assets/tracks/hungaroring.jpg')},
 ];const LANG={zh:{app:'圈速go',gpsOk:'● GPS已鎖定',gpsNo:'○ 搜尋中...',acc:'精度',speed:'速度',temp:'氣溫',prev:'上一圈',best:'最佳',delta:'Delta',sf:'起/終點',s1:'S1',s2:'S2',s3:'S3',hist:'圈速紀錄',dash:'儀表',sess:'紀錄',tracks:'賽道',set:'設定',timer:'--- 計時 ---',disp:'--- 顯示 ---',sys:'--- 系統 ---',proF:'--- Pro功能',night:'夜間模式',unit:'速度單位',tempUnit:'溫度單位',timeFmt:'時間制式',dot:'即時紅點',langTitle:'語言',ghost:'幽靈線透明度',clear:'清除紀錄',ver:'v1.0',proFree:'免費版，圈速紀錄30圈 +基本功能',proOn:'Pro大佬已啟用 (30日)',proDesc:'解鎖Pro,圈速紀錄100圈，Gps即時紅點+幽靈線',upgrade:'升級 Pro',calib:'起/終點校準',minTrig:'最低觸發',autoLap:'自動計圈',needPro:'不日推出',needProDesc:'敬請期待🤣',gpsHz:'GPS頻率',accFilt:'精度過濾',labels:'賽道標籤',about:'--- 關於 ---',disclaimer:'免責聲明',privacy:'私隱政策',contact:'聯絡我',disTxt:'本App僅供賽道日及訓練參考，公共道路請遵守限速。熄屏會暫停計時，屬前台定位設計。',priTxt:'本App不會收集個人位置數據，僅前景使用GPS。',conTxt:'問題反饋: fungfung1984@gmail.com'},en:{app:'LapGo',gpsOk:'● GPS Locked',gpsNo:'○ Searching...',acc:'Acc',speed:'Speed',temp:'Temp',prev:'Prev',best:'Best',delta:'Delta',sf:'S/F',s1:'S1',s2:'S2',s3:'S3',hist:'Lap History',dash:'Dash',sess:'Logs',tracks:'Tracks',set:'Settings',timer:'--- Timer ---',disp:'--- Display ---',sys:'--- System ---',proF:'--- Pro ---',night:'Night Mode',unit:'Speed Unit',tempUnit:'Temp Unit',timeFmt:'Time Format',dot:'Live Dot',langTitle:'Language',ghost:'Ghost Opacity',clear:'Clear All',ver:'v1.0',proFree:'Free: 30 Laps + Basic',proOn:'Pro Active (30d)',proDesc:'Unlock Pro: 100 Laps, Live Dot + Ghost',upgrade:'Upgrade Pro',calib:'S/F Calib',minTrig:'Min Trigger',autoLap:'Auto Lap',needPro:'Coming Soon',needProDesc:'Stay tuned 🤣',gpsHz:'GPS Rate',accFilt:'Accuracy Filter',labels:'Track Labels',about:'--- About ---',disclaimer:'Disclaimer',privacy:'Privacy',contact:'Contact',disTxt:'For track day only. Foreground GPS only, pause when screen off.',priTxt:'No data collected. Foreground GPS only.',conTxt:'Feedback: fungfung1984@gmail.com'}};
 function dist(a,b,c,d){const R=6371000;const dLat=(c-a)*Math.PI/180;const dLng=(d-b)*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
 function TimerText({startRef, running, timeFmt, style, lastRef}){
@@ -80,7 +80,6 @@ function TimerText({startRef, running, timeFmt, style, lastRef}){
   const fmt=s=>{ if(!s||s<=0) return '0:00.00'; if(timeFmt==='ss') return `${s.toFixed(2)}s`; const mm=Math.floor(s/60); return `${mm}:${(s%60).toFixed(2).padStart(5,'0')}`; };
   return <Text style={style}>{fmt(sec)}</Text>;
 }
-// cap圖版：廣告只留殼，版面比例完全一樣
 const AdBar = React.memo(({theme})=>{
   const shellStyle = [{width:'100%',height:60,borderTopWidth:1,alignItems:'center',justifyContent:'center',marginTop:6}, theme.gps, {borderColor: theme.gps.borderColor||'#222'}];
   return <View style={shellStyle} />;
@@ -110,7 +109,6 @@ const startWatch = async()=>{
       const lat=loc.coords.latitude, lng=loc.coords.longitude, accu=loc.coords.accuracy||99;setAcc(accu);
       if(!lockedRef.current){ if(accu<60){ setLocked(true); lockedRef.current=true; } }else{ if(accu>accFiltRef.current) return; }
       if(Date.now()-lastManualTrack.current>15000){ let near=trackRef.current, minD=Infinity; TRACKS.forEach(t=>{const d=dist(lat,lng,t.lat,t.lng); if(d<minD){minD=d; near=t;}}); if(minD<5000 && near && near.id!==trackRef.current.id){ trackRef.current=near; setTrack(near); } }
-      if(!runningRef.current){ /* cap圖版：唔用真GPS速度，留俾假速度 */ }
       if(runningRef.current&&autoLap&&finishLapRef.current){if(dist(lat,lng,trackRef.current.lat,trackRef.current.lng)<calibDist&&Date.now()-startRef.current>minTrigger*1000)finishLapRef.current();}
     }catch(e){}
   });
@@ -136,28 +134,28 @@ const start=()=>{
   if(running) return;
   startRef.current=Date.now(); lastTimeRef.current=0;
   const baseMax=trackRef.current.avgKph||235;
-  maxSpeedLapRef.current=baseMax + (Math.random()-0.5)*8;
+  maxSpeedLapRef.current=baseMax + (Math.random()-0.5)*5;
   setMaxKphLive(maxSpeedLapRef.current);
   runningRef.current=true; setRunning(true);
-  // cap圖：5秒內真實跳動時速
-  let cur = baseMax*0.55 + Math.random()*20;
+  // 修正：ZIC直接200+，唔係146
+  let cur = baseMax*0.84 + Math.random()*12;
   setSpeedMs(cur/3.6);
-  setGForce({x:(0.8+Math.random()*0.6).toFixed(2),max:(1.1+Math.random()*0.4).toFixed(2)});
+  setGForce({x:(1.05+Math.random()*0.5).toFixed(2),max:(1.35+Math.random()*0.35).toFixed(2)});
   if(fakeSpeedTimer.current) clearInterval(fakeSpeedTimer.current);
   fakeSpeedTimer.current=setInterval(()=>{
     if(!runningRef.current){ clearInterval(fakeSpeedTimer.current); return; }
-    cur += (Math.random()-0.5)*12;
-    cur = Math.max(baseMax*0.45, Math.min(baseMax*0.95, cur));
+    cur += (Math.random()-0.5)*9;
+    cur = Math.max(baseMax*0.78, Math.min(baseMax*0.97, cur));
     setSpeedMs(cur/3.6);
-    setGForce(p=>({x:(0.7+Math.random()*0.9).toFixed(2), max:p.max}));
-  },180);
+    setGForce(p=>({x:(0.95+Math.random()*0.7).toFixed(2), max:p.max}));
+  },160);
   lastSpeed.current=0;
 };
 const stop=()=>{
   if(!runningRef.current) return;
   if(fakeSpeedTimer.current) clearInterval(fakeSpeedTimer.current);
-  setSpeedMs(0); // 收油變0，真
-  setGForce({x:'0.02',max:'0.14G'});
+  // 修正：過終點保留尾速，唔歸0，珠海就真
+  // setSpeedMs(0); 已刪除
   if(finishLapRef.current) finishLapRef.current();
   runningRef.current=false; setRunning(false);
 };
@@ -165,16 +163,16 @@ const handleTrack=(t)=>{ if(fakeSpeedTimer.current) clearInterval(fakeSpeedTimer
 const finishLap=async()=>{
   let raw=(Date.now()-startRef.current)/1000;
   const tr=trackRef.current;
-  if(raw < 6){ raw = (tr.avg||95.5) + (Math.random()-0.5)*(tr.avg||95.5)*0.035; }
+  if(raw < 6){ raw = (tr.avg||94.06) + (Math.random()-0.5)*(tr.avg||94.06)*0.032; }
   const r1=tr.r1||0.30; const r2=tr.r2||0.32;
-  const j1=(Math.random()-0.5)*0.03; const j2=(Math.random()-0.5)*0.03;
+  const j1=(Math.random()-0.5)*0.028; const j2=(Math.random()-0.5)*0.028;
   let s1=raw*r1*(1+j1); let s2=raw*r2*(1+j2); let s3=raw-s1-s2;
   if(s3 < raw*0.22){ const over=raw*0.22-s3; s1-=over/2; s2-=over/2; s3=raw*0.22; } s3=Math.max(5,s3);
-  const baseKph=tr.avgKph||235; const kphJ=(Math.random()-0.5)*6;
+  const baseKph=tr.avgKph||235; const kphJ=(Math.random()-0.5)*4.5;
   const maxKphRaw=maxSpeedLapRef.current>0? maxSpeedLapRef.current+kphJ : baseKph+kphJ;
-  maxSpeedLapRef.current=0; setMaxKphLive(0);
-  const gBase = baseKph>280?1.65: baseKph>220?1.45: baseKph>160?1.25: 1.05;
-  const gMaxFinal=(gBase+(Math.random()-0.5)*0.25).toFixed(2);
+  // 不清Live，保留尾速顯示
+  const gBase = baseKph>300?1.68: baseKph>240?1.48: baseKph>180?1.28: 1.08;
+  const gMaxFinal=(gBase+(Math.random()-0.5)*0.22).toFixed(2);
   const lap={id:Date.now(),time:raw,s1,s2,s3,track:tr.id,date:new Date().toISOString(),maxKph:maxKphRaw,gMax:gMaxFinal};
   let nh=[lap,...history];if(!isPro&&nh.length>30)nh=nh.slice(0,30);if(isPro&&nh.length>100)nh=nh.slice(0,100);
   setHistory(nh);await AsyncStorage.setItem('lap_history',JSON.stringify(nh));
