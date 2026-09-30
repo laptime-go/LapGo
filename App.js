@@ -82,7 +82,7 @@ function TimerText({startRef, running, timeFmt, style, lastRef}){
 }
 const AdBar = React.memo(({theme})=>{
   const [fail,setFail]=useState(false);
-  const shellStyle = [{width:'100%',height:60,borderTopWidth:1,alignItems:'center',justifyContent:'center',marginTop:6}, theme.gps, {borderColor: theme.gps.borderColor||'#222'}];
+  const shellStyle = [{width:'100%',borderTopWidth:1,alignItems:'center',justifyContent:'center',marginTop:6,minHeight:50,paddingVertical:0}, theme.gps, {borderColor: theme.gps.borderColor||'#222'}];
   if(fail ||!BannerAd){ return <View style={shellStyle} />; }
   return(
     <View style={shellStyle}>
