@@ -5,10 +5,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          echo "=== Real SHA1 ==="
-          keytool -list -v -keystore release.keystore -storepass ${{ secrets.MYAPP_RELEASE_STORE_PASSWORD }} | grep -E "SHA1|Alias"
-          base64 -w 0 release.keystore > b64.txt
+      - name: Show files and try SHA1
+        run: |
+          pwd
+          ls -lh
+          echo "Trying with secret password..."
+          keytool -list -v -keystore release.keystore -storepass ${{ secrets.MYAPP_RELEASE_STORE_PASSWORD }} || echo "Secret password failed, trying common passwords"
+          keytool -list -v -keystore release.keystore -storepass laptime123 || true
+          keytool -list -v -keystore release.keystore -storepass 123456 || true
+          keytool -list -v -keystore release.keystore -storepass android || true
+      - name: Make b64
+        run: base64 -w 0 release.keystore > b64.txt || true
       - uses: actions/upload-artifact@v4
         with:
           name: keystore-b64
