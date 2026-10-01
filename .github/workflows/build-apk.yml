@@ -38,9 +38,6 @@ jobs:
           comm -23 /tmp/need.txt /tmp/have.txt || true
           if [ $(comm -23 /tmp/need.txt /tmp/have.txt | wc -l) -gt 0 ]; then echo "❌ 爭圖"; comm -23 /tmp/need.txt /tmp/have.txt; exit 1; fi
 
-      - name: Clean old keystores
-        run: rm -rf android && rm -rf ~/.gradle/caches
-
       - name: Expo prebuild
         run: npx expo prebuild --clean
 
@@ -52,46 +49,60 @@ jobs:
       - name: Use Permanent Keystore 40:0C:73 from Secrets
         run: |
           mkdir -p android/app
-          echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/app/release.keystore
           echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/release.keystore
+          echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/app/release.keystore
           ls -lh android/app/release.keystore
-          echo "=== KEYSTORE CONTENT ==="
-          keytool -list -keystore android/app/release.keystore -storepass "${{ secrets.KEYSTONE_PASSWORD }}" || (echo "❌ PASSWORD/ALIAS錯" && exit 1)
-          echo "=== SHA1 MUST BE 40:0C:73 ==="
+          echo "=== 檢查密碼 ==="
+          keytool -list -keystore android/app/release.keystore -storepass "${{ secrets.KEYSTONE_PASSWORD }}" || (echo "❌ password incorrect - 你個KEYSTONE_PASSWORD唔啱把keystore" && exit 1)
+          echo "=== SHA1 ==="
           keytool -list -v -keystore android/app/release.keystore -storepass "${{ secrets.KEYSTONE_PASSWORD }}" | grep -A1 SHA1
-          keytool -list -v -keystore android/app/release.keystore -storepass "${{ secrets.KEYSTONE_PASSWORD }}" | grep -q "40:0C:73" || (echo "❌ 呢把唔係40:0C:73，你個KEYSTONE_B64仲係舊5E" && exit 1)
 
-      - name: Inject signing with Secrets 40:0C:73
+      - name: Inject signing with Secrets 40:0C:73 - Fixed # bug
         run: |
           rm -f android/app/debug.keystore
+          PASS='${{ secrets.KEYSTONE_PASSWORD }}'
+          # 將 # escape 做 \# 防止gradle當註解
+          ESC_PASS=$(printf "%s" "$PASS" | sed 's/#/\\#/g')
+          echo "原密碼長度: ${#PASS} escape後: $ESC_PASS"
           cat >> android/gradle.properties <<EOF
           MYAPP_RELEASE_STORE_FILE=release.keystore
           MYAPP_RELEASE_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}
-          MYAPP_RELEASE_STORE_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}
-          MYAPP_RELEASE_KEY_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}
+          MYAPP_RELEASE_STORE_PASSWORD=$ESC_PASS
+          MYAPP_RELEASE_KEY_PASSWORD=$ESC_PASS
           MYAPP_UPLOAD_STORE_FILE=release.keystore
           MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}
-          MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}
-          MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}
+          MYAPP_UPLOAD_STORE_PASSWORD=$ESC_PASS
+          MYAPP_UPLOAD_KEY_PASSWORD=$ESC_PASS
           android.injected.signing.store.file=$PWD/android/app/release.keystore
-          android.injected.signing.store.password=${{ secrets.KEYSTONE_PASSWORD }}
+          android.injected.signing.store.password=$ESC_PASS
           android.injected.signing.key.alias=${{ secrets.KEYSTONE_ALIAS }}
-          android.injected.signing.key.password=${{ secrets.KEYSTONE_PASSWORD }}
+          android.injected.signing.key.password=$ESC_PASS
           EOF
-          cat android/gradle.properties
+          cat android/gradle.properties | tail -20
 
       - name: Build AAB + APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew bundleRelease assembleRelease --stacktrace
+          ./gradlew bundleRelease assembleRelease
 
       - name: Verify final AAB is 40:0C:73
         run: |
-          sudo apt-get install -y unzip
+          sudo apt-get install -y unzip -qq
           AAB=android/app/build/outputs/bundle/release/app-release.aab
           unzip -p $AAB META-INF/*.RSA > /tmp/final.RSA 2>/dev/null || unzip -p $AAB META-INF/*.DSA > /tmp/final.RSA
           echo "=== FINAL AAB CERT ==="
           keytool -printcert -file /tmp/final.RSA
-          keytool -printcert -file /tmp/final.RSA | grep -q "40:0C:73" || (echo "❌ FINAL AAB IS NOT 40:0C:73 - 仲係5E，簽名失敗" && exit 1)
-          echo "✅ VERIFIED 40:0C:73 - 可以
+          keytool -printcert -file /tmp/final.RSA | grep -q "40:0C:73" && echo "✅ 40:0C:73正確" || (echo "❌ 仲係5E" && exit 1)
+
+      - name: Upload AAB For Play
+        uses: actions/upload-artifact@v4
+        with:
+          name: lapgo-63tracks-AAB-40-0C-73-for-play
+          path: android/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Upload APK For Test
+        uses: actions/upload-artifact@v4
+        with:
+          name: lapgo-63tracks-APK-40-0C-73-for-test
+          path: android/app/build/outputs/apk/release/app-release.apk
