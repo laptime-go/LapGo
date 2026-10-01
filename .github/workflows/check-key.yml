@@ -1,0 +1,15 @@
+name: Check Key SHA1
+on: workflow_dispatch
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          echo "=== Real SHA1 ==="
+          keytool -list -v -keystore release.keystore -storepass ${{ secrets.MYAPP_RELEASE_STORE_PASSWORD }} | grep -E "SHA1|Alias"
+          base64 -w 0 release.keystore > b64.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: keystore-b64
+          path: b64.txt
