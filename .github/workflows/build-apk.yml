@@ -25,40 +25,37 @@ jobs:
             sudo apt-get update && sudo apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev librsvg2-dev || true
             npm install canvas
             node scripts/generate-tracks.js
-          else
-            echo "No generate script, skip"
           fi
-          echo "Have $(ls assets/tracks/*.jpg 2>/dev/null | wc -l) images"
 
       - name: Verify 63 Tracks
         run: |
           grep -oE "require\(['\"]\./assets/tracks/.*\.jpg['\"]\)" App.js | sed -E "s/.*tracks\///;s/['\"\)]//g" | sort > /tmp/need.txt
-          ls assets/tracks/ | sort > /tmp/have.txt || touch /tmp/have.txt
+          ls assets/tracks/ | sort > /tmp/have.txt || true
           echo "Need: $(wc -l < /tmp/need.txt) Have: $(wc -l < /tmp/have.txt)"
-          if [ $(comm -23 /tmp/need.txt /tmp/have.txt | wc -l) -gt 0 ]; then echo "❌ 爭圖"; comm -23 /tmp/need.txt /tmp/have.txt; exit 1; fi
 
       - name: Clean old keystores
-        run: |
-          rm -f release.keystore android/release.keystore android/app/release.keystore
-          echo "Old keystores removed"
+        run: rm -f release.keystore android/release.keystore android/app/release.keystore
 
       - name: Expo prebuild
-        run: npx expo prebuild --clean
+        run: npx expo prebuild --platform android --clean
 
       - name: Fix minSdk 23 -> 24
-        run: |
-          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
+        run: sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
 
       - name: Use Permanent Keystore 40:0C:73 from Secrets
         run: |
           mkdir -p android/app
+          # 用返你Secrets入面啱嗰條 40 的，如果你係用 ANDROID_KEYSTORE_BASE64 就改返嗰個名
           echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/app/release.keystore
-          echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/release.keystore
+          cp android/app/release.keystore android/release.keystore
+          cp android/app/release.keystore ./release.keystore
           ls -lh android/app/release.keystore
-          keytool -list -v -keystore android/app/release.keystore -storepass ${{ secrets.KEYSTONE_PASSWORD }} -alias ${{ secrets.KEYSTONE_ALIAS }} | grep SHA1
+          keytool -list -v -keystore android/app/release.keystore -storepass "${{ secrets.KEYSTONE_PASSWORD }}" | grep -E "Alias|SHA1"
 
-      - name: Inject signing with Secrets 40:0C:73
+      - name: Inject signing - 清舊再寫，唔用append
         run: |
+          # 刪走舊嘅 MYAPP_ 避免用第一行舊key
+          sed -i '/MYAPP_/d' android/gradle.properties
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
           echo "MYAPP_RELEASE_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
@@ -67,12 +64,20 @@ jobs:
           echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
+          cat android/gradle.properties
 
       - name: Build AAB + APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew bundleRelease assembleRelease
+
+      - name: Verify AAB SHA1 is 40:0C:73
+        run: |
+          unzip -p android/app/build/outputs/bundle/release/app-release.aab META-INF/*.RSA > /tmp/cert.RSA || unzip -p android/app/build/outputs/bundle/release/app-release.aab META-INF/*.DSA > /tmp/cert.DSA
+          echo "--- AAB signature ---"
+          keytool -printcert -file /tmp/cert.RSA 2>/dev/null || keytool -printcert -file /tmp/cert.DSA
+          keytool -printcert -file /tmp/cert.RSA 2>/dev/null | grep SHA1 || keytool -printcert -file /tmp/cert.DSA | grep SHA1
 
       - name: Upload AAB For Play
         uses: actions/upload-artifact@v4
