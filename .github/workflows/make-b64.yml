@@ -1,0 +1,21 @@
+name: Make B64 from uploaded keystore
+on: workflow_dispatch
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Encode from root
+        run: |
+          echo "=== 搵你個file ==="
+          ls -lh *.keystore release.keystore 2>/dev/null || ls -lh
+          FILE=$(ls *.keystore release.keystore 2>/dev/null | head -n 1)
+          echo "Use: $FILE"
+          keytool -list -v -keystore "$FILE" -storepass 'LapGo2026#40Secure!' | grep -E "Alias|SHA1"
+          base64 -w 0 "$FILE" > /tmp/b64.txt
+          echo ""
+          echo "Length: $(wc -c < /tmp/b64.txt) 應該 ~3700"
+          echo "TAIL: $(tail -c 20 /tmp/b64.txt) 應該係 =="
+          echo ""
+          echo "=== FULL B64 下面呢行就係，Copy去Secrets ==="
+          cat /tmp/b64.txt
