@@ -27,8 +27,9 @@ jobs:
       - name: Use Permanent Keystore 40:0C:73 from Secrets
         run: |
           mkdir -p android/app
-          echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/app/release.keystore
-          keytool -list -v -keystore android/app/release.keystore -storepass '${{ secrets.KEYSTONE_PASSWORD }}' | grep SHA1
+          printf '%s' "${{ secrets.KEYSTONE_B64 }}" | tr -d '\n\r ' | base64 --decode > android/app/release.keystore
+          ls -lh android/app/release.keystore
+          keytool -list -v -keystore android/app/release.keystore -storepass "${{ secrets.KEYSTONE_PASSWORD }}" 2>&1 | grep -E "SHA1|Alias"
       - name: Inject signing Fixed for #
         run: |
           PASS='${{ secrets.KEYSTONE_PASSWORD }}'
