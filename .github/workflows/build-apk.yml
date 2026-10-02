@@ -22,7 +22,6 @@ jobs:
             npm install canvas
             node scripts/generate-tracks.js
           fi
-          echo "Have $(ls assets/tracks/*.jpg 2>/dev/null | wc -l) images"
 
       - name: Expo prebuild
         run: npx expo prebuild --clean
@@ -35,15 +34,11 @@ jobs:
           printf '%s' "${{ secrets.KEYSTONE_B64 }}" | tr -d '\n\r ' | base64 --decode > android/app/release.keystore
           cp android/app/release.keystore android/app/debug.keystore
           cp android/app/release.keystore android/release.keystore || true
-          echo "=== Before fix ==="
-          keytool -list -v -keystore android/app/release.keystore -storepass 123456 2>&1 | grep -E "Alias|SHA1"
           ALIAS=$(keytool -list -v -keystore android/app/release.keystore -storepass 123456 2>&1 | grep "Alias name:" | head -n1 | cut -d: -f2 | xargs)
           echo "ALIAS=$ALIAS" >> $GITHUB_ENV
           echo "Found alias $ALIAS"
-          echo "Trying to change keyPassword from OLD to 123456..."
-          keytool -keypasswd -keystore android/app/release.keystore -alias "$ALIAS" -storepass 123456 -keypass "$OLD_PWD" -new 123456 2>&1 || echo "OLD_PWD failed"
+          keytool -keypasswd -keystore android/app/release.keystore -alias "$ALIAS" -storepass 123456 -keypass "$OLD_PWD" -new 123456 2>&1 || true
           keytool -keypasswd -keystore android/app/release.keystore -alias "$ALIAS" -storepass 123456 -keypass 123456 -new 123456 2>&1 || true
-          echo "=== After fix ==="
           keytool -list -v -keystore android/app/release.keystore -storepass 123456 2>&1 | grep -E "Alias|SHA1"
           sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
           sed -i 's/debug.keystore/release.keystore/g' android/app/build.gradle
@@ -56,10 +51,8 @@ jobs:
                   release { storeFile file('release.keystore'); storePassword '123456'; keyAlias '${p}'; keyPassword '123456' }
               }`);
           fs.writeFileSync('android/app/build.gradle',g);
-          console.log('patched alias='+p);
           JS
           FOUND_ALIAS=$ALIAS ALIAS=$ALIAS node /tmp/patch.js
-          grep -A4 "release {" android/app/build.gradle | head -n 10
 
       - name: Build AAB + APK
         run: |
@@ -67,17 +60,16 @@ jobs:
           chmod +x gradlew
           ./gradlew bundleRelease assembleRelease
 
-      - name: Verify AAB is 40
+      - name: Verify APK is 40 - REAL CHECK
         run: |
-          echo "=== AAB cert ==="
-          keytool -printcert -jarfile android/app/build/outputs/bundle/release/app-release.aab 2>&1 | tee /tmp/cert.txt || true
+          echo "=== APK cert - 呢個先係準 ==="
+          keytool -printcert -jarfile android/app/build/outputs/apk/release/app-release.apk 2>&1 | tee /tmp/cert.txt
           cat /tmp/cert.txt
-          echo "=== check ==="
-          if cat /tmp/cert.txt | grep -i -q "40:0C:73"; then
-            echo "✅ 係40可以上架"
-          else
-            echo "⚠️ 唔係40，但AAB已build，照上傳睇log"
-          fi
+          echo "=== check 40 ==="
+          cat /tmp/cert.txt | grep -i "40:0C:73" && echo "✅ 係40可以上架" || echo "❌ 唔係40"
+          echo "=== AAB info ==="
+          unzip -p android/app/build/outputs/bundle/release/app-release.aab META-INF/*.RSA 2>/dev/null | keytool -printcert 2>&1 | head -n 20 || echo "AAB用apksigner簽，Not a signed jar係正常"
+          ls -lh android/app/build/outputs/bundle/release/ android/app/build/outputs/apk/release/
 
       - name: Upload AAB For Play
         if: always()
