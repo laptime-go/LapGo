@@ -51,12 +51,11 @@ jobs:
           echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/release.keystore
           echo "${{ secrets.KEYSTONE_B64 }}" | base64 -d > android/app/release.keystore
           ls -lh android/app/release.keystore
-          echo "=== 驗證 Keystore 係咪 40:0C:73 ==="
+          echo "=== 驗證係咪 40:0C:73 真身 ==="
           keytool -list -v -keystore android/app/release.keystore -storepass '${{ secrets.KEYSTONE_PASSWORD }}' | grep -E "Alias|SHA1|SHA-256"
 
-      - name: Inject signing with Secrets 40:0C:73 - Fixed for LapGo2026#40Secure!
+      - name: Inject signing with Secrets 40:0C:73 - Fixed for #
         run: |
-          # 因為新密碼有 #，要用 \ 跳脫，否則 gradle 當註釋
           PASS='${{ secrets.KEYSTONE_PASSWORD }}'
           ESC=$(printf '%s' "$PASS" | sed 's/#/\\#/g')
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
@@ -67,7 +66,7 @@ jobs:
           echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=$ESC" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=$ESC" >> android/gradle.properties
-          echo "=== gradle.properties 已寫入 ==="
+          echo "=== gradle.properties ==="
           cat android/gradle.properties
 
       - name: Build AAB + APK
@@ -81,7 +80,7 @@ jobs:
           AAB=android/app/build/outputs/bundle/release/app-release.aab
           echo "Checking $AAB"
           keytool -printcert -jarfile "$AAB" | grep -E "SHA1|SHA-256"
-          keytool -printcert -jarfile "$AAB" | grep -q "40:0C:73" && echo "✅ 係40:0C:73，可以上Play" || (echo "❌ 仲係5E" && exit 1)
+          keytool -printcert -jarfile "$AAB" | grep -q "40:0C:73" && echo "✅ 係40:0C:73，可以上Play" || (echo "❌ 仲係5E，失敗" && exit 1)
 
       - name: Upload AAB For Play
         uses: actions/upload-artifact@v4
