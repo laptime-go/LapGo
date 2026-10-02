@@ -20,7 +20,6 @@ jobs:
             npm install canvas
             node scripts/generate-tracks.js
           fi
-          echo "Have $(ls assets/tracks/*.jpg 2>/dev/null | wc -l) images"
       - name: Verify 63 Tracks
         run: |
           grep -oE "require\(['\"]\./assets/tracks/.*\.jpg['\"]\)" App.js | sed -E "s/.*tracks\///;s/['\"\)]//g" | sort > /tmp/need.txt
@@ -28,29 +27,38 @@ jobs:
           comm -23 /tmp/need.txt /tmp/have.txt || true
       - name: Expo prebuild
         run: npx expo prebuild --clean
-      - name: Fix minSdk
-        run: sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
-      - name: Use Permanent Keystore 40 with 123456
+      - name: Fix minSdk + Use 40 Keystore
         run: |
           mkdir -p android/app
           printf '%s' "${{ secrets.KEYSTONE_B64 }}" | tr -d '\n\r ' | base64 --decode > android/app/release.keystore
-          cp android/app/release.keystore android/release.keystore
-          ls -lh android/app/release.keystore
+          cp android/app/release.keystore android/app/debug.keystore
+          cp android/app/release.keystore android/debug.keystore || true
+          cp android/app/release.keystore android/app/release.keystore.bak
+          ls -lh android/app/release.keystore android/app/debug.keystore
           keytool -list -v -keystore android/app/release.keystore -storepass 123456 2>&1 | grep -E "SHA1|Alias"
+          # 暴力將build.gradle所有debug.keystore改做release.keystore
+          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
+          sed -i 's/debug.keystore/release.keystore/g' android/app/build.gradle
+          sed -i "s/storeFile file.*/storeFile file('release.keystore')/g" android/app/build.gradle
+          echo "---- signingConfigs ----"
+          grep -n "release.keystore\|signingConfigs\|storeFile\|storePassword\|keyAlias" android/app/build.gradle | head -n 40
       - name: Inject signing 40 + 123456
         run: |
+          ALIAS=${{ secrets.KEYSTONE_ALIAS }}
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
-          echo "MYAPP_RELEASE_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
+          echo "MYAPP_RELEASE_KEY_ALIAS=$ALIAS" >> android/gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=123456" >> android/gradle.properties
           echo "MYAPP_RELEASE_KEY_PASSWORD=123456" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_FILE=release.keystore" >> android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=$ALIAS" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=123456" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=123456" >> android/gradle.properties
+          cat android/gradle.properties | tail -n 12
       - name: Build AAB + APK FORCED 40
         run: |
           cd android
           chmod +x gradlew
+          ./gradlew bundleRelease assembleRelease -PMYAPP_RELEASE_STORE_FILE=release.keystore -PMYAPP_RELEASE_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }} -PMYAPP_RELEASE_STORE_PASSWORD=123456 -PMYAPP_RELEASE_KEY_PASSWORD=123456 -PMYAPP_UPLOAD_STORE_FILE=release.keystore -PMYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }} -PMYAPP_UPLOAD_STORE_PASSWORD=123456 -PMYAPP_UPLOAD_KEY_PASSWORD=123456 --info | grep -i "signing\|release.keystore\|40:0C" || true
           ./gradlew bundleRelease assembleRelease -PMYAPP_RELEASE_STORE_FILE=release.keystore -PMYAPP_RELEASE_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }} -PMYAPP_RELEASE_STORE_PASSWORD=123456 -PMYAPP_RELEASE_KEY_PASSWORD=123456 -PMYAPP_UPLOAD_STORE_FILE=release.keystore -PMYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }} -PMYAPP_UPLOAD_STORE_PASSWORD=123456 -PMYAPP_UPLOAD_KEY_PASSWORD=123456
       - name: Verify AAB is 40
         run: |
