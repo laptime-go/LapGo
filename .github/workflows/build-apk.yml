@@ -37,9 +37,17 @@ jobs:
       - name: Expo prebuild
         run: npx expo prebuild --clean
 
-      - name: Fix minSdk 23 -> 24
+      - name: Fix minSdk 23 -> 24 and Target 34 -> 36 FOR PLAY
         run: |
           sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
+          sed -i 's/targetSdkVersion 34/targetSdkVersion 36/g' android/app/build.gradle || true
+          sed -i 's/targetSdk 34/targetSdk 36/g' android/app/build.gradle || true
+          sed -i 's/compileSdkVersion 34/compileSdkVersion 36/g' android/app/build.gradle || true
+          sed -i 's/compileSdk 34/compileSdk 36/g' android/app/build.gradle || true
+          sed -i 's/compileSdkVersion = 34/compileSdkVersion = 36/g' android/build.gradle || true
+          sed -i 's/targetSdkVersion = 34/targetSdkVersion = 36/g' android/build.gradle || true
+          echo "=== CHECK 36 ==="
+          grep -E "targetSdk|compileSdk|minSdk" android/app/build.gradle | head -10
 
       - name: Use Permanent Keystore 40:0C:73 lapgo
         run: |
@@ -66,7 +74,6 @@ jobs:
       - name: Build AAB + APK
         run: |
           cd android
-          # === 強制修正，解決你圖入面 5E 問題 ===
           cat > /tmp/fix.py << 'PY'
           import pathlib, re
           p = pathlib.Path("app/build.gradle").read_text()
@@ -95,8 +102,9 @@ jobs:
           python3 /tmp/fix.py
           chmod +x gradlew
           KS_PASS=${{ secrets.KEYSTONE_PASSWORD }} KS_ALIAS=${{ secrets.KEYSTONE_ALIAS }} ./gradlew bundleRelease assembleRelease
-          echo "=== FINAL AAB MUST BE 40:0C:73 ==="
+          echo "=== FINAL AAB MUST BE 40:0C:73 and 36 ==="
           keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab | grep SHA1
+          aapt2 dump badging app/build/outputs/apk/release/app-release.apk 2>/dev/null | grep targetSdkVersion || true
 
       - name: Upload AAB For Play
         if: always()
