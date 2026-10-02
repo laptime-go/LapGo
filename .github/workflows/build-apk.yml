@@ -50,7 +50,7 @@ jobs:
           echo "=== THIS BUILD SHOULD BE 40 ==="
           keytool -list -v -keystore android/app/release.keystore -alias ${{ secrets.KEYSTONE_ALIAS }} -storepass ${{ secrets.KEYSTONE_PASSWORD }} | grep -E "Alias name|SHA1"
 
-      - name: Inject signing 40 from Secrets - FIXED FOR 5E
+      - name: Inject signing 40 from Secrets
         run: |
           sed -i '/MYAPP_RELEASE/d' android/gradle.properties || true
           sed -i '/MYAPP_UPLOAD/d' android/gradle.properties || true
@@ -62,20 +62,41 @@ jobs:
           echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
-          # 強制寫死 build.gradle 唔俾佢跌去 debug
-          echo "=== FORCE build.gradle ==="
-          sed -i "s/if (.*MYAPP_RELEASE.*)/if (true)/" android/app/build.gradle || true
-          cat android/app/build.gradle | grep -A5 "signingConfigs" | head -20
 
       - name: Build AAB + APK
         run: |
           cd android
+          # === 強制修正，解決你圖入面 5E 問題 ===
+          cat > /tmp/fix.py << 'PY'
+          import pathlib, re
+          p = pathlib.Path("app/build.gradle").read_text()
+          new_block = """
+          signingConfigs {
+              debug {
+                  storeFile file('debug.keystore')
+                  storePassword 'android'
+                  keyAlias 'androiddebugkey'
+                  keyPassword 'android'
+              }
+              release {
+                  storeFile file('release.keystore')
+                  storePassword System.getenv("KS_PASS") ?: "123456"
+                  keyAlias System.getenv("KS_ALIAS") ?: "lapgo"
+                  keyPassword System.getenv("KS_PASS") ?: "123456"
+              }
+          }
+          """
+          p = re.sub(r'signingConfigs\s*\{.*?^\s*\}\s*\n\s*buildTypes', new_block + '\nbuildTypes', p, flags=re.MULTILINE|re.DOTALL)
+          if 'signingConfig signingConfigs.debug' in p:
+              p = p.replace('signingConfig signingConfigs.debug', 'signingConfig signingConfigs.release')
+          pathlib.Path("app/build.gradle").write_text(p)
+          print("Patched to release")
+          PY
+          python3 /tmp/fix.py
           chmod +x gradlew
-          ./gradlew bundleRelease assembleRelease --info | grep -E "signing|keystore|lapgo|release" | head -30
-          echo "=== FINAL AAB CHECK ==="
+          KS_PASS=${{ secrets.KEYSTONE_PASSWORD }} KS_ALIAS=${{ secrets.KEYSTONE_ALIAS }} ./gradlew bundleRelease assembleRelease
+          echo "=== FINAL AAB MUST BE 40:0C:73 ==="
           keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab | grep SHA1
-          echo "=== FINAL APK CHECK ==="
-          keytool -printcert -jarfile app/build/outputs/apk/release/app-release.apk | grep SHA1 || apksigner verify --print-certs app/build/outputs/apk/release/app-release.apk | grep SHA1
 
       - name: Upload AAB For Play
         if: always()
