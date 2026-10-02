@@ -25,21 +25,26 @@ jobs:
       - name: Fix minSdk
         run: sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
       - name: Use Permanent Keystore 40:0C:73 from Secrets
+        env:
+          PWD: ${{ secrets.KEYSTONE_PASSWORD }}
         run: |
           mkdir -p android/app
           printf '%s' "${{ secrets.KEYSTONE_B64 }}" | tr -d '\n\r ' | base64 --decode > android/app/release.keystore
           ls -lh android/app/release.keystore
-          keytool -list -v -keystore android/app/release.keystore -storepass "${{ secrets.KEYSTONE_PASSWORD }}" 2>&1 | grep -E "SHA1|Alias"
+          keytool -list -v -keystore android/app/release.keystore -storepass "$PWD" || true
+          keytool -list -v -keystore android/app/release.keystore -storepass "$PWD" 2>&1 | grep -E "SHA1|Alias" || true
       - name: Inject signing Fixed for #
+        env:
+          PWD: ${{ secrets.KEYSTONE_PASSWORD }}
+          ALIAS: ${{ secrets.KEYSTONE_ALIAS }}
         run: |
-          PASS='${{ secrets.KEYSTONE_PASSWORD }}'
-          ESC=$(printf '%s' "$PASS" | sed 's/#/\\#/g')
+          ESC=$(printf '%s' "$PWD" | sed 's/#/\\#/g')
           echo "MYAPP_RELEASE_STORE_FILE=release.keystore" >> android/gradle.properties
-          echo "MYAPP_RELEASE_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
+          echo "MYAPP_RELEASE_KEY_ALIAS=$ALIAS" >> android/gradle.properties
           echo "MYAPP_RELEASE_STORE_PASSWORD=$ESC" >> android/gradle.properties
           echo "MYAPP_RELEASE_KEY_PASSWORD=$ESC" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_FILE=release.keystore" >> android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=$ALIAS" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=$ESC" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=$ESC" >> android/gradle.properties
       - name: Build AAB + APK
