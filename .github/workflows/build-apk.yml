@@ -50,7 +50,7 @@ jobs:
           echo "=== THIS BUILD SHOULD BE 40 ==="
           keytool -list -v -keystore android/app/release.keystore -alias ${{ secrets.KEYSTONE_ALIAS }} -storepass ${{ secrets.KEYSTONE_PASSWORD }} | grep -E "Alias name|SHA1"
 
-      - name: Inject signing 40 from Secrets
+      - name: Inject signing 40 from Secrets - FIXED FOR 5E
         run: |
           sed -i '/MYAPP_RELEASE/d' android/gradle.properties || true
           sed -i '/MYAPP_UPLOAD/d' android/gradle.properties || true
@@ -62,12 +62,20 @@ jobs:
           echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEYSTONE_ALIAS }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEYSTONE_PASSWORD }}" >> android/gradle.properties
+          # 強制寫死 build.gradle 唔俾佢跌去 debug
+          echo "=== FORCE build.gradle ==="
+          sed -i "s/if (.*MYAPP_RELEASE.*)/if (true)/" android/app/build.gradle || true
+          cat android/app/build.gradle | grep -A5 "signingConfigs" | head -20
 
       - name: Build AAB + APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew bundleRelease assembleRelease
+          ./gradlew bundleRelease assembleRelease --info | grep -E "signing|keystore|lapgo|release" | head -30
+          echo "=== FINAL AAB CHECK ==="
+          keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab | grep SHA1
+          echo "=== FINAL APK CHECK ==="
+          keytool -printcert -jarfile app/build/outputs/apk/release/app-release.apk | grep SHA1 || apksigner verify --print-certs app/build/outputs/apk/release/app-release.apk | grep SHA1
 
       - name: Upload AAB For Play
         if: always()
