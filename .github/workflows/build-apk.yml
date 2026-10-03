@@ -17,6 +17,22 @@ jobs:
       - name: Install deps
         run: npm install
 
+      - name: Force app.json to 36 + v3 BEFORE prebuild
+        run: |
+          node -e "
+          const fs=require('fs');
+          let j=JSON.parse(fs.readFileSync('app.json','utf8'));
+          j.expo=j.expo||{};
+          j.expo.android=j.expo.android||{};
+          j.expo.android.compileSdkVersion=36;
+          j.expo.android.targetSdkVersion=36;
+          j.expo.android.minSdkVersion=24;
+          j.expo.android.versionCode=3;
+          j.expo.version='1.0.2';
+          fs.writeFileSync('app.json', JSON.stringify(j,null,2));
+          console.log('patched to 36 v3');
+          "
+
       - name: Generate tracks if script exists
         run: |
           mkdir -p assets/tracks
@@ -37,7 +53,7 @@ jobs:
       - name: Expo prebuild
         run: npx expo prebuild --clean
 
-      - name: Fix minSdk 23->24 + Target 34->36 + versionCode 1->2
+      - name: Fix minSdk 23->24 + Target 34->36 + versionCode 1/2->3
         run: |
           sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
           sed -i 's/targetSdkVersion 34/targetSdkVersion 36/g' android/app/build.gradle || true
@@ -46,8 +62,10 @@ jobs:
           sed -i 's/compileSdk 34/compileSdk 36/g' android/app/build.gradle || true
           sed -i 's/compileSdkVersion = 34/compileSdkVersion = 36/g' android/build.gradle || true
           sed -i 's/targetSdkVersion = 34/targetSdkVersion = 36/g' android/build.gradle || true
-          sed -i 's/versionCode 1/versionCode 2/g' android/app/build.gradle || true
-          sed -i 's/versionName "1.0.0"/versionName "1.0.1"/g' android/app/build.gradle || true
+          sed -i 's/versionCode 1/versionCode 3/g' android/app/build.gradle || true
+          sed -i 's/versionCode 2/versionCode 3/g' android/app/build.gradle || true
+          sed -i 's/versionName "1.0.0"/versionName "1.0.2"/g' android/app/build.gradle || true
+          sed -i 's/versionName "1.0.1"/versionName "1.0.2"/g' android/app/build.gradle || true
           echo "=== CHECK ==="
           grep -E "versionCode|versionName|targetSdk|compileSdk|minSdk" android/app/build.gradle | head -15
 
@@ -104,19 +122,19 @@ jobs:
           python3 /tmp/fix.py
           chmod +x gradlew
           KS_PASS=${{ secrets.KEYSTONE_PASSWORD }} KS_ALIAS=${{ secrets.KEYSTONE_ALIAS }} ./gradlew bundleRelease assembleRelease
-          echo "=== FINAL MUST BE 40:0C:73 / v2 / 36 ==="
+          echo "=== FINAL MUST BE 40:0C:73 / v3 / 36 ==="
           keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab | grep SHA1
 
       - name: Upload AAB For Play
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lapgo-63tracks-AAB-40-0C-73-v2-for-play
+          name: lapgo-63tracks-AAB-40-0C-73-v3-36-for-play
           path: android/app/build/outputs/bundle/release/app-release.aab
 
       - name: Upload APK For Test
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: lapgo-63tracks-APK-40-0C-73-v2-for-test
+          name: lapgo-63tracks-APK-40-0C-73-v3-36-for-test
           path: android/app/build/outputs/apk/release/app-release.apk
