@@ -125,16 +125,10 @@ jobs:
           echo "=== FINAL MUST BE 40:0C:73 / v3 / 36 ==="
           keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab | grep SHA1
 
-      - name: Upload AAB For Play
+      - name: Create Release - No storage quota
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: softprops/action-gh-release@v2
         with:
-          name: lapgo-63tracks-AAB-40-0C-73-v3-36-for-play
-          path: android/app/build/outputs/bundle/release/app-release.aab
-
-      - name: Upload APK For Test
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lapgo-63tracks-APK-40-0C-73-v3-36-for-test
-          path: android/app/build/outputs/apk/release/app-release.apk
+          tag_name: v3-36-40-0C-73-${{ github.run_number }}
+          files: android/app/build/outputs/bundle/release/app-release.aab
+          name: lapgo-v3-36-40-0C-73-for-play
