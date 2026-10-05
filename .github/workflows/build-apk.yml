@@ -19,7 +19,7 @@ jobs:
       - name: Install deps
         run: npm install
 
-      - name: Force app.json to 36 + v3 BEFORE prebuild
+      - name: Force app.json to 36 + v4 BEFORE prebuild
         run: |
           node -e "
           const fs=require('fs');
@@ -29,10 +29,10 @@ jobs:
           j.expo.android.compileSdkVersion=36;
           j.expo.android.targetSdkVersion=36;
           j.expo.android.minSdkVersion=24;
-          j.expo.android.versionCode=3;
-          j.expo.version='1.0.2';
+          j.expo.android.versionCode=4;
+          j.expo.version='1.0.3';
           fs.writeFileSync('app.json', JSON.stringify(j,null,2));
-          console.log('patched to 36 v3');
+          console.log('patched to 36 v4');
           "
 
       - name: Generate tracks if script exists
@@ -55,21 +55,15 @@ jobs:
       - name: Expo prebuild
         run: npx expo prebuild --clean
 
-      - name: Fix minSdk 23->24 + Target 34->36 + versionCode 1/2->3
+      - name: FORCE Fix API 36 - brute force all gradle
         run: |
-          sed -i 's/minSdkVersion 23/minSdkVersion 24/g' android/app/build.gradle || true
-          sed -i 's/targetSdkVersion 34/targetSdkVersion 36/g' android/app/build.gradle || true
-          sed -i 's/targetSdk 34/targetSdk 36/g' android/app/build.gradle || true
-          sed -i 's/compileSdkVersion 34/compileSdkVersion 36/g' android/app/build.gradle || true
-          sed -i 's/compileSdk 34/compileSdk 36/g' android/app/build.gradle || true
-          sed -i 's/compileSdkVersion = 34/compileSdkVersion = 36/g' android/build.gradle || true
-          sed -i 's/targetSdkVersion = 34/targetSdkVersion = 36/g' android/build.gradle || true
-          sed -i 's/versionCode 1/versionCode 3/g' android/app/build.gradle || true
-          sed -i 's/versionCode 2/versionCode 3/g' android/app/build.gradle || true
-          sed -i 's/versionName "1.0.0"/versionName "1.0.2"/g' android/app/build.gradle || true
-          sed -i 's/versionName "1.0.1"/versionName "1.0.2"/g' android/app/build.gradle || true
-          echo "=== CHECK ==="
-          grep -E "versionCode|versionName|targetSdk|compileSdk|minSdk" android/app/build.gradle | head -15
+          echo "=== BEFORE ==="
+          grep -R "targetSdk\|compileSdk" android --include="*.gradle" | head -20 || true
+          find android -type f -name "*.gradle" -exec sed -i 's/targetSdkVersion 34/targetSdkVersion 36/g; s/targetSdk 34/targetSdk 36/g; s/compileSdkVersion 34/compileSdkVersion 36/g; s/compileSdk 34/compileSdk 36/g; s/targetSdkVersion = 34/targetSdkVersion = 36/g; s/compileSdkVersion = 34/compileSdkVersion = 36/g' {} \;
+          sed -i 's/versionCode 1/versionCode 4/g; s/versionCode 2/versionCode 4/g; s/versionCode 3/versionCode 4/g' android/app/build.gradle || true
+          sed -i 's/versionName "1.0.0"/versionName "1.0.3"/g; s/versionName "1.0.1"/versionName "1.0.3"/g; s/versionName "1.0.2"/versionName "1.0.3"/g' android/app/build.gradle || true
+          echo "=== AFTER MUST BE 36 ==="
+          grep -R "targetSdk\|compileSdk\|versionCode" android/app/build.gradle | head -20
 
       - name: Use Permanent Keystore 40:0C:73 lapgo
         run: |
@@ -124,15 +118,15 @@ jobs:
           python3 /tmp/fix.py
           chmod +x gradlew
           KS_PASS=${{ secrets.KEYSTONE_PASSWORD }} KS_ALIAS=${{ secrets.KEYSTONE_ALIAS }} ./gradlew bundleRelease assembleRelease
-          echo "=== FINAL MUST BE 40:0C:73 / v3 / 36 ==="
+          echo "=== FINAL MUST BE 40:0C:73 / v4 / 36 ==="
           keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab | grep SHA1
 
-      - name: Upload AAB+APK to Release (0MB storage - 不計500MB)
+      - name: Upload AAB+APK to Release - 0MB 不計500MB
         if: always()
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: lapgo-v3-36-${{ github.run_number }}
-          name: lapgo 63tracks v3 API36 #${{ github.run_number }}
+          tag_name: lapgo-v4-api36-${{ github.run_number }}
+          name: lapgo 63tracks v4 API36 #${{ github.run_number }}
           files: |
             android/app/build/outputs/bundle/release/app-release.aab
             android/app/build/outputs/apk/release/app-release.apk
