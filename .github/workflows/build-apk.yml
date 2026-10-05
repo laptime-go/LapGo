@@ -16,7 +16,7 @@ jobs:
       - name: Install deps
         run: npm install
 
-      - name: Force app.json to 36 + v6 BEFORE prebuild
+      - name: Force app.json to 36 + v7 BEFORE prebuild
         run: |
           node -e "
           const fs=require('fs');
@@ -26,10 +26,10 @@ jobs:
           j.expo.android.compileSdkVersion=36;
           j.expo.android.targetSdkVersion=36;
           j.expo.android.minSdkVersion=24;
-          j.expo.android.versionCode=6;
-          j.expo.version='1.0.5';
+          j.expo.android.versionCode=7;
+          j.expo.version='1.0.6';
           fs.writeFileSync('app.json', JSON.stringify(j,null,2));
-          console.log('patched to 36 v6');
+          console.log('patched to 36 v7');
           "
 
       - name: Generate tracks if script exists
@@ -56,7 +56,6 @@ jobs:
         run: |
           python3 - << 'PY'
           import pathlib, re
-          # 1. 改 android/build.gradle ext
           bg_path = pathlib.Path("android/build.gradle")
           bg = bg_path.read_text()
           bg = re.sub(r'compileSdkVersion\s*=\s*\d+', 'compileSdkVersion = 36', bg)
@@ -64,7 +63,6 @@ jobs:
           bg = re.sub(r'minSdkVersion\s*=\s*\d+', 'minSdkVersion = 24', bg)
           bg_path.write_text(bg)
           
-          # 2. 改 app/build.gradle 將 rootProject.ext 硬改成數字 36
           for p in pathlib.Path("android").rglob("*.gradle"):
               t = p.read_text()
               t = t.replace('rootProject.ext.compileSdkVersion', '36')
@@ -80,12 +78,12 @@ jobs:
           
           ap = pathlib.Path("android/app/build.gradle")
           s = ap.read_text()
-          s = re.sub(r'versionCode \d+', 'versionCode 6', s)
-          s = re.sub(r'versionName ".*?"', 'versionName "1.0.5"', s)
+          s = re.sub(r'versionCode \d+', 'versionCode 7', s)
+          s = re.sub(r'versionName ".*?"', 'versionName "1.0.6"', s)
           ap.write_text(s)
-          print("forced all to 36 and v6")
+          print("forced all to 36 and v7")
           PY
-          echo "=== AFTER MUST BE 36 v6 ==="
+          echo "=== AFTER MUST BE 36 v7 ==="
           grep -R "targetSdk\|compileSdk\|versionCode\|rootProject.ext" android/build.gradle android/app/build.gradle | head -40
 
       - name: Use Permanent Keystore 40:0C:73 lapgo
@@ -141,15 +139,15 @@ jobs:
           python3 /tmp/fix.py
           chmod +x gradlew
           KS_PASS=${{ secrets.KEYSTONE_PASSWORD }} KS_ALIAS=${{ secrets.KEYSTONE_ALIAS }} ./gradlew bundleRelease assembleRelease --no-daemon
-          echo "=== FINAL MUST BE 40:0C:73 / v6 / 36 ==="
+          echo "=== FINAL MUST BE 40:0C:73 / v7 / 36 ==="
           keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab | grep SHA1
 
       - name: Upload AAB+APK to Release - 0MB 不計500MB
         if: always()
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: lapgo-v6-api36-${{ github.run_number }}
-          name: lapgo 63tracks v6 API36 #${{ github.run_number }}
+          tag_name: lapgo-v7-api36-${{ github.run_number }}
+          name: lapgo 63tracks v7 API36 #${{ github.run_number }}
           files: |
             android/app/build/outputs/bundle/release/app-release.aab
             android/app/build/outputs/apk/release/app-release.apk
